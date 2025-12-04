@@ -5,6 +5,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 
+import testimonialMichael from "@/assets/testimonial-michael.jpg";
+import testimonialDavid from "@/assets/testimonial-david.jpg";
+import testimonialJames from "@/assets/testimonial-james.jpg";
+import testimonialRobert from "@/assets/testimonial-robert.jpg";
+import testimonialSteven from "@/assets/testimonial-steven.jpg";
+
 interface Testimonial {
   id: number;
   name: string;
@@ -23,7 +29,7 @@ const testimonials: Testimonial[] = [
     location: "Austin, TX",
     quote: "At 47, I thought my best years were behind me. Fortivus proved me wrong. The AI body analysis gave me the roadmap I needed, and the personalized training plans fit perfectly into my busy schedule.",
     achievement: "Lost 35 lbs in 6 months",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+    avatar: testimonialMichael,
   },
   {
     id: 2,
@@ -32,7 +38,7 @@ const testimonials: Testimonial[] = [
     location: "Chicago, IL",
     quote: "The progress photo tracking kept me accountable when motivation was low. Seeing my transformation week by week was incredibly powerful. This program understands what men over 40 actually need.",
     achievement: "Gained 12 lbs muscle, dropped 8% body fat",
-    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+    avatar: testimonialDavid,
   },
   {
     id: 3,
@@ -41,7 +47,7 @@ const testimonials: Testimonial[] = [
     location: "Denver, CO",
     quote: "I tried countless programs before Fortivus. The difference is the science-backed approach and the community of like-minded men. The supplement recommendations alone saved me hundreds in wasted products.",
     achievement: "Bench press increased 85 lbs",
-    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
+    avatar: testimonialJames,
   },
   {
     id: 4,
@@ -50,7 +56,7 @@ const testimonials: Testimonial[] = [
     location: "Seattle, WA",
     quote: "The Elite membership was the best investment in myself. The AI analysis showed me exactly where I was holding excess fat and the build plan targeted those areas specifically. Incredible results.",
     achievement: "Went from 28% to 15% body fat",
-    avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop&crop=face",
+    avatar: testimonialRobert,
   },
   {
     id: 5,
@@ -59,7 +65,7 @@ const testimonials: Testimonial[] = [
     location: "Miami, FL",
     quote: "At 55, I have more energy than I did at 35. The workout programs are designed for real life - efficient, effective, and actually sustainable. My doctor was amazed at my recent bloodwork.",
     achievement: "Reversed pre-diabetic markers",
-    avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&h=150&fit=crop&crop=face",
+    avatar: testimonialSteven,
   },
 ];
 
