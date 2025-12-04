@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, LogOut, Settings, Camera, Trophy } from "lucide-react";
+import { Menu, X, LogOut, Settings, Camera, Trophy, Users } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 const Navbar = () => {
@@ -14,7 +14,7 @@ const Navbar = () => {
     { name: "About", href: "/about", isPage: true },
     { name: "Forum", href: "/forum", isPage: true },
     { name: "Check-in", href: "/checkin", isPage: true },
-    { name: "Achievements", href: "/achievements", isPage: true },
+    { name: "Community", href: "/community", isPage: true },
     { name: "Supplements", href: "#supplements" },
     { name: "Gear", href: "#gear" },
     { name: "Pricing", href: "#pricing" },
