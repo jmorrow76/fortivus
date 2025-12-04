@@ -11,6 +11,7 @@ import Profile from "./pages/Profile";
 import Progress from "./pages/Progress";
 import PersonalPlan from "./pages/PersonalPlan";
 import Forum from "./pages/Forum";
+import DailyCheckin from "./pages/DailyCheckin";
 import SubscriptionSuccess from "./pages/SubscriptionSuccess";
 import NotFound from "./pages/NotFound";
 
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/progress" element={<Progress />} />
             <Route path="/personal-plan" element={<PersonalPlan />} />
             <Route path="/forum" element={<Forum />} />
+            <Route path="/checkin" element={<DailyCheckin />} />
             <Route path="/subscription-success" element={<SubscriptionSuccess />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

@@ -129,6 +129,45 @@ export type Database = {
           },
         ]
       }
+      mood_checkins: {
+        Row: {
+          check_in_date: string
+          created_at: string
+          energy_level: number
+          id: string
+          mood_level: number
+          notes: string | null
+          sleep_quality: number | null
+          stress_level: number
+          user_id: string
+          workout_recommendation: Json | null
+        }
+        Insert: {
+          check_in_date?: string
+          created_at?: string
+          energy_level: number
+          id?: string
+          mood_level: number
+          notes?: string | null
+          sleep_quality?: number | null
+          stress_level: number
+          user_id: string
+          workout_recommendation?: Json | null
+        }
+        Update: {
+          check_in_date?: string
+          created_at?: string
+          energy_level?: number
+          id?: string
+          mood_level?: number
+          notes?: string | null
+          sleep_quality?: number | null
+          stress_level?: number
+          user_id?: string
+          workout_recommendation?: Json | null
+        }
+        Relationships: []
+      }
       personal_plans: {
         Row: {
           created_at: string
