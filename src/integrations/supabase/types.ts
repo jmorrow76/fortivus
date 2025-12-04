@@ -142,6 +142,7 @@ export type Database = {
           duration_days: number
           id: string
           is_active: boolean
+          reset_type: string | null
           target_count: number
           title: string
           xp_reward: number
@@ -154,6 +155,7 @@ export type Database = {
           duration_days?: number
           id?: string
           is_active?: boolean
+          reset_type?: string | null
           target_count?: number
           title: string
           xp_reward?: number
@@ -166,6 +168,7 @@ export type Database = {
           duration_days?: number
           id?: string
           is_active?: boolean
+          reset_type?: string | null
           target_count?: number
           title?: string
           xp_reward?: number
@@ -511,6 +514,7 @@ export type Database = {
           id: string
           is_completed: boolean
           progress: number
+          reset_week: string | null
           started_at: string
           user_id: string
         }
@@ -520,6 +524,7 @@ export type Database = {
           id?: string
           is_completed?: boolean
           progress?: number
+          reset_week?: string | null
           started_at?: string
           user_id: string
         }
@@ -529,6 +534,7 @@ export type Database = {
           id?: string
           is_completed?: boolean
           progress?: number
+          reset_week?: string | null
           started_at?: string
           user_id?: string
         }
