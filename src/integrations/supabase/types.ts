@@ -599,6 +599,36 @@ export type Database = {
         }
         Relationships: []
       }
+      workout_logs: {
+        Row: {
+          created_at: string
+          duration_minutes: number
+          id: string
+          notes: string | null
+          user_id: string
+          workout_type: string
+          xp_earned: number
+        }
+        Insert: {
+          created_at?: string
+          duration_minutes?: number
+          id?: string
+          notes?: string | null
+          user_id: string
+          workout_type: string
+          xp_earned?: number
+        }
+        Update: {
+          created_at?: string
+          duration_minutes?: number
+          id?: string
+          notes?: string | null
+          user_id?: string
+          workout_type?: string
+          xp_earned?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       leaderboard_view: {
