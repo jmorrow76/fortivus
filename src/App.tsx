@@ -13,6 +13,7 @@ import PersonalPlan from "./pages/PersonalPlan";
 import Forum from "./pages/Forum";
 import DailyCheckin from "./pages/DailyCheckin";
 import Gamification from "./pages/Gamification";
+import LeaderboardPage from "./pages/LeaderboardPage";
 import SubscriptionSuccess from "./pages/SubscriptionSuccess";
 import NotFound from "./pages/NotFound";
 
@@ -35,6 +36,7 @@ const App = () => (
             <Route path="/forum" element={<Forum />} />
             <Route path="/checkin" element={<DailyCheckin />} />
             <Route path="/achievements" element={<Gamification />} />
+            <Route path="/leaderboard" element={<LeaderboardPage />} />
             <Route path="/subscription-success" element={<SubscriptionSuccess />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
