@@ -31,7 +31,7 @@ const Newsletter = () => {
 
           {/* Content */}
           <h2 className="section-title">
-            Get Weekly <span className="text-accent">Prime Insights</span>
+            The <span className="text-accent">Fortivus</span> Weekly
           </h2>
           <p className="section-description mb-10">
             Join 50,000+ men receiving our weekly newsletter with training tips,
