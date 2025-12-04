@@ -27,8 +27,21 @@ const Index = () => {
         <SuccessStories />
         <Articles />
         <TestimonialCarousel />
-        <Supplements />
-        <Gear />
+        
+        {/* Partner Products Section */}
+        <div className="bg-secondary/20">
+          <div className="container mx-auto px-4 pt-16 md:pt-24">
+            <div className="section-header">
+              <span className="section-label">Curated For You</span>
+              <h2 className="section-title">Partner Products</h2>
+              <p className="section-description">
+                Handpicked supplements and gear from brands we trust, designed specifically for men over 40.
+              </p>
+            </div>
+          </div>
+          <Supplements />
+          <Gear />
+        </div>
         <Pricing />
         <FAQ />
         <Newsletter />
