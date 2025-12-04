@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, LogOut, Settings, Camera } from "lucide-react";
+import { Menu, X, LogOut, Settings, Camera, MessageSquare } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 const Navbar = () => {
@@ -12,12 +12,11 @@ const Navbar = () => {
 
   const navLinks = [
     { name: "About", href: "/about", isPage: true },
+    { name: "Forum", href: "/forum", isPage: true },
     { name: "Supplements", href: "#supplements" },
     { name: "Gear", href: "#gear" },
-    { name: "Articles", href: "#articles" },
     { name: "AI Analysis", href: "#analysis" },
     { name: "Pricing", href: "#pricing" },
-    { name: "FAQ", href: "#faq" },
   ];
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
