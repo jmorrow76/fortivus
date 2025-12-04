@@ -14,7 +14,7 @@ const Newsletter = () => {
     if (email) {
       setIsSubmitted(true);
       toast({
-        title: "Welcome to PrimeFit!",
+        title: "Welcome to Prime Forge!",
         description: "Check your inbox for your first newsletter.",
       });
     }
