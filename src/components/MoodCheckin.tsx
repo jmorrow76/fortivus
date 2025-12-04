@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { useGamification } from "@/hooks/useGamification";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -55,6 +56,7 @@ interface CheckinData {
 const MoodCheckin = () => {
   const { user, session } = useAuth();
   const { toast } = useToast();
+  const { updateStreak, updateChallengeProgress, userChallenges } = useGamification();
 
   const [todayCheckin, setTodayCheckin] = useState<CheckinData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -162,9 +164,31 @@ const MoodCheckin = () => {
         workout_recommendation: data.workout_recommendation as unknown as WorkoutRecommendation | null
       });
 
+      // Update streak and check for challenge progress
+      await updateStreak();
+      
+      // Check for challenge progress based on check-in values
+      for (const uc of userChallenges) {
+        if (uc.is_completed) continue;
+        const challenge = uc.challenge;
+        
+        // Stress Mastery challenge: stress below 3
+        if (challenge.category === 'mental' && stressLevel < 3) {
+          await updateChallengeProgress(challenge.id);
+        }
+        // Energy Excellence challenge: energy 4+
+        if (challenge.category === 'vitality' && energyLevel >= 4) {
+          await updateChallengeProgress(challenge.id);
+        }
+        // Consistency Quest: any check-in counts
+        if (challenge.category === 'consistency') {
+          await updateChallengeProgress(challenge.id);
+        }
+      }
+
       toast({
         title: "Check-in complete!",
-        description: "Your personalized workout is ready.",
+        description: "Your personalized workout is ready. Streak updated!",
       });
     } catch (error: any) {
       toast({

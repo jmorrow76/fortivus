@@ -14,6 +14,89 @@ export type Database = {
   }
   public: {
     Tables: {
+      badges: {
+        Row: {
+          category: Database["public"]["Enums"]["badge_category"]
+          created_at: string
+          description: string
+          icon: string
+          id: string
+          name: string
+          requirement_type: string
+          requirement_value: number
+          xp_value: number
+        }
+        Insert: {
+          category?: Database["public"]["Enums"]["badge_category"]
+          created_at?: string
+          description: string
+          icon?: string
+          id?: string
+          name: string
+          requirement_type: string
+          requirement_value?: number
+          xp_value?: number
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["badge_category"]
+          created_at?: string
+          description?: string
+          icon?: string
+          id?: string
+          name?: string
+          requirement_type?: string
+          requirement_value?: number
+          xp_value?: number
+        }
+        Relationships: []
+      }
+      challenges: {
+        Row: {
+          badge_id: string | null
+          category: string
+          created_at: string
+          description: string
+          duration_days: number
+          id: string
+          is_active: boolean
+          target_count: number
+          title: string
+          xp_reward: number
+        }
+        Insert: {
+          badge_id?: string | null
+          category?: string
+          created_at?: string
+          description: string
+          duration_days?: number
+          id?: string
+          is_active?: boolean
+          target_count?: number
+          title: string
+          xp_reward?: number
+        }
+        Update: {
+          badge_id?: string | null
+          category?: string
+          created_at?: string
+          description?: string
+          duration_days?: number
+          id?: string
+          is_active?: boolean
+          target_count?: number
+          title?: string
+          xp_reward?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "challenges_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "badges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       forum_categories: {
         Row: {
           created_at: string
@@ -276,6 +359,106 @@ export type Database = {
         }
         Relationships: []
       }
+      user_badges: {
+        Row: {
+          badge_id: string
+          earned_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          badge_id: string
+          earned_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          badge_id?: string
+          earned_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_badges_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "badges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_challenges: {
+        Row: {
+          challenge_id: string
+          completed_at: string | null
+          id: string
+          is_completed: boolean
+          progress: number
+          started_at: string
+          user_id: string
+        }
+        Insert: {
+          challenge_id: string
+          completed_at?: string | null
+          id?: string
+          is_completed?: boolean
+          progress?: number
+          started_at?: string
+          user_id: string
+        }
+        Update: {
+          challenge_id?: string
+          completed_at?: string | null
+          id?: string
+          is_completed?: boolean
+          progress?: number
+          started_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_challenges_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_streaks: {
+        Row: {
+          current_streak: number
+          id: string
+          last_checkin_date: string | null
+          longest_streak: number
+          total_checkins: number
+          total_xp: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          current_streak?: number
+          id?: string
+          last_checkin_date?: string | null
+          longest_streak?: number
+          total_checkins?: number
+          total_xp?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          current_streak?: number
+          id?: string
+          last_checkin_date?: string | null
+          longest_streak?: number
+          total_checkins?: number
+          total_xp?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -284,7 +467,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      badge_category: "streak" | "challenge" | "milestone" | "special"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -411,6 +594,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      badge_category: ["streak", "challenge", "milestone", "special"],
+    },
   },
 } as const
