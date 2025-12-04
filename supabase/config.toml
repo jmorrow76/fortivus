@@ -2,3 +2,6 @@ project_id = "olfyvfxtphpkxlcwqqmt"
 
 [functions.analyze-body]
 verify_jwt = false
+
+[functions.generate-stories]
+verify_jwt = false
