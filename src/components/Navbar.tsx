@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, LogOut, User, Settings } from "lucide-react";
+import { Menu, X, LogOut, Settings, Camera } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 const Navbar = () => {
@@ -51,6 +51,12 @@ const Navbar = () => {
             {user ? (
               <>
                 <Button variant="ghost" size="sm" asChild>
+                  <Link to="/progress" className="flex items-center gap-2">
+                    <Camera className="h-4 w-4" />
+                    Progress
+                  </Link>
+                </Button>
+                <Button variant="ghost" size="sm" asChild>
                   <Link to="/profile" className="flex items-center gap-2">
                     <Settings className="h-4 w-4" />
                     Profile
@@ -99,6 +105,12 @@ const Navbar = () => {
               <div className="flex flex-col gap-3 pt-4 border-t border-border mt-2">
                 {user ? (
                   <>
+                    <Button variant="ghost" className="justify-start" asChild>
+                      <Link to="/progress" onClick={() => setIsOpen(false)}>
+                        <Camera className="h-4 w-4 mr-2" />
+                        Progress
+                      </Link>
+                    </Button>
                     <Button variant="ghost" className="justify-start" asChild>
                       <Link to="/profile" onClick={() => setIsOpen(false)}>
                         <Settings className="h-4 w-4 mr-2" />
