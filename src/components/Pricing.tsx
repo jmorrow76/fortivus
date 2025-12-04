@@ -2,7 +2,15 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Check, Sparkles, Zap, Crown, Loader2 } from "lucide-react";
+import { Check, Sparkles, Zap, Crown, Loader2, X } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { useAuth, FORTIVUS_ELITE } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -224,6 +232,73 @@ const Pricing = () => {
               </CardContent>
             </Card>
           ))}
+        </div>
+
+        {/* Feature Comparison Table */}
+        <div className="mt-16 max-w-4xl mx-auto">
+          <h3 className="font-heading text-2xl font-bold text-center mb-8">
+            Feature Comparison
+          </h3>
+          <Card className="overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-secondary/50">
+                  <TableHead className="font-heading font-semibold w-[40%]">Feature</TableHead>
+                  <TableHead className="text-center font-heading font-semibold">Free</TableHead>
+                  <TableHead className="text-center font-heading font-semibold bg-accent/10">
+                    <span className="flex items-center justify-center gap-1">
+                      <Crown className="h-4 w-4 text-accent" />
+                      Elite
+                    </span>
+                  </TableHead>
+                  <TableHead className="text-center font-heading font-semibold">Lifetime</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {[
+                  { feature: "Access to articles", free: true, elite: true, lifetime: true },
+                  { feature: "Basic workout guides", free: true, elite: true, lifetime: true },
+                  { feature: "Community forum", free: true, elite: true, lifetime: true },
+                  { feature: "Weekly newsletter", free: true, elite: true, lifetime: true },
+                  { feature: "AI Body Analysis", free: false, elite: true, lifetime: true },
+                  { feature: "Progress photo tracking", free: false, elite: true, lifetime: true },
+                  { feature: "Personalized training plans", free: false, elite: true, lifetime: true },
+                  { feature: "Premium workout programs", free: false, elite: true, lifetime: true },
+                  { feature: "Exclusive supplement discounts", free: false, elite: true, lifetime: true },
+                  { feature: "Priority support", free: false, elite: true, lifetime: true },
+                  { feature: "Early access to features", free: false, elite: false, lifetime: true },
+                  { feature: "VIP community access", free: false, elite: false, lifetime: true },
+                  { feature: "Annual gear giveaways", free: false, elite: false, lifetime: true },
+                  { feature: "1-on-1 coaching session", free: false, elite: false, lifetime: true },
+                ].map((row) => (
+                  <TableRow key={row.feature}>
+                    <TableCell className="font-medium">{row.feature}</TableCell>
+                    <TableCell className="text-center">
+                      {row.free ? (
+                        <Check className="h-5 w-5 text-green-500 mx-auto" />
+                      ) : (
+                        <X className="h-5 w-5 text-muted-foreground/40 mx-auto" />
+                      )}
+                    </TableCell>
+                    <TableCell className="text-center bg-accent/5">
+                      {row.elite ? (
+                        <Check className="h-5 w-5 text-green-500 mx-auto" />
+                      ) : (
+                        <X className="h-5 w-5 text-muted-foreground/40 mx-auto" />
+                      )}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {row.lifetime ? (
+                        <Check className="h-5 w-5 text-green-500 mx-auto" />
+                      ) : (
+                        <X className="h-5 w-5 text-muted-foreground/40 mx-auto" />
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Card>
         </div>
 
         {/* Guarantee */}
