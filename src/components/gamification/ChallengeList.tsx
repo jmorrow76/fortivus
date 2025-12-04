@@ -1,4 +1,4 @@
-import { Target, Clock, Zap, CheckCircle } from 'lucide-react';
+import { Target, Clock, Zap, CheckCircle, RefreshCw } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -12,6 +12,7 @@ interface Challenge {
   duration_days: number;
   target_count: number;
   xp_reward: number;
+  reset_type?: string;
 }
 
 interface UserChallenge {
@@ -35,6 +36,9 @@ const categoryColors: Record<string, string> = {
   vitality: 'bg-yellow-500/20 text-yellow-400',
   consistency: 'bg-red-500/20 text-red-400',
   strength: 'bg-rose-500/20 text-rose-400',
+  workout: 'bg-indigo-500/20 text-indigo-400',
+  cardio: 'bg-cyan-500/20 text-cyan-400',
+  general: 'bg-slate-500/20 text-slate-400',
 };
 
 export function ChallengeList({ challenges, userChallenges, onJoinChallenge }: ChallengeListProps) {
@@ -72,6 +76,12 @@ export function ChallengeList({ challenges, userChallenges, onJoinChallenge }: C
                     )}>
                       {challenge.category}
                     </span>
+                    {challenge.reset_type === 'weekly' && (
+                      <span className="px-2 py-0.5 rounded text-xs uppercase tracking-wider bg-primary/20 text-primary flex items-center gap-1">
+                        <RefreshCw className="h-3 w-3" />
+                        Weekly
+                      </span>
+                    )}
                     {isCompleted && (
                       <CheckCircle className="h-4 w-4 text-green-500" />
                     )}
