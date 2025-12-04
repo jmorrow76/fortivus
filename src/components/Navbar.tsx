@@ -29,7 +29,7 @@ const Navbar = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
             <span className="font-heading text-xl md:text-2xl font-bold tracking-tight text-foreground">
-              Prime<span className="text-accent">Forge</span>
+              Fortivus
             </span>
           </Link>
 
