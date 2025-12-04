@@ -1,4 +1,5 @@
 import { Instagram, Youtube, Twitter, Linkedin } from "lucide-react";
+import fortivusLogo from "@/assets/fortivus-logo.png";
 
 const footerLinks = {
   Programs: ["Foundation Builder", "Prime Strength", "Metabolic Reset", "Custom Plans"],
@@ -22,6 +23,7 @@ const Footer = () => {
           {/* Brand */}
           <div className="col-span-2">
             <a href="/" className="flex items-center gap-2 mb-6">
+              <img src={fortivusLogo} alt="Fortivus" className="h-8 w-8" />
               <span className="font-heading text-xl font-bold tracking-tight">
                 Fortivus
               </span>
