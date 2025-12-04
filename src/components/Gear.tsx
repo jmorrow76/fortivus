@@ -84,18 +84,11 @@ const Gear = () => {
   };
 
   return (
-    <section id="gear" className="section-padding bg-background">
+    <section id="gear" className="py-12 md:py-16">
       <div className="container mx-auto px-4">
-        {/* Section Header */}
-        <div className="section-header">
-          <span className="section-label">Official Partners</span>
-          <h2 className="section-title">
-            Premium <span className="text-accent">Partner Brands</span>
-          </h2>
-          <p className="section-description">
-            Exclusively partnered with the brands we wear and trust. Quality gear 
-            that performs as hard as you do.
-          </p>
+        {/* Subsection Header */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-10">
+          <h3 className="text-xl md:text-2xl font-medium">Apparel & Gear</h3>
         </div>
 
         {/* Partner Brand Cards */}
