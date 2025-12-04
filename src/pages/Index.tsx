@@ -8,6 +8,7 @@ import BodyAnalysis from "@/components/BodyAnalysis";
 import SuccessStories from "@/components/SuccessStories";
 import Gear from "@/components/Gear";
 import Articles from "@/components/Articles";
+import TestimonialCarousel from "@/components/TestimonialCarousel";
 import Pricing from "@/components/Pricing";
 import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
@@ -26,6 +27,7 @@ const Index = () => {
         <SuccessStories />
         <Gear />
         <Articles />
+        <TestimonialCarousel />
         <Pricing />
         <Newsletter />
       </main>
