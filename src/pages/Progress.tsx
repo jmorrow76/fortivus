@@ -9,8 +9,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Plus, Loader2, Trash2, Calendar, Scale } from "lucide-react";
+import { ArrowLeft, Plus, Loader2, Trash2, Calendar, Scale, LayoutGrid, Columns } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Navbar from "@/components/Navbar";
+import PhotoComparison from "@/components/PhotoComparison";
 import { format } from "date-fns";
 
 interface ProgressPhoto {
@@ -271,49 +273,68 @@ const Progress = () => {
               </CardContent>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {photos.map((photo) => (
-                <Card key={photo.id} className="shadow-card overflow-hidden group">
-                  <div className="aspect-[3/4] relative">
-                    <img
-                      src={photo.photo_url}
-                      alt={`Progress photo from ${photo.photo_date}`}
-                      className="w-full h-full object-cover"
-                    />
-                    <Button
-                      variant="destructive"
-                      size="icon"
-                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                      onClick={() => handleDelete(photo)}
-                      disabled={deleting === photo.id}
-                    >
-                      {deleting === photo.id ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Trash2 className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </div>
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
-                      <span className="flex items-center gap-1">
-                        <Calendar className="h-4 w-4" />
-                        {format(new Date(photo.photo_date), "MMM d, yyyy")}
-                      </span>
-                      {photo.weight && (
-                        <span className="flex items-center gap-1">
-                          <Scale className="h-4 w-4" />
-                          {photo.weight} lbs
-                        </span>
-                      )}
-                    </div>
-                    {photo.notes && (
-                      <p className="text-sm text-foreground line-clamp-2">{photo.notes}</p>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <Tabs defaultValue="grid" className="w-full">
+              <TabsList className="mb-6">
+                <TabsTrigger value="grid" className="gap-2">
+                  <LayoutGrid className="h-4 w-4" />
+                  Gallery
+                </TabsTrigger>
+                <TabsTrigger value="compare" className="gap-2">
+                  <Columns className="h-4 w-4" />
+                  Compare
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="grid">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {photos.map((photo) => (
+                    <Card key={photo.id} className="shadow-card overflow-hidden group">
+                      <div className="aspect-[3/4] relative">
+                        <img
+                          src={photo.photo_url}
+                          alt={`Progress photo from ${photo.photo_date}`}
+                          className="w-full h-full object-cover"
+                        />
+                        <Button
+                          variant="destructive"
+                          size="icon"
+                          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => handleDelete(photo)}
+                          disabled={deleting === photo.id}
+                        >
+                          {deleting === photo.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
+                          <span className="flex items-center gap-1">
+                            <Calendar className="h-4 w-4" />
+                            {format(new Date(photo.photo_date), "MMM d, yyyy")}
+                          </span>
+                          {photo.weight && (
+                            <span className="flex items-center gap-1">
+                              <Scale className="h-4 w-4" />
+                              {photo.weight} lbs
+                            </span>
+                          )}
+                        </div>
+                        {photo.notes && (
+                          <p className="text-sm text-foreground line-clamp-2">{photo.notes}</p>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="compare">
+                <PhotoComparison photos={photos} />
+              </TabsContent>
+            </Tabs>
           )}
         </div>
       </main>
