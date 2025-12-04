@@ -1,18 +1,20 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth, FORTIVUS_ELITE } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Camera, Loader2, User } from "lucide-react";
+import { ArrowLeft, Camera, Loader2, User, Crown } from "lucide-react";
 import Navbar from "@/components/Navbar";
 
 const Profile = () => {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, subscription } = useAuth();
+  const isElite = subscription.subscribed && subscription.productId === FORTIVUS_ELITE.product_id;
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -149,10 +151,20 @@ const Profile = () => {
 
           <Card className="shadow-card">
             <CardHeader>
-              <CardTitle className="font-heading text-2xl">Profile Settings</CardTitle>
-              <CardDescription>
-                Manage your profile information and avatar
-              </CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="font-heading text-2xl">Profile Settings</CardTitle>
+                  <CardDescription>
+                    Manage your profile information and avatar
+                  </CardDescription>
+                </div>
+                {isElite && (
+                  <Badge className="bg-accent text-accent-foreground font-semibold px-3 py-1.5 flex items-center gap-1.5">
+                    <Crown className="h-4 w-4" />
+                    Elite Member
+                  </Badge>
+                )}
+              </div>
             </CardHeader>
             <CardContent className="space-y-8">
               {/* Avatar Section */}
