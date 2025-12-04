@@ -3,9 +3,12 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import MoodCheckin from "@/components/MoodCheckin";
+import { TrendsDashboard } from "@/components/TrendsDashboard";
+import { useAuth } from "@/hooks/useAuth";
 
 const DailyCheckin = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   return (
     <div className="min-h-screen bg-background">
@@ -27,7 +30,11 @@ const DailyCheckin = () => {
             </p>
           </div>
 
-          <MoodCheckin />
+          <div className="space-y-8">
+            <MoodCheckin />
+            
+            {user && <TrendsDashboard />}
+          </div>
         </div>
       </main>
     </div>
