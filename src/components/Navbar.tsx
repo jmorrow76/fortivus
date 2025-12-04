@@ -1,9 +1,12 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogOut, User } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { user, signOut } = useAuth();
 
   const navLinks = [
     { name: "Programs", href: "#programs" },
@@ -14,16 +17,21 @@ const Navbar = () => {
     { name: "Pricing", href: "#pricing" },
   ];
 
+  const handleSignOut = async () => {
+    await signOut();
+    setIsOpen(false);
+  };
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <a href="/" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
             <span className="font-heading text-xl md:text-2xl font-bold tracking-tight text-foreground">
               Prime<span className="text-accent">Fit</span>
             </span>
-          </a>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-8">
@@ -40,12 +48,27 @@ const Navbar = () => {
 
           {/* Desktop CTA */}
           <div className="hidden lg:flex items-center gap-3">
-            <Button variant="ghost" size="sm">
-              Sign In
-            </Button>
-            <Button variant="default" size="sm">
-              Get Started
-            </Button>
+            {user ? (
+              <>
+                <span className="text-sm text-muted-foreground flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  {user.email}
+                </span>
+                <Button variant="ghost" size="sm" onClick={handleSignOut}>
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sign Out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link to="/auth">Sign In</Link>
+                </Button>
+                <Button variant="default" size="sm" asChild>
+                  <Link to="/auth">Get Started</Link>
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -72,10 +95,27 @@ const Navbar = () => {
                 </a>
               ))}
               <div className="flex flex-col gap-3 pt-4 border-t border-border mt-2">
-                <Button variant="ghost" className="justify-start">
-                  Sign In
-                </Button>
-                <Button variant="default">Get Started</Button>
+                {user ? (
+                  <>
+                    <span className="text-sm text-muted-foreground flex items-center gap-2 py-2">
+                      <User className="h-4 w-4" />
+                      {user.email}
+                    </span>
+                    <Button variant="ghost" className="justify-start" onClick={handleSignOut}>
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Sign Out
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button variant="ghost" className="justify-start" asChild>
+                      <Link to="/auth" onClick={() => setIsOpen(false)}>Sign In</Link>
+                    </Button>
+                    <Button variant="default" asChild>
+                      <Link to="/auth" onClick={() => setIsOpen(false)}>Get Started</Link>
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </div>
