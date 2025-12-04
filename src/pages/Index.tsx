@@ -9,7 +9,6 @@ import SuccessStories from "@/components/SuccessStories";
 
 import Gear from "@/components/Gear";
 import Articles from "@/components/Articles";
-import TestimonialCarousel from "@/components/TestimonialCarousel";
 import Pricing from "@/components/Pricing";
 import FAQ from "@/components/FAQ";
 import Newsletter from "@/components/Newsletter";
@@ -28,7 +27,6 @@ const Index = () => {
         <FAQ />
         <SuccessStories />
         <Articles />
-        <TestimonialCarousel />
         
         {/* Partner Products Section */}
         <div className="bg-secondary/20">
