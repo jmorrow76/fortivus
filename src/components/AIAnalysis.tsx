@@ -62,7 +62,7 @@ const AIAnalysis = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button variant="gold" size="lg" className="group">
+              <Button variant="default" size="lg" className="group">
                 Try AI Analysis Free
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Button>

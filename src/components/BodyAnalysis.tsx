@@ -172,7 +172,7 @@ const BodyAnalysis = () => {
                   onClick={analyzeImage}
                   disabled={!selectedImage || isAnalyzing}
                   className="flex-1"
-                  variant="gold"
+                  variant="default"
                 >
                   {isAnalyzing ? (
                     <>

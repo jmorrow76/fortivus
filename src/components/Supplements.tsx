@@ -148,11 +148,11 @@ const Supplements = () => {
 
                 {/* Price & CTA */}
                 <div className="flex items-center justify-between pt-4 border-t border-border">
-                  <span className="font-heading text-lg font-bold text-accent">
+                  <span className="text-lg font-medium text-foreground">
                     {supplement.price}
                   </span>
                   <Button 
-                    variant="gold" 
+                    variant="default" 
                     size="sm"
                     onClick={() => handleShopClick(supplement.affiliateUrl)}
                   >

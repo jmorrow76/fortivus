@@ -1,38 +1,16 @@
 import { useEffect, useState, useRef } from "react";
-import { Users, Dumbbell, TrendingUp, Award } from "lucide-react";
 
 interface Stat {
   label: string;
   value: number;
   suffix: string;
-  icon: React.ReactNode;
 }
 
 const stats: Stat[] = [
-  {
-    label: "Active Members",
-    value: 2500,
-    suffix: "+",
-    icon: <Users className="h-6 w-6" />,
-  },
-  {
-    label: "Workouts Completed",
-    value: 50000,
-    suffix: "+",
-    icon: <Dumbbell className="h-6 w-6" />,
-  },
-  {
-    label: "Lbs Lost Combined",
-    value: 15000,
-    suffix: "+",
-    icon: <TrendingUp className="h-6 w-6" />,
-  },
-  {
-    label: "Transformations",
-    value: 850,
-    suffix: "+",
-    icon: <Award className="h-6 w-6" />,
-  },
+  { label: "Active Members", value: 2500, suffix: "+" },
+  { label: "Workouts Completed", value: 50000, suffix: "+" },
+  { label: "Lbs Lost Combined", value: 15000, suffix: "+" },
+  { label: "Transformations", value: 850, suffix: "+" },
 ];
 
 const useCountUp = (end: number, duration: number = 2000, shouldStart: boolean) => {
@@ -47,8 +25,6 @@ const useCountUp = (end: number, duration: number = 2000, shouldStart: boolean) 
     const animate = (timestamp: number) => {
       if (!startTime) startTime = timestamp;
       const progress = Math.min((timestamp - startTime) / duration, 1);
-      
-      // Easing function for smooth animation
       const easeOutQuart = 1 - Math.pow(1 - progress, 4);
       setCount(Math.floor(easeOutQuart * end));
 
@@ -58,7 +34,6 @@ const useCountUp = (end: number, duration: number = 2000, shouldStart: boolean) 
     };
 
     animationFrame = requestAnimationFrame(animate);
-
     return () => cancelAnimationFrame(animationFrame);
   }, [end, duration, shouldStart]);
 
@@ -73,15 +48,11 @@ const StatItem = ({ stat, isVisible }: { stat: Stat; isVisible: boolean }) => {
   };
 
   return (
-    <div className="flex flex-col items-center text-center p-6 group">
-      <div className="w-14 h-14 rounded-full bg-accent/10 flex items-center justify-center mb-4 text-accent group-hover:bg-accent group-hover:text-accent-foreground transition-all duration-300">
-        {stat.icon}
+    <div className="flex flex-col items-center text-center py-8">
+      <div className="text-4xl md:text-5xl font-medium text-foreground mb-3 tracking-tight">
+        {formatNumber(count)}{stat.suffix}
       </div>
-      <div className="font-heading text-4xl md:text-5xl font-bold text-foreground mb-2">
-        {formatNumber(count)}
-        <span className="text-accent">{stat.suffix}</span>
-      </div>
-      <p className="text-muted-foreground text-sm uppercase tracking-wider">
+      <p className="text-xs text-muted-foreground uppercase tracking-[0.2em]">
         {stat.label}
       </p>
     </div>
@@ -111,9 +82,9 @@ const StatsCounter = () => {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-16 bg-secondary/30">
+    <section ref={sectionRef} className="py-20 bg-secondary border-y border-border">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {stats.map((stat) => (
             <StatItem key={stat.label} stat={stat} isVisible={isVisible} />
           ))}

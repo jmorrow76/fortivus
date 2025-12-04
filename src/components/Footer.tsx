@@ -17,26 +17,26 @@ const socialLinks = [
 const Footer = () => {
   return (
     <footer className="bg-foreground text-background">
-      <div className="container mx-auto px-4 py-16">
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-8 mb-12">
+      <div className="container mx-auto px-4 py-20">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-8 mb-16">
           {/* Brand */}
           <div className="col-span-2">
-            <a href="/" className="inline-block mb-6">
-              <span className="text-xl font-medium tracking-[0.2em] uppercase">
+            <a href="/" className="inline-block mb-8">
+              <span className="text-lg font-medium tracking-[0.25em] uppercase">
                 Fortivus
               </span>
             </a>
-            <p className="text-background/70 text-sm mb-6 max-w-xs leading-relaxed">
+            <p className="text-background/60 text-sm mb-8 max-w-xs leading-relaxed">
               The premier fitness platform for men over 40. Transform your body,
               optimize your health, and live your best years.
             </p>
-            <div className="flex gap-3">
+            <div className="flex gap-4">
               {socialLinks.map((social) => (
                 <a
                   key={social.label}
                   href={social.href}
                   aria-label={social.label}
-                  className="w-9 h-9 rounded-md bg-background/10 flex items-center justify-center text-background/70 hover:text-background hover:bg-background/20 transition-colors"
+                  className="w-10 h-10 border border-background/20 flex items-center justify-center text-background/60 hover:text-background hover:border-background/40 transition-colors"
                 >
                   <social.icon className="w-4 h-4" />
                 </a>
@@ -47,13 +47,13 @@ const Footer = () => {
           {/* Links */}
           {Object.entries(footerLinks).map(([category, links]) => (
             <div key={category}>
-              <h3 className="font-semibold mb-4 text-sm">{category}</h3>
-              <ul className="space-y-2">
+              <h3 className="text-xs font-medium tracking-[0.15em] uppercase mb-6">{category}</h3>
+              <ul className="space-y-3">
                 {links.map((link) => (
                   <li key={link}>
                     <a
                       href="#"
-                      className="text-sm text-background/60 hover:text-background transition-colors"
+                      className="text-sm text-background/50 hover:text-background transition-colors"
                     >
                       {link}
                     </a>
@@ -66,10 +66,10 @@ const Footer = () => {
 
         {/* Bottom */}
         <div className="pt-8 border-t border-background/10 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-background/60">
+          <p className="text-xs text-background/50 tracking-wide">
             © {new Date().getFullYear()} Fortivus. All rights reserved.
           </p>
-          <p className="text-xs text-background/50">
+          <p className="text-xs text-background/40">
             Affiliate Disclosure: We may earn commissions from qualifying purchases.
           </p>
         </div>

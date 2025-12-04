@@ -112,7 +112,7 @@ const Programs = () => {
                   </div>
                 </div>
                 <Button
-                  variant={program.featured ? "gold" : "outline"}
+                  variant={program.featured ? "default" : "outline"}
                   className="w-full group"
                 >
                   Start Program
