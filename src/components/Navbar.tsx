@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X, LogOut, Settings, Camera } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -8,6 +8,8 @@ import fortivusLogo from "@/assets/fortivus-logo.png";
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, signOut } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const navLinks = [
     { name: "Programs", href: "#programs" },
@@ -17,6 +19,24 @@ const Navbar = () => {
     { name: "AI Analysis", href: "#analysis" },
     { name: "Pricing", href: "#pricing" },
   ];
+
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    setIsOpen(false);
+    
+    // If not on home page, navigate there first
+    if (location.pathname !== "/") {
+      navigate("/" + href);
+      return;
+    }
+    
+    // Smooth scroll to section
+    const targetId = href.replace("#", "");
+    const element = document.getElementById(targetId);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   const handleSignOut = async () => {
     await signOut();
@@ -41,7 +61,8 @@ const Navbar = () => {
               <a
                 key={link.name}
                 href={link.href}
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-200"
+                onClick={(e) => handleNavClick(e, link.href)}
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-200 cursor-pointer"
               >
                 {link.name}
               </a>
@@ -98,8 +119,8 @@ const Navbar = () => {
                 <a
                   key={link.name}
                   href={link.href}
-                  className="text-base font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
-                  onClick={() => setIsOpen(false)}
+                  className="text-base font-medium text-muted-foreground hover:text-foreground transition-colors py-2 cursor-pointer"
+                  onClick={(e) => handleNavClick(e, link.href)}
                 >
                   {link.name}
                 </a>

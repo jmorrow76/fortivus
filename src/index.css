@@ -4,6 +4,16 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap');
 
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Offset for fixed header */
+html {
+  scroll-padding-top: 5rem;
+}
+
 @layer base {
   :root {
     --background: 40 20% 98%;
