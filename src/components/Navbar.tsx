@@ -48,19 +48,19 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center">
-            <span className="text-xl md:text-2xl font-medium tracking-[0.2em] uppercase text-foreground">
+            <span className="text-lg md:text-xl font-medium tracking-[0.25em] uppercase text-foreground">
               Fortivus
             </span>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-8">
+          <div className="hidden lg:flex items-center gap-10">
             {navLinks.map((link) => (
               <a
                 key={link.name}
                 href={link.href}
                 onClick={(e) => handleNavClick(e, link.href)}
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-200 cursor-pointer"
+                className="text-xs font-medium tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-200 cursor-pointer"
               >
                 {link.name}
               </a>
@@ -112,12 +112,12 @@ const Navbar = () => {
         {/* Mobile Navigation */}
         {isOpen && (
           <div className="lg:hidden py-6 border-t border-border animate-fade-in">
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-4">
               {navLinks.map((link) => (
                 <a
                   key={link.name}
                   href={link.href}
-                  className="text-base font-medium text-muted-foreground hover:text-foreground transition-colors py-2 cursor-pointer"
+                  className="text-xs font-medium tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors py-2 cursor-pointer"
                   onClick={(e) => handleNavClick(e, link.href)}
                 >
                   {link.name}
