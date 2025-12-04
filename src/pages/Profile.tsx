@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Camera, Loader2, User, Crown, Settings, Calendar, Sparkles } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import HealthDashboard from "@/components/HealthDashboard";
+import { NotificationSettings } from "@/components/NotificationSettings";
 import { format } from "date-fns";
 
 const Profile = () => {
@@ -337,6 +338,11 @@ const Profile = () => {
               <HealthDashboard />
             </div>
           )}
+
+          {/* Notification Settings */}
+          <div className="mt-6">
+            <NotificationSettings />
+          </div>
         </div>
       </main>
     </div>
