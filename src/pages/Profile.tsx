@@ -15,7 +15,10 @@ import { format } from "date-fns";
 
 const Profile = () => {
   const { user, loading: authLoading, subscription, session } = useAuth();
-  const isElite = subscription.subscribed && subscription.productId === FORTIVUS_ELITE.product_id;
+  const isElite = subscription.subscribed && (
+    subscription.productId === FORTIVUS_ELITE.monthly.product_id ||
+    subscription.productId === FORTIVUS_ELITE.yearly.product_id
+  );
   const navigate = useNavigate();
   const { toast } = useToast();
   

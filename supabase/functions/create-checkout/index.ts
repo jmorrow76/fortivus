@@ -25,6 +25,12 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
+    const { priceId } = await req.json().catch(() => ({}));
+    
+    // Default to monthly if no priceId provided
+    const selectedPriceId = priceId || "price_1SalhlClAe0PX3avSpaZIuZE";
+    logStep("Price selected", { priceId: selectedPriceId });
+
     const authHeader = req.headers.get("Authorization")!;
     const token = authHeader.replace("Bearer ", "");
     const { data } = await supabaseClient.auth.getUser(token);
@@ -48,7 +54,7 @@ serve(async (req) => {
       customer_email: customerId ? undefined : user.email,
       line_items: [
         {
-          price: "price_1SajvxClAe0PX3avKwphWf1Q",
+          price: selectedPriceId,
           quantity: 1,
         },
       ],
