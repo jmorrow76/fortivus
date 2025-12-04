@@ -9,11 +9,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Camera, Loader2, User, Crown } from "lucide-react";
+import { ArrowLeft, Camera, Loader2, User, Crown, Settings } from "lucide-react";
 import Navbar from "@/components/Navbar";
 
 const Profile = () => {
-  const { user, loading: authLoading, subscription } = useAuth();
+  const { user, loading: authLoading, subscription, session } = useAuth();
   const isElite = subscription.subscribed && subscription.productId === FORTIVUS_ELITE.product_id;
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -23,6 +23,33 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [managingSubscription, setManagingSubscription] = useState(false);
+
+  const handleManageSubscription = async () => {
+    if (!session) return;
+    
+    setManagingSubscription(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('customer-portal', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (error) throw error;
+      if (data?.url) {
+        window.open(data.url, '_blank');
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to open subscription management",
+        variant: "destructive",
+      });
+    } finally {
+      setManagingSubscription(false);
+    }
+  };
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -227,20 +254,43 @@ const Profile = () => {
               </div>
 
               {/* Save Button */}
-              <Button
-                onClick={handleSave}
-                disabled={saving}
-                className="w-full sm:w-auto"
-              >
-                {saving ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  "Save Changes"
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Button
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="w-full sm:w-auto"
+                >
+                  {saving ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    "Save Changes"
+                  )}
+                </Button>
+                
+                {isElite && (
+                  <Button
+                    variant="outline"
+                    onClick={handleManageSubscription}
+                    disabled={managingSubscription}
+                    className="w-full sm:w-auto"
+                  >
+                    {managingSubscription ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Loading...
+                      </>
+                    ) : (
+                      <>
+                        <Settings className="h-4 w-4 mr-2" />
+                        Manage Subscription
+                      </>
+                    )}
+                  </Button>
                 )}
-              </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
