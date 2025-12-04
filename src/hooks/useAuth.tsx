@@ -22,10 +22,19 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const FORTIVUS_ELITE = {
-  price_id: "price_1SajvxClAe0PX3avKwphWf1Q",
-  product_id: "prod_TXpbnvJJAu3MRi",
+  monthly: {
+    price_id: "price_1SalhlClAe0PX3avSpaZIuZE",
+    product_id: "prod_TXrQkWjvadiPDC",
+    price: 15,
+    interval: "month",
+  },
+  yearly: {
+    price_id: "price_1SalhsClAe0PX3avqmzqwqgg",
+    product_id: "prod_TXrQrkzH13DuVC",
+    price: 99,
+    interval: "year",
+  },
   name: "Fortivus Elite",
-  price: 29.99,
 };
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {

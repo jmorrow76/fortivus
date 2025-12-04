@@ -20,6 +20,7 @@ const Pricing = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState<string | null>(null);
+  const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
 
   const handleSubscribe = async (planName: string) => {
     if (!user || !session) {
@@ -33,10 +34,15 @@ const Pricing = () => {
 
     setLoading(planName);
     try {
+      const priceId = billingCycle === "yearly" 
+        ? FORTIVUS_ELITE.yearly.price_id 
+        : FORTIVUS_ELITE.monthly.price_id;
+
       const { data, error } = await supabase.functions.invoke("create-checkout", {
         headers: {
           Authorization: `Bearer ${session.access_token}`,
         },
+        body: { priceId },
       });
 
       if (error) throw error;
@@ -82,6 +88,15 @@ const Pricing = () => {
     }
   };
 
+  const currentPrice = billingCycle === "yearly" 
+    ? FORTIVUS_ELITE.yearly.price 
+    : FORTIVUS_ELITE.monthly.price;
+  
+  const savingsPercent = Math.round(
+    ((FORTIVUS_ELITE.monthly.price * 12 - FORTIVUS_ELITE.yearly.price) / 
+    (FORTIVUS_ELITE.monthly.price * 12)) * 100
+  );
+
   const plans = [
     {
       name: "Free",
@@ -90,9 +105,10 @@ const Pricing = () => {
       period: "forever",
       icon: Zap,
       features: [
-        "Knowledge Hub access",
+        "Basic workout plans",
+        "Simple progress tracking",
+        "Community forum access",
         "Partner product recommendations",
-        "Sample AI Body Analysis",
       ],
       cta: user ? "Current Plan" : "Get Started",
       variant: "outline" as const,
@@ -102,15 +118,16 @@ const Pricing = () => {
     {
       name: "Elite",
       description: "Full access to transform your fitness",
-      price: `$${FORTIVUS_ELITE.price}`,
-      period: "per month",
+      price: `$${currentPrice}`,
+      period: billingCycle === "yearly" ? "per year" : "per month",
       icon: Sparkles,
       features: [
         "Everything in Free",
+        "AI-generated personalized workouts",
+        "AI nutrition plans",
+        "Advanced analytics",
+        "Wearable integration (Apple Health / Google Fit)",
         "Unlimited AI Body Analysis",
-        "AI Personal Diet Plan",
-        "AI Workout Programming",
-        "AI Supplement Recommendations",
         "Progress photo tracking",
         "Priority support",
       ],
@@ -152,6 +169,35 @@ const Pricing = () => {
           <p className="section-description">
             Choose the plan that matches your commitment. Cancel anytime.
           </p>
+        </div>
+
+        {/* Billing Toggle */}
+        <div className="flex justify-center mb-10">
+          <div className="inline-flex items-center gap-4 p-1 bg-secondary rounded-lg">
+            <button
+              onClick={() => setBillingCycle("monthly")}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                billingCycle === "monthly"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              Monthly
+            </button>
+            <button
+              onClick={() => setBillingCycle("yearly")}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
+                billingCycle === "yearly"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              Yearly
+              <span className="px-2 py-0.5 bg-accent text-accent-foreground text-xs rounded-full">
+                Save {savingsPercent}%
+              </span>
+            </button>
+          </div>
         </div>
 
         {/* Pricing Cards */}
@@ -254,13 +300,15 @@ const Pricing = () => {
               </TableHeader>
               <TableBody>
                 {[
-                  { feature: "Knowledge Hub access", free: true, elite: true, lifetime: true },
-                  { feature: "Partner product recommendations", free: true, elite: true, lifetime: true },
-                  { feature: "Sample AI Body Analysis", free: true, elite: true, lifetime: true },
+                  { feature: "Basic workout plans", free: true, elite: true, lifetime: true },
+                  { feature: "Simple progress tracking", free: true, elite: true, lifetime: true },
+                  { feature: "Community forum access", free: true, elite: true, lifetime: true },
+                  { feature: "Partner recommendations", free: true, elite: true, lifetime: true },
+                  { feature: "AI personalized workouts", free: false, elite: true, lifetime: true },
+                  { feature: "AI nutrition plans", free: false, elite: true, lifetime: true },
+                  { feature: "Advanced analytics", free: false, elite: true, lifetime: true },
+                  { feature: "Wearable integration", free: false, elite: true, lifetime: true },
                   { feature: "Unlimited AI Body Analysis", free: false, elite: true, lifetime: true },
-                  { feature: "AI Personal Diet Plan", free: false, elite: true, lifetime: true },
-                  { feature: "AI Workout Programming", free: false, elite: true, lifetime: true },
-                  { feature: "AI Supplement Recommendations", free: false, elite: true, lifetime: true },
                   { feature: "Progress photo tracking", free: false, elite: true, lifetime: true },
                   { feature: "Priority support", free: false, elite: true, lifetime: true },
                   { feature: "Early access to features", free: false, elite: false, lifetime: true },
