@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Plus, Loader2, Trash2, Calendar, Scale, LayoutGrid, Columns, LineChart } from "lucide-react";
+import { ArrowLeft, Plus, Loader2, Trash2, Calendar, Scale, LayoutGrid, Columns, LineChart, Lock, Sparkles } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Navbar from "@/components/Navbar";
 import PhotoComparison from "@/components/PhotoComparison";
@@ -26,7 +26,7 @@ interface ProgressPhoto {
 }
 
 const Progress = () => {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, subscription } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -47,6 +47,7 @@ const Progress = () => {
       navigate("/auth");
     }
   }, [user, authLoading, navigate]);
+
 
   useEffect(() => {
     if (user) {
@@ -165,6 +166,52 @@ const Progress = () => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-accent" />
+      </div>
+    );
+  }
+
+  // Premium gate - show upgrade prompt if not subscribed
+  if (!subscription.subscribed) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <main className="pt-24 pb-16 px-4">
+          <div className="container max-w-lg mx-auto">
+            <Card className="shadow-elevated text-center">
+              <CardHeader>
+                <div className="mx-auto w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mb-4">
+                  <Lock className="h-8 w-8 text-accent" />
+                </div>
+                <CardTitle className="font-heading text-2xl">Elite Feature</CardTitle>
+                <CardDescription className="text-base">
+                  Progress tracking is available exclusively for Fortivus Elite members.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="bg-secondary/50 rounded-lg p-4">
+                  <h3 className="font-semibold text-foreground mb-3 flex items-center justify-center gap-2">
+                    <Sparkles className="h-4 w-4 text-accent" />
+                    Unlock with Elite
+                  </h3>
+                  <ul className="text-sm text-muted-foreground space-y-2 text-left">
+                    <li>• Unlimited progress photo storage</li>
+                    <li>• Side-by-side comparison view</li>
+                    <li>• Weight tracking charts</li>
+                    <li>• AI body composition analysis</li>
+                  </ul>
+                </div>
+                <div className="flex flex-col gap-3">
+                  <Button asChild className="w-full">
+                    <a href="/#pricing">Upgrade to Elite - $29.99/mo</a>
+                  </Button>
+                  <Button variant="outline" onClick={() => navigate("/")}>
+                    Back to Home
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </main>
       </div>
     );
   }

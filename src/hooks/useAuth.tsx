@@ -2,10 +2,18 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
+interface SubscriptionStatus {
+  subscribed: boolean;
+  productId: string | null;
+  subscriptionEnd: string | null;
+}
+
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  subscription: SubscriptionStatus;
+  checkSubscription: () => Promise<void>;
   signUp: (email: string, password: string, displayName?: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
@@ -13,13 +21,53 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+export const FORTIVUS_ELITE = {
+  price_id: "price_1SajvxClAe0PX3avKwphWf1Q",
+  product_id: "prod_TXpbnvJJAu3MRi",
+  name: "Fortivus Elite",
+  price: 29.99,
+};
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [subscription, setSubscription] = useState<SubscriptionStatus>({
+    subscribed: false,
+    productId: null,
+    subscriptionEnd: null,
+  });
+
+  const checkSubscription = async () => {
+    if (!session) {
+      setSubscription({ subscribed: false, productId: null, subscriptionEnd: null });
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase.functions.invoke('check-subscription', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (error) {
+        console.error('Error checking subscription:', error);
+        return;
+      }
+
+      setSubscription({
+        subscribed: data.subscribed || false,
+        productId: data.product_id || null,
+        subscriptionEnd: data.subscription_end || null,
+      });
+    } catch (error) {
+      console.error('Error checking subscription:', error);
+    }
+  };
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+    const { data: { subscription: authSubscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
@@ -33,8 +81,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => authSubscription.unsubscribe();
   }, []);
+
+  // Check subscription when session changes
+  useEffect(() => {
+    if (session) {
+      checkSubscription();
+    } else {
+      setSubscription({ subscribed: false, productId: null, subscriptionEnd: null });
+    }
+  }, [session]);
+
+  // Periodically refresh subscription status
+  useEffect(() => {
+    if (!session) return;
+
+    const interval = setInterval(() => {
+      checkSubscription();
+    }, 60000); // Every minute
+
+    return () => clearInterval(interval);
+  }, [session]);
 
   const signUp = async (email: string, password: string, displayName?: string) => {
     const redirectUrl = `${window.location.origin}/`;
@@ -59,7 +127,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      session, 
+      loading, 
+      subscription, 
+      checkSubscription,
+      signUp, 
+      signIn, 
+      signOut 
+    }}>
       {children}
     </AuthContext.Provider>
   );
