@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Camera, Loader2, User, Crown, Settings, Calendar, Sparkles } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import HealthDashboard from "@/components/HealthDashboard";
 import { format } from "date-fns";
 
 const Profile = () => {
@@ -329,6 +330,13 @@ const Profile = () => {
               </div>
             </CardContent>
           </Card>
+
+          {/* Health Data Section - Elite Only */}
+          {isElite && (
+            <div className="mt-6">
+              <HealthDashboard />
+            </div>
+          )}
         </div>
       </main>
     </div>
