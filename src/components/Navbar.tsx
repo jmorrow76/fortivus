@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, LogOut, Settings, Camera, Trophy, Users, LayoutDashboard } from "lucide-react";
+import { Menu, X, LogOut, Settings, Camera, Trophy, Users, LayoutDashboard, Shield } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useAdmin } from "@/hooks/useAdmin";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, signOut } = useAuth();
+  const { isAdmin } = useAdmin();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -88,6 +90,14 @@ const Navbar = () => {
                     Dashboard
                   </Link>
                 </Button>
+                {isAdmin && (
+                  <Button variant="outline" size="sm" asChild>
+                    <Link to="/admin" className="flex items-center gap-2">
+                      <Shield className="h-4 w-4" />
+                      Admin
+                    </Link>
+                  </Button>
+                )}
                 <Button variant="ghost" size="sm" asChild>
                   <Link to="/profile" className="flex items-center gap-2">
                     <Settings className="h-4 w-4" />
@@ -154,6 +164,14 @@ const Navbar = () => {
                         Dashboard
                       </Link>
                     </Button>
+                    {isAdmin && (
+                      <Button variant="outline" className="justify-start" asChild>
+                        <Link to="/admin" onClick={() => setIsOpen(false)}>
+                          <Shield className="h-4 w-4 mr-2" />
+                          Admin
+                        </Link>
+                      </Button>
+                    )}
                     <Button variant="ghost" className="justify-start" asChild>
                       <Link to="/profile" onClick={() => setIsOpen(false)}>
                         <Settings className="h-4 w-4 mr-2" />

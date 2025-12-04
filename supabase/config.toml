@@ -20,3 +20,6 @@ verify_jwt = false
 
 [functions.reset-monthly-challenges]
 verify_jwt = false
+
+[functions.check-admin]
+verify_jwt = false
