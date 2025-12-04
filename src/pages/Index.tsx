@@ -1,7 +1,7 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import StatsCounter from "@/components/StatsCounter";
-import Programs from "@/components/Programs";
+
 import Supplements from "@/components/Supplements";
 import AIAnalysis from "@/components/AIAnalysis";
 import BodyAnalysis from "@/components/BodyAnalysis";
@@ -21,7 +21,7 @@ const Index = () => {
       <main>
         <Hero />
         <StatsCounter />
-        <Programs />
+        
         <Supplements />
         <AIAnalysis />
         <BodyAnalysis />
