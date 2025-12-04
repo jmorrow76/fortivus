@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Dumbbell } from "lucide-react";
+import { Menu, X } from "lucide-react";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,21 +10,18 @@ const Navbar = () => {
     { name: "Supplements", href: "#supplements" },
     { name: "Gear", href: "#gear" },
     { name: "Articles", href: "#articles" },
-    { name: "AI Analysis", href: "#ai-analysis" },
+    { name: "AI Analysis", href: "#analysis" },
     { name: "Pricing", href: "#pricing" },
   ];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-background/80 border-b border-border/50">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <a href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500 to-yellow-400 flex items-center justify-center shadow-[0_0_20px_hsla(38,92%,50%,0.3)] group-hover:shadow-[0_0_30px_hsla(38,92%,50%,0.4)] transition-all duration-300">
-              <Dumbbell className="w-5 h-5 text-background" />
-            </div>
-            <span className="font-heading text-xl font-bold tracking-tight">
-              Prime<span className="text-primary">Fit</span>
+          <a href="/" className="flex items-center gap-2">
+            <span className="font-heading text-xl md:text-2xl font-bold tracking-tight text-foreground">
+              Prime<span className="text-accent">Fit</span>
             </span>
           </a>
 
@@ -34,7 +31,7 @@ const Navbar = () => {
               <a
                 key={link.name}
                 href={link.href}
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-300 relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-primary hover:after:w-full after:transition-all after:duration-300"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-200"
               >
                 {link.name}
               </a>
@@ -42,12 +39,12 @@ const Navbar = () => {
           </div>
 
           {/* Desktop CTA */}
-          <div className="hidden lg:flex items-center gap-4">
+          <div className="hidden lg:flex items-center gap-3">
             <Button variant="ghost" size="sm">
               Sign In
             </Button>
-            <Button variant="gold" size="sm">
-              Join Free
+            <Button variant="default" size="sm">
+              Get Started
             </Button>
           </div>
 
@@ -62,8 +59,8 @@ const Navbar = () => {
 
         {/* Mobile Navigation */}
         {isOpen && (
-          <div className="lg:hidden py-6 border-t border-border/50 animate-fade-in">
-            <div className="flex flex-col gap-4">
+          <div className="lg:hidden py-6 border-t border-border animate-fade-in">
+            <div className="flex flex-col gap-3">
               {navLinks.map((link) => (
                 <a
                   key={link.name}
@@ -74,11 +71,11 @@ const Navbar = () => {
                   {link.name}
                 </a>
               ))}
-              <div className="flex flex-col gap-3 pt-4 border-t border-border/50">
+              <div className="flex flex-col gap-3 pt-4 border-t border-border mt-2">
                 <Button variant="ghost" className="justify-start">
                   Sign In
                 </Button>
-                <Button variant="gold">Join Free</Button>
+                <Button variant="default">Get Started</Button>
               </div>
             </div>
           </div>

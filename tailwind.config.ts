@@ -14,8 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        heading: ['Playfair Display', 'serif'],
-        body: ['Inter', 'sans-serif'],
+        heading: ['Libre Baskerville', 'serif'],
+        body: ['Source Sans 3', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -61,10 +61,19 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        gold: {
-          DEFAULT: "hsl(38, 92%, 50%)",
-          light: "hsl(45, 100%, 60%)",
-          dark: "hsl(38, 80%, 40%)",
+        navy: {
+          DEFAULT: "hsl(220, 45%, 25%)",
+          light: "hsl(220, 35%, 35%)",
+          dark: "hsl(220, 50%, 18%)",
+        },
+        bronze: {
+          DEFAULT: "hsl(32, 60%, 45%)",
+          light: "hsl(38, 50%, 55%)",
+          dark: "hsl(30, 65%, 35%)",
+        },
+        cream: {
+          DEFAULT: "hsl(40, 20%, 98%)",
+          dark: "hsl(40, 15%, 94%)",
         },
       },
       borderRadius: {
@@ -81,15 +90,10 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
-        "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 20px hsla(38, 92%, 50%, 0.3)" },
-          "50%": { boxShadow: "0 0 40px hsla(38, 92%, 50%, 0.5)" },
-        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "pulse-glow": "pulse-glow 2s ease-in-out infinite",
       },
     },
   },

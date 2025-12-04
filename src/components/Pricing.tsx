@@ -35,7 +35,7 @@ const plans = [
       "Monthly coaching calls",
     ],
     cta: "Start 7-Day Trial",
-    variant: "gold" as const,
+    variant: "default" as const,
     popular: true,
   },
   {
@@ -60,63 +60,58 @@ const plans = [
 
 const Pricing = () => {
   return (
-    <section id="pricing" className="py-24 bg-gradient-to-b from-background to-card/50">
+    <section id="pricing" className="section-padding bg-background">
       <div className="container mx-auto px-4">
         {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <span className="text-primary font-semibold text-sm tracking-wider uppercase mb-4 block">
-            Membership
-          </span>
-          <h2 className="font-heading text-4xl md:text-5xl font-bold mb-6">
-            Invest in Your{" "}
-            <span className="bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 bg-clip-text text-transparent">
-              Prime Years
-            </span>
+        <div className="section-header">
+          <span className="section-label">Membership</span>
+          <h2 className="section-title">
+            Invest in Your <span className="text-accent">Prime Years</span>
           </h2>
-          <p className="text-muted-foreground text-lg">
+          <p className="section-description">
             Choose the plan that fits your commitment level. Cancel anytime.
           </p>
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto">
           {plans.map((plan) => (
             <Card
               key={plan.name}
               variant={plan.popular ? "premium" : "default"}
               className={`relative overflow-hidden ${
-                plan.popular ? "md:-mt-4 md:mb-4 scale-[1.02]" : ""
+                plan.popular ? "md:-mt-4 md:mb-4 ring-1 ring-accent/20" : ""
               }`}
             >
               {plan.popular && (
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500" />
+                <div className="absolute top-0 left-0 right-0 h-1 bg-accent" />
               )}
               {plan.popular && (
-                <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-semibold">
+                <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-accent text-accent-foreground text-xs font-semibold">
                   Most Popular
                 </div>
               )}
               <CardHeader className="text-center pb-2">
-                <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/10 flex items-center justify-center">
-                  <plan.icon className="w-7 h-7 text-primary" />
+                <div className="w-12 h-12 mx-auto mb-4 rounded-lg bg-secondary flex items-center justify-center">
+                  <plan.icon className="w-6 h-6 text-accent" />
                 </div>
-                <CardTitle className="text-2xl">{plan.name}</CardTitle>
+                <CardTitle className="text-xl">{plan.name}</CardTitle>
                 <CardDescription className="text-base">
                   {plan.description}
                 </CardDescription>
               </CardHeader>
               <CardContent className="text-center">
                 <div className="mb-8">
-                  <span className="font-heading text-5xl font-bold">{plan.price}</span>
-                  <span className="text-muted-foreground ml-2">/{plan.period}</span>
+                  <span className="font-heading text-4xl font-bold">{plan.price}</span>
+                  <span className="text-muted-foreground ml-2 text-sm">/{plan.period}</span>
                 </div>
-                <ul className="space-y-4 mb-8 text-left">
+                <ul className="space-y-3 mb-8 text-left">
                   {plan.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-3">
-                      <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-                        <Check className="w-3 h-3 text-primary" />
+                      <div className="w-5 h-5 rounded-full bg-accent/10 flex items-center justify-center shrink-0 mt-0.5">
+                        <Check className="w-3 h-3 text-accent" />
                       </div>
-                      <span className="text-sm">{feature}</span>
+                      <span className="text-sm text-muted-foreground">{feature}</span>
                     </li>
                   ))}
                 </ul>

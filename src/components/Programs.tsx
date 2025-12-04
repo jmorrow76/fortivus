@@ -34,45 +34,40 @@ const programs = [
 
 const Programs = () => {
   return (
-    <section id="programs" className="py-24 bg-gradient-to-b from-background to-card/50">
+    <section id="programs" className="section-padding bg-background">
       <div className="container mx-auto px-4">
         {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <span className="text-primary font-semibold text-sm tracking-wider uppercase mb-4 block">
-            Training Programs
-          </span>
-          <h2 className="font-heading text-4xl md:text-5xl font-bold mb-6">
-            Programs Built for{" "}
-            <span className="bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 bg-clip-text text-transparent">
-              Your Stage of Life
-            </span>
+        <div className="section-header">
+          <span className="section-label">Training Programs</span>
+          <h2 className="section-title">
+            Programs Built for <span className="text-accent">Your Stage of Life</span>
           </h2>
-          <p className="text-muted-foreground text-lg">
+          <p className="section-description">
             Each program is designed with recovery, joint health, and hormonal
             optimization in mind. No more generic workouts.
           </p>
         </div>
 
         {/* Programs Grid */}
-        <div className="grid md:grid-cols-3 gap-8">
-          {programs.map((program, index) => (
+        <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
+          {programs.map((program) => (
             <Card
               key={program.title}
               variant={program.featured ? "premium" : "interactive"}
               className={`relative overflow-hidden ${
-                program.featured ? "md:-mt-4 md:mb-4 scale-[1.02]" : ""
+                program.featured ? "md:-mt-4 md:mb-4 ring-1 ring-accent/20" : ""
               }`}
             >
               {program.featured && (
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500" />
+                <div className="absolute top-0 left-0 right-0 h-1 bg-accent" />
               )}
               {program.featured && (
-                <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-primary/20 text-primary text-xs font-semibold">
+                <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-accent/10 text-accent text-xs font-semibold">
                   Most Popular
                 </div>
               )}
               <CardHeader className="pb-4">
-                <CardTitle className="text-2xl">{program.title}</CardTitle>
+                <CardTitle className="text-xl">{program.title}</CardTitle>
                 <CardDescription className="text-base mt-2">
                   {program.description}
                 </CardDescription>
@@ -80,35 +75,35 @@ const Programs = () => {
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center">
-                      <Clock className="w-5 h-5 text-primary" />
+                    <div className="w-10 h-10 rounded-md bg-secondary flex items-center justify-center">
+                      <Clock className="w-5 h-5 text-accent" />
                     </div>
                     <div>
                       <div className="text-xs text-muted-foreground">Duration</div>
-                      <div className="font-semibold">{program.duration}</div>
+                      <div className="font-semibold text-sm">{program.duration}</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center">
-                      <Flame className="w-5 h-5 text-primary" />
+                    <div className="w-10 h-10 rounded-md bg-secondary flex items-center justify-center">
+                      <Flame className="w-5 h-5 text-accent" />
                     </div>
                     <div>
                       <div className="text-xs text-muted-foreground">Intensity</div>
-                      <div className="font-semibold">{program.intensity}</div>
+                      <div className="font-semibold text-sm">{program.intensity}</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center">
-                      <Dumbbell className="w-5 h-5 text-primary" />
+                    <div className="w-10 h-10 rounded-md bg-secondary flex items-center justify-center">
+                      <Dumbbell className="w-5 h-5 text-accent" />
                     </div>
                     <div>
                       <div className="text-xs text-muted-foreground">Weekly</div>
-                      <div className="font-semibold">{program.workoutsPerWeek}x</div>
+                      <div className="font-semibold text-sm">{program.workoutsPerWeek}x</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center">
-                      <Target className="w-5 h-5 text-primary" />
+                    <div className="w-10 h-10 rounded-md bg-secondary flex items-center justify-center">
+                      <Target className="w-5 h-5 text-accent" />
                     </div>
                     <div>
                       <div className="text-xs text-muted-foreground">Focus</div>

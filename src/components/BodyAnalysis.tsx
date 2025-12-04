@@ -96,27 +96,27 @@ const BodyAnalysis = () => {
   const getCategoryColor = (category: string) => {
     switch (category) {
       case 'Athletic':
-        return 'text-green-400';
+        return 'text-emerald-600';
       case 'Fit':
-        return 'text-emerald-400';
+        return 'text-green-600';
       case 'Average':
-        return 'text-yellow-400';
+        return 'text-amber-600';
       case 'Above Average':
-        return 'text-orange-400';
+        return 'text-orange-600';
       default:
-        return 'text-red-400';
+        return 'text-red-600';
     }
   };
 
   return (
-    <section id="analysis" className="py-24 px-4 bg-gradient-to-b from-background to-background/95">
+    <section id="analysis" className="section-padding bg-secondary/30">
       <div className="container mx-auto max-w-6xl">
-        <div className="text-center mb-16">
-          <span className="text-primary font-semibold tracking-wider uppercase text-sm">AI-Powered</span>
-          <h2 className="text-4xl md:text-5xl font-bold mt-2 mb-4">
-            Body Composition <span className="text-primary">Analysis</span>
+        <div className="section-header">
+          <span className="section-label">AI-Powered</span>
+          <h2 className="section-title">
+            Body Composition <span className="text-accent">Analysis</span>
           </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+          <p className="section-description">
             Upload a photo and get an AI-powered estimate of your body fat percentage 
             with personalized recommendations tailored for men over 40.
           </p>
@@ -124,10 +124,10 @@ const BodyAnalysis = () => {
 
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Upload Section */}
-          <Card variant="glass" className="overflow-hidden">
+          <Card variant="default" className="overflow-hidden">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Camera className="w-5 h-5 text-primary" />
+                <Camera className="w-5 h-5 text-accent" />
                 Upload Your Photo
               </CardTitle>
             </CardHeader>
@@ -143,7 +143,7 @@ const BodyAnalysis = () => {
               {!selectedImage ? (
                 <div
                   onClick={() => fileInputRef.current?.click()}
-                  className="border-2 border-dashed border-border/50 rounded-xl p-12 text-center cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-all duration-300"
+                  className="border-2 border-dashed border-border rounded-lg p-12 text-center cursor-pointer hover:border-accent/50 hover:bg-secondary/50 transition-all duration-200"
                 >
                   <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
                   <p className="text-muted-foreground mb-2">Click to upload or drag and drop</p>
@@ -154,7 +154,7 @@ const BodyAnalysis = () => {
                   <img
                     src={selectedImage}
                     alt="Selected"
-                    className="w-full h-80 object-contain rounded-xl bg-black/20"
+                    className="w-full h-80 object-contain rounded-lg bg-secondary"
                   />
                   <Button
                     variant="outline"
@@ -188,7 +188,7 @@ const BodyAnalysis = () => {
                 </Button>
               </div>
 
-              <div className="text-xs text-muted-foreground/70 space-y-1">
+              <div className="text-xs text-muted-foreground space-y-1">
                 <p>💡 For best results, use a well-lit front or side photo</p>
                 <p>🔒 Your photo is processed securely and not stored</p>
               </div>
@@ -198,7 +198,7 @@ const BodyAnalysis = () => {
           {/* Results Section */}
           <div className="space-y-6">
             {!result && !isAnalyzing && (
-              <Card variant="glass" className="h-full flex items-center justify-center min-h-[400px]">
+              <Card variant="default" className="h-full flex items-center justify-center min-h-[400px]">
                 <CardContent className="text-center py-12">
                   <Target className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
                   <p className="text-muted-foreground">
@@ -209,9 +209,9 @@ const BodyAnalysis = () => {
             )}
 
             {isAnalyzing && (
-              <Card variant="glass" className="h-full flex items-center justify-center min-h-[400px]">
+              <Card variant="default" className="h-full flex items-center justify-center min-h-[400px]">
                 <CardContent className="text-center py-12">
-                  <Loader2 className="w-16 h-16 mx-auto mb-4 text-primary animate-spin" />
+                  <Loader2 className="w-16 h-16 mx-auto mb-4 text-accent animate-spin" />
                   <p className="text-muted-foreground">Analyzing your body composition...</p>
                   <p className="text-sm text-muted-foreground/70 mt-2">This may take a few seconds</p>
                 </CardContent>
@@ -224,18 +224,18 @@ const BodyAnalysis = () => {
                 <Card variant="premium">
                   <CardContent className="pt-6">
                     <div className="text-center mb-6">
-                      <div className="text-6xl font-bold text-primary mb-2">
+                      <div className="text-5xl font-heading font-bold text-accent mb-2">
                         {result.bodyFatPercentage}%
                       </div>
-                      <div className={`text-xl font-semibold ${getCategoryColor(result.bodyFatCategory)}`}>
+                      <div className={`text-lg font-semibold ${getCategoryColor(result.bodyFatCategory)}`}>
                         {result.bodyFatCategory}
                       </div>
-                      <p className="text-muted-foreground mt-2">{result.muscleAssessment}</p>
+                      <p className="text-muted-foreground mt-2 text-sm">{result.muscleAssessment}</p>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4 mt-6">
                       <div>
-                        <h4 className="font-semibold text-green-400 flex items-center gap-2 mb-2">
+                        <h4 className="font-semibold text-emerald-600 flex items-center gap-2 mb-2 text-sm">
                           <CheckCircle className="w-4 h-4" /> Strengths
                         </h4>
                         <ul className="space-y-1">
@@ -245,7 +245,7 @@ const BodyAnalysis = () => {
                         </ul>
                       </div>
                       <div>
-                        <h4 className="font-semibold text-orange-400 flex items-center gap-2 mb-2">
+                        <h4 className="font-semibold text-amber-600 flex items-center gap-2 mb-2 text-sm">
                           <Target className="w-4 h-4" /> Areas to Improve
                         </h4>
                         <ul className="space-y-1">
@@ -260,28 +260,28 @@ const BodyAnalysis = () => {
 
                 {/* Recommendations */}
                 <div className="grid gap-4">
-                  <Card variant="glass">
+                  <Card variant="default">
                     <CardContent className="pt-4">
-                      <h4 className="font-semibold flex items-center gap-2 mb-2">
-                        <Apple className="w-4 h-4 text-green-400" /> Nutrition
+                      <h4 className="font-semibold flex items-center gap-2 mb-2 text-sm">
+                        <Apple className="w-4 h-4 text-emerald-600" /> Nutrition
                       </h4>
                       <p className="text-sm text-muted-foreground">{result.recommendations.nutrition}</p>
                     </CardContent>
                   </Card>
 
-                  <Card variant="glass">
+                  <Card variant="default">
                     <CardContent className="pt-4">
-                      <h4 className="font-semibold flex items-center gap-2 mb-2">
-                        <Dumbbell className="w-4 h-4 text-primary" /> Training
+                      <h4 className="font-semibold flex items-center gap-2 mb-2 text-sm">
+                        <Dumbbell className="w-4 h-4 text-accent" /> Training
                       </h4>
                       <p className="text-sm text-muted-foreground">{result.recommendations.training}</p>
                     </CardContent>
                   </Card>
 
-                  <Card variant="glass">
+                  <Card variant="default">
                     <CardContent className="pt-4">
-                      <h4 className="font-semibold flex items-center gap-2 mb-2">
-                        <Moon className="w-4 h-4 text-blue-400" /> Recovery
+                      <h4 className="font-semibold flex items-center gap-2 mb-2 text-sm">
+                        <Moon className="w-4 h-4 text-blue-600" /> Recovery
                       </h4>
                       <p className="text-sm text-muted-foreground">{result.recommendations.recovery}</p>
                     </CardContent>
@@ -289,13 +289,13 @@ const BodyAnalysis = () => {
                 </div>
 
                 {/* Timeframe & Disclaimer */}
-                <Card variant="glass">
+                <Card variant="default">
                   <CardContent className="pt-4">
                     <p className="text-sm text-center text-muted-foreground mb-4">
                       <strong className="text-foreground">Estimated timeframe to next level:</strong>{' '}
                       {result.estimatedTimeframe}
                     </p>
-                    <div className="flex items-start gap-2 text-xs text-muted-foreground/70 bg-muted/20 rounded-lg p-3">
+                    <div className="flex items-start gap-2 text-xs text-muted-foreground bg-secondary rounded-md p-3">
                       <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
                       <p>{result.disclaimer}</p>
                     </div>

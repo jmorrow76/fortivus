@@ -21,27 +21,19 @@ const Newsletter = () => {
   };
 
   return (
-    <section className="py-24 relative overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-card/50 to-background" />
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
-
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="max-w-3xl mx-auto text-center">
+    <section className="section-padding bg-secondary/50">
+      <div className="container mx-auto px-4">
+        <div className="max-w-2xl mx-auto text-center">
           {/* Icon */}
-          <div className="w-20 h-20 mx-auto mb-8 rounded-2xl bg-gradient-to-br from-amber-500 to-yellow-400 flex items-center justify-center shadow-[0_0_40px_hsla(38,92%,50%,0.3)]">
-            <Mail className="w-10 h-10 text-background" />
+          <div className="w-16 h-16 mx-auto mb-8 rounded-xl bg-accent flex items-center justify-center">
+            <Mail className="w-8 h-8 text-accent-foreground" />
           </div>
 
           {/* Content */}
-          <h2 className="font-heading text-4xl md:text-5xl font-bold mb-6">
-            Get Weekly{" "}
-            <span className="bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 bg-clip-text text-transparent">
-              Prime Insights
-            </span>
+          <h2 className="section-title">
+            Get Weekly <span className="text-accent">Prime Insights</span>
           </h2>
-          <p className="text-muted-foreground text-lg mb-10 max-w-xl mx-auto">
+          <p className="section-description mb-10">
             Join 50,000+ men receiving our weekly newsletter with training tips,
             supplement research, and exclusive deals.
           </p>
@@ -55,16 +47,16 @@ const Newsletter = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="flex-1"
+                className="flex-1 bg-card"
               />
-              <Button type="submit" variant="gold" size="lg" className="group">
+              <Button type="submit" variant="default" size="lg" className="group">
                 Subscribe
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Button>
             </form>
           ) : (
-            <div className="flex items-center justify-center gap-3 text-primary">
-              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+            <div className="flex items-center justify-center gap-3 text-accent">
+              <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
                 <Check className="w-5 h-5" />
               </div>
               <span className="font-semibold">You're in! Check your inbox.</span>
