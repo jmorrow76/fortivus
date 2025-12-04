@@ -75,7 +75,7 @@ const Auth = () => {
             toast({ title: 'Sign Up Failed', description: error.message, variant: 'destructive' });
           }
         } else {
-          toast({ title: 'Account Created!', description: 'Welcome to Prime Forge.' });
+          toast({ title: 'Account Created!', description: 'Welcome to Fortivus.' });
         }
       }
     } finally {
@@ -101,7 +101,7 @@ const Auth = () => {
           <CardDescription>
             {isLogin 
               ? 'Sign in to save your favorite success stories' 
-              : 'Join Prime Forge to save transformations'}
+              : 'Join Fortivus to save transformations'}
           </CardDescription>
         </CardHeader>
         <CardContent>
