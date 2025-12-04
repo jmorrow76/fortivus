@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Camera, Sparkles, TrendingUp, FileText, ArrowRight } from "lucide-react";
 
@@ -62,12 +63,14 @@ const AIAnalysis = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button variant="default" size="lg" className="group">
-                Try AI Analysis Free
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              <Button variant="default" size="lg" className="group" asChild>
+                <Link to="/personal-plan">
+                  Get Your Personal Plan
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </Link>
               </Button>
-              <Button variant="outline" size="lg">
-                See Sample Report
+              <Button variant="outline" size="lg" asChild>
+                <a href="#pricing">View Membership</a>
               </Button>
             </div>
           </div>
