@@ -465,6 +465,7 @@ export type Database = {
           id: string
           last_checkin_date: string | null
           longest_streak: number
+          show_on_leaderboard: boolean
           total_checkins: number
           total_xp: number
           updated_at: string
@@ -475,6 +476,7 @@ export type Database = {
           id?: string
           last_checkin_date?: string | null
           longest_streak?: number
+          show_on_leaderboard?: boolean
           total_checkins?: number
           total_xp?: number
           updated_at?: string
@@ -485,6 +487,7 @@ export type Database = {
           id?: string
           last_checkin_date?: string | null
           longest_streak?: number
+          show_on_leaderboard?: boolean
           total_checkins?: number
           total_xp?: number
           updated_at?: string
@@ -494,7 +497,18 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      leaderboard_view: {
+        Row: {
+          avatar_url: string | null
+          current_streak: number | null
+          display_name: string | null
+          longest_streak: number | null
+          total_checkins: number | null
+          total_xp: number | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
