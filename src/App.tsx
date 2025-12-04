@@ -15,6 +15,7 @@ import DailyCheckin from "./pages/DailyCheckin";
 import Gamification from "./pages/Gamification";
 import LeaderboardPage from "./pages/LeaderboardPage";
 import Social from "./pages/Social";
+import Dashboard from "./pages/Dashboard";
 import SubscriptionSuccess from "./pages/SubscriptionSuccess";
 import NotFound from "./pages/NotFound";
 
@@ -29,6 +30,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/about" element={<About />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/profile" element={<Profile />} />
