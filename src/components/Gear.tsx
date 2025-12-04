@@ -16,6 +16,8 @@ const partnerBrands = [
     affiliateUrl: "https://municipal.com/?ref=YOURAFFILIATEID",
     bgColor: "bg-slate-50",
     borderColor: "border-slate-200",
+    logoColor: "text-slate-900",
+    logoBg: "bg-slate-900",
   },
   {
     name: "Vuori",
@@ -30,6 +32,8 @@ const partnerBrands = [
     affiliateUrl: "https://vuori.com/?ref=YOURAFFILIATEID",
     bgColor: "bg-teal-50",
     borderColor: "border-teal-200",
+    logoColor: "text-teal-700",
+    logoBg: "bg-teal-600",
   },
   {
     name: "Alo Yoga",
@@ -44,6 +48,8 @@ const partnerBrands = [
     affiliateUrl: "https://aloyoga.com/?ref=YOURAFFILIATEID",
     bgColor: "bg-purple-50",
     borderColor: "border-purple-200",
+    logoColor: "text-purple-700",
+    logoBg: "bg-purple-600",
   },
 ];
 
@@ -99,13 +105,19 @@ const Gear = () => {
               className={`overflow-hidden ${brand.bgColor} ${brand.borderColor} border`}
             >
               <CardContent className="p-6">
+                {/* Brand Logo */}
+                <div className={`h-14 rounded-lg ${brand.logoBg} flex items-center justify-center mb-4`}>
+                  <span className="font-heading text-lg font-bold tracking-[0.15em] uppercase text-white">
+                    {brand.name}
+                  </span>
+                </div>
+                
                 {/* Brand Header */}
-                <div className="mb-6 pb-4 border-b border-border">
-                  <span className="px-2 py-1 rounded-md bg-accent/10 text-accent text-xs font-semibold mb-3 inline-block">
+                <div className="mb-4 pb-4 border-b border-border">
+                  <span className="px-2 py-1 rounded-md bg-accent/10 text-accent text-xs font-semibold mb-2 inline-block">
                     Official Partner
                   </span>
-                  <h3 className="font-heading text-xl font-bold mb-1">{brand.name}</h3>
-                  <p className="text-sm text-accent font-medium">{brand.tagline}</p>
+                  <p className={`text-sm ${brand.logoColor} font-medium`}>{brand.tagline}</p>
                 </div>
                 
                 <p className="text-sm text-muted-foreground mb-6 leading-relaxed">

@@ -14,6 +14,8 @@ const supplements = [
     tag: "Featured Partner",
     affiliateUrl: "https://drinkag1.com/?utm_source=YOURAFFILIATEID",
     logo: "AG1",
+    brandColor: "bg-emerald-500",
+    brandBg: "bg-emerald-50",
   },
   {
     name: "IM8 Performance Formula",
@@ -26,6 +28,8 @@ const supplements = [
     tag: "Partner Brand",
     affiliateUrl: "https://im8.com/?ref=YOURAFFILIATEID",
     logo: "IM8",
+    brandColor: "bg-orange-500",
+    brandBg: "bg-orange-50",
   },
   {
     name: "Caldera + Lab The Good",
@@ -37,7 +41,9 @@ const supplements = [
     icon: Shield,
     tag: "Men's Skincare",
     affiliateUrl: "https://calderalab.com/?utm_source=YOURAFFILIATEID",
-    logo: "Caldera Lab",
+    logo: "Caldera",
+    brandColor: "bg-slate-800",
+    brandBg: "bg-slate-100",
   },
   {
     name: "Testosterone Support",
@@ -50,6 +56,8 @@ const supplements = [
     tag: "Amazon Pick",
     affiliateUrl: "https://amazon.com/dp/PRODUCTID?tag=YOURAMAZONID",
     logo: "Amazon",
+    brandColor: "bg-amber-500",
+    brandBg: "bg-amber-50",
   },
 ];
 
@@ -105,14 +113,18 @@ const Supplements = () => {
           {supplements.map((supplement) => (
             <Card key={supplement.name} variant="interactive" className="group">
               <CardContent className="p-5">
+                {/* Brand Logo */}
+                <div className={`h-16 rounded-lg ${supplement.brandBg} flex items-center justify-center mb-4`}>
+                  <span className={`font-heading text-lg font-bold ${supplement.brandColor === 'bg-slate-800' ? 'text-slate-800' : supplement.brandColor === 'bg-emerald-500' ? 'text-emerald-600' : supplement.brandColor === 'bg-orange-500' ? 'text-orange-600' : 'text-amber-600'}`}>
+                    {supplement.logo}
+                  </span>
+                </div>
+                
                 {/* Tag */}
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-3">
                   <span className="px-2 py-1 rounded-md bg-accent/10 text-accent text-xs font-semibold">
                     {supplement.tag}
                   </span>
-                  <div className="w-9 h-9 rounded-lg bg-secondary flex items-center justify-center group-hover:bg-accent/10 transition-colors">
-                    <supplement.icon className="w-4 h-4 text-accent" />
-                  </div>
                 </div>
 
                 {/* Content */}
