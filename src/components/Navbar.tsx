@@ -11,7 +11,7 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const navLinks = [
-    { name: "Programs", href: "#programs" },
+    { name: "About", href: "/about", isPage: true },
     { name: "Supplements", href: "#supplements" },
     { name: "Gear", href: "#gear" },
     { name: "Articles", href: "#articles" },
@@ -56,14 +56,24 @@ const Navbar = () => {
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-10">
             {navLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                onClick={(e) => handleNavClick(e, link.href)}
-                className="text-xs font-medium tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-200 cursor-pointer"
-              >
-                {link.name}
-              </a>
+              link.isPage ? (
+                <Link
+                  key={link.name}
+                  to={link.href}
+                  className="text-xs font-medium tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-200"
+                >
+                  {link.name}
+                </Link>
+              ) : (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  onClick={(e) => handleNavClick(e, link.href)}
+                  className="text-xs font-medium tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-200 cursor-pointer"
+                >
+                  {link.name}
+                </a>
+              )
             ))}
           </div>
 
@@ -114,14 +124,25 @@ const Navbar = () => {
           <div className="lg:hidden py-6 border-t border-border animate-fade-in">
             <div className="flex flex-col gap-4">
               {navLinks.map((link) => (
-                <a
-                  key={link.name}
-                  href={link.href}
-                  className="text-xs font-medium tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors py-2 cursor-pointer"
-                  onClick={(e) => handleNavClick(e, link.href)}
-                >
-                  {link.name}
-                </a>
+                link.isPage ? (
+                  <Link
+                    key={link.name}
+                    to={link.href}
+                    className="text-xs font-medium tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors py-2"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {link.name}
+                  </Link>
+                ) : (
+                  <a
+                    key={link.name}
+                    href={link.href}
+                    className="text-xs font-medium tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors py-2 cursor-pointer"
+                    onClick={(e) => handleNavClick(e, link.href)}
+                  >
+                    {link.name}
+                  </a>
+                )
               ))}
               <div className="flex flex-col gap-3 pt-4 border-t border-border mt-2">
                 {user ? (
