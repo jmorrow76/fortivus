@@ -4,6 +4,7 @@ import Programs from "@/components/Programs";
 import Supplements from "@/components/Supplements";
 import AIAnalysis from "@/components/AIAnalysis";
 import BodyAnalysis from "@/components/BodyAnalysis";
+import SuccessStories from "@/components/SuccessStories";
 import Gear from "@/components/Gear";
 import Articles from "@/components/Articles";
 import Pricing from "@/components/Pricing";
@@ -20,6 +21,7 @@ const Index = () => {
         <Supplements />
         <AIAnalysis />
         <BodyAnalysis />
+        <SuccessStories />
         <Gear />
         <Articles />
         <Pricing />
