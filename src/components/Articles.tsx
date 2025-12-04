@@ -39,62 +39,57 @@ const articles = [
 
 const Articles = () => {
   return (
-    <section id="articles" className="py-24 bg-background">
+    <section id="articles" className="section-padding bg-secondary/30">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-16">
           <div className="max-w-2xl">
-            <span className="text-primary font-semibold text-sm tracking-wider uppercase mb-4 block">
-              Knowledge Hub
-            </span>
-            <h2 className="font-heading text-4xl md:text-5xl font-bold mb-4">
-              Expert{" "}
-              <span className="bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 bg-clip-text text-transparent">
-                Insights
-              </span>
+            <span className="section-label text-left">Knowledge Hub</span>
+            <h2 className="section-title text-left">
+              Expert <span className="text-accent">Insights</span>
             </h2>
-            <p className="text-muted-foreground text-lg">
+            <p className="section-description text-left mx-0">
               AI-powered articles and expert contributions covering training,
               nutrition, and lifestyle optimization.
             </p>
           </div>
-          <Button variant="outline" size="lg" className="shrink-0">
+          <Button variant="outline" size="lg" className="shrink-0 self-start md:self-auto">
             Browse All Articles
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
         </div>
 
         {/* Articles Grid */}
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid lg:grid-cols-2 gap-6 lg:gap-8">
           {/* Featured Article */}
           <Card variant="premium" className="lg:row-span-2 overflow-hidden group">
             <CardContent className="p-0 h-full flex flex-col">
-              <div className="h-64 bg-gradient-to-br from-secondary to-muted relative overflow-hidden">
+              <div className="h-56 bg-gradient-to-br from-secondary to-muted relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-t from-card to-transparent" />
                 <div className="absolute top-4 left-4">
-                  <span className="px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-semibold">
+                  <span className="px-3 py-1 rounded-md bg-accent text-accent-foreground text-xs font-semibold">
                     Featured
                   </span>
                 </div>
               </div>
-              <div className="p-8 flex-1 flex flex-col">
-                <span className="text-primary text-sm font-semibold mb-2">
+              <div className="p-6 lg:p-8 flex-1 flex flex-col">
+                <span className="text-accent text-sm font-semibold mb-2">
                   {articles[0].category}
                 </span>
-                <h3 className="font-heading text-2xl md:text-3xl font-bold mb-4 group-hover:text-primary transition-colors">
+                <h3 className="font-heading text-xl lg:text-2xl font-bold mb-4 group-hover:text-accent transition-colors">
                   {articles[0].title}
                 </h3>
-                <p className="text-muted-foreground mb-6 flex-1">
+                <p className="text-muted-foreground mb-6 flex-1 text-sm leading-relaxed">
                   {articles[0].excerpt}
                 </p>
                 <div className="flex items-center justify-between pt-6 border-t border-border">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center">
-                      <User className="w-5 h-5 text-muted-foreground" />
+                    <div className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
+                      <User className="w-4 h-4 text-muted-foreground" />
                     </div>
                     <div>
                       <div className="text-sm font-semibold">{articles[0].author}</div>
-                      <div className="text-xs text-muted-foreground flex items-center gap-2">
+                      <div className="text-xs text-muted-foreground flex items-center gap-1">
                         <Clock className="w-3 h-3" />
                         {articles[0].readTime} read
                       </div>
@@ -113,13 +108,13 @@ const Articles = () => {
           {articles.slice(1).map((article) => (
             <Card key={article.title} variant="interactive" className="group">
               <CardContent className="p-6">
-                <span className="text-primary text-sm font-semibold mb-2 block">
+                <span className="text-accent text-sm font-semibold mb-2 block">
                   {article.category}
                 </span>
-                <h3 className="font-heading text-xl font-bold mb-3 group-hover:text-primary transition-colors">
+                <h3 className="font-heading text-lg font-bold mb-3 group-hover:text-accent transition-colors">
                   {article.title}
                 </h3>
-                <p className="text-muted-foreground text-sm mb-6">
+                <p className="text-muted-foreground text-sm mb-6 leading-relaxed">
                   {article.excerpt}
                 </p>
                 <div className="flex items-center justify-between pt-4 border-t border-border">

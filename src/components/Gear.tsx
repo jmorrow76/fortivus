@@ -14,8 +14,8 @@ const partnerBrands = [
       { name: "Jogger Pants", price: "$78", rating: 4.9 },
     ],
     affiliateUrl: "https://municipal.com/?ref=YOURAFFILIATEID",
-    color: "from-blue-900/30 to-slate-900/30",
-    accent: "blue",
+    bgColor: "bg-slate-50",
+    borderColor: "border-slate-200",
   },
   {
     name: "Vuori",
@@ -28,8 +28,8 @@ const partnerBrands = [
       { name: "Meta Pant", price: "$98", rating: 4.9 },
     ],
     affiliateUrl: "https://vuori.com/?ref=YOURAFFILIATEID",
-    color: "from-teal-900/30 to-cyan-900/30",
-    accent: "teal",
+    bgColor: "bg-teal-50",
+    borderColor: "border-teal-200",
   },
   {
     name: "Alo Yoga",
@@ -42,8 +42,8 @@ const partnerBrands = [
       { name: "Triumph Hoodie", price: "$148", rating: 4.9 },
     ],
     affiliateUrl: "https://aloyoga.com/?ref=YOURAFFILIATEID",
-    color: "from-purple-900/30 to-indigo-900/30",
-    accent: "purple",
+    bgColor: "bg-purple-50",
+    borderColor: "border-purple-200",
   },
 ];
 
@@ -84,68 +84,62 @@ const Gear = () => {
   };
 
   return (
-    <section id="gear" className="py-24 bg-gradient-to-b from-card/30 to-background">
+    <section id="gear" className="section-padding bg-background">
       <div className="container mx-auto px-4">
         {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <span className="text-primary font-semibold text-sm tracking-wider uppercase mb-4 block">
-            Official Partners
-          </span>
-          <h2 className="font-heading text-4xl md:text-5xl font-bold mb-6">
-            Premium{" "}
-            <span className="bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 bg-clip-text text-transparent">
-              Partner Brands
-            </span>
+        <div className="section-header">
+          <span className="section-label">Official Partners</span>
+          <h2 className="section-title">
+            Premium <span className="text-accent">Partner Brands</span>
           </h2>
-          <p className="text-muted-foreground text-lg">
+          <p className="section-description">
             Exclusively partnered with the brands we wear and trust. Quality gear 
             that performs as hard as you do.
           </p>
         </div>
 
         {/* Partner Brand Cards */}
-        <div className="grid lg:grid-cols-3 gap-8 mb-16">
+        <div className="grid lg:grid-cols-3 gap-6 lg:gap-8 mb-16">
           {partnerBrands.map((brand) => (
             <Card 
               key={brand.name} 
-              variant="glass" 
-              className={`overflow-hidden bg-gradient-to-br ${brand.color} border-${brand.accent}-500/20`}
+              className={`overflow-hidden ${brand.bgColor} ${brand.borderColor} border`}
             >
               <CardContent className="p-6">
                 {/* Brand Header */}
-                <div className="mb-6 pb-4 border-b border-border/50">
-                  <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-3 inline-block">
+                <div className="mb-6 pb-4 border-b border-border">
+                  <span className="px-2 py-1 rounded-md bg-accent/10 text-accent text-xs font-semibold mb-3 inline-block">
                     Official Partner
                   </span>
-                  <h3 className="font-heading text-2xl font-bold mb-1">{brand.name}</h3>
-                  <p className="text-sm text-primary font-medium">{brand.tagline}</p>
+                  <h3 className="font-heading text-xl font-bold mb-1">{brand.name}</h3>
+                  <p className="text-sm text-accent font-medium">{brand.tagline}</p>
                 </div>
                 
-                <p className="text-sm text-muted-foreground mb-6">
+                <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
                   {brand.description}
                 </p>
 
                 {/* Featured Products */}
-                <div className="space-y-3 mb-6">
+                <div className="space-y-2 mb-6">
                   {brand.featured.map((item) => (
                     <div
                       key={item.name}
-                      className="flex items-center justify-between p-3 rounded-xl bg-background/30 hover:bg-background/50 transition-colors"
+                      className="flex items-center justify-between p-3 rounded-lg bg-card hover:shadow-subtle transition-all"
                     >
                       <div>
                         <h4 className="font-medium text-sm">{item.name}</h4>
                         <div className="flex items-center gap-1 mt-1">
-                          <Star className="w-3 h-3 fill-primary text-primary" />
+                          <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
                           <span className="text-xs text-muted-foreground">{item.rating}</span>
                         </div>
                       </div>
-                      <span className="font-heading font-bold text-primary">{item.price}</span>
+                      <span className="font-heading font-bold text-accent">{item.price}</span>
                     </div>
                   ))}
                 </div>
 
                 <Button 
-                  variant="gold" 
+                  variant="default" 
                   className="w-full"
                   onClick={() => handleShopClick(brand.affiliateUrl)}
                 >
@@ -159,10 +153,10 @@ const Gear = () => {
 
         {/* Amazon Equipment Section */}
         <div className="mt-16">
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <div>
-              <h3 className="font-heading text-2xl font-bold mb-2">Training Equipment</h3>
-              <p className="text-muted-foreground">Top-rated gear via our Amazon partnership</p>
+              <h3 className="font-heading text-xl font-bold mb-2">Training Equipment</h3>
+              <p className="text-muted-foreground text-sm">Top-rated gear via our Amazon partnership</p>
             </div>
             <Button 
               variant="outline"
@@ -178,18 +172,18 @@ const Gear = () => {
               <div
                 key={item.name}
                 onClick={() => handleShopClick(item.affiliateUrl)}
-                className="p-4 rounded-xl bg-card/50 border border-border/50 hover:border-primary/50 hover:bg-card transition-all cursor-pointer group"
+                className="p-4 rounded-lg bg-card border border-border hover:border-accent/30 hover:shadow-subtle transition-all cursor-pointer group"
               >
                 <p className="text-xs text-muted-foreground mb-1">{item.brand}</p>
-                <h4 className="font-semibold mb-2 group-hover:text-primary transition-colors">
+                <h4 className="font-semibold text-sm mb-2 group-hover:text-accent transition-colors">
                   {item.name}
                 </h4>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1">
-                    <Star className="w-3 h-3 fill-primary text-primary" />
+                    <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
                     <span className="text-xs text-muted-foreground">{item.rating}</span>
                   </div>
-                  <span className="font-heading font-bold text-primary">{item.price}</span>
+                  <span className="font-heading font-bold text-accent">{item.price}</span>
                 </div>
               </div>
             ))}
