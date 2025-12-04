@@ -59,22 +59,13 @@ const Supplements = () => {
   };
 
   return (
-    <section id="supplements" className="section-padding bg-secondary/30">
+    <section id="supplements" className="py-12 md:py-16">
       <div className="container mx-auto px-4">
-        {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-16">
-          <div className="max-w-2xl">
-            <span className="section-label text-left">Partner Supplements</span>
-            <h2 className="section-title text-left">
-              Science-Backed <span className="text-accent">Nutrition</span>
-            </h2>
-            <p className="section-description text-left mx-0">
-              Exclusively partnered with premium brands we trust. Every product vetted 
-              and tested by our team.
-            </p>
-          </div>
-          <Button variant="outline" size="lg" className="shrink-0 self-start md:self-auto">
-            View All Partners
+        {/* Subsection Header */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-10">
+          <h3 className="text-xl md:text-2xl font-medium">Supplements</h3>
+          <Button variant="outline" size="sm" className="shrink-0 self-start md:self-auto">
+            View All
             <ExternalLink className="w-4 h-4 ml-2" />
           </Button>
         </div>
