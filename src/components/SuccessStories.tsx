@@ -1,8 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { RefreshCw, Quote, Target, TrendingUp, Clock } from 'lucide-react';
+import { RefreshCw, Quote, Target, TrendingUp, Clock, Heart } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { useNavigate } from 'react-router-dom';
+import type { Json } from '@/integrations/supabase/types';
 
 interface Story {
   name: string;
@@ -16,9 +20,29 @@ interface Story {
 
 const SuccessStories = () => {
   const [stories, setStories] = useState<Story[]>([]);
+  const [savedStories, setSavedStories] = useState<Story[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasGenerated, setHasGenerated] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      fetchSavedStories();
+    }
+  }, [user]);
+
+  const fetchSavedStories = async () => {
+    const { data, error } = await supabase
+      .from('saved_stories')
+      .select('story_data')
+      .order('created_at', { ascending: false });
+
+    if (!error && data) {
+      setSavedStories(data.map(d => d.story_data as unknown as Story));
+    }
+  };
 
   const generateStories = async () => {
     setIsLoading(true);
@@ -54,11 +78,105 @@ const SuccessStories = () => {
     }
   };
 
+  const isStorySaved = (story: Story) => {
+    return savedStories.some(s => s.name === story.name && s.quote === story.quote);
+  };
+
+  const toggleSaveStory = async (story: Story) => {
+    if (!user) {
+      toast({
+        title: 'Sign in Required',
+        description: 'Please sign in to save stories.',
+      });
+      navigate('/auth');
+      return;
+    }
+
+    const isSaved = isStorySaved(story);
+
+    if (isSaved) {
+      const { error } = await supabase
+        .from('saved_stories')
+        .delete()
+        .eq('user_id', user.id)
+        .contains('story_data', { name: story.name, quote: story.quote });
+
+      if (!error) {
+        setSavedStories(prev => prev.filter(s => !(s.name === story.name && s.quote === story.quote)));
+        toast({ title: 'Story removed', description: 'Story removed from your favorites.' });
+      }
+    } else {
+      const { error } = await supabase
+        .from('saved_stories')
+        .insert([{ user_id: user.id, story_data: story as unknown as Json }]);
+
+      if (!error) {
+        setSavedStories(prev => [story, ...prev]);
+        toast({ title: 'Story saved!', description: 'Story added to your favorites.' });
+      }
+    }
+  };
+
+  const StoryCard = ({ story, showSaveButton = true }: { story: Story; showSaveButton?: boolean }) => {
+    const saved = isStorySaved(story);
+    
+    return (
+      <Card className="bg-card border-border/40 shadow-card overflow-hidden">
+        <CardContent className="p-6">
+          <div className="mb-6 pb-4 border-b border-border/30 flex items-start justify-between">
+            <div>
+              <h3 className="text-xl font-heading font-semibold text-foreground">
+                {story.name}, {story.age}
+              </h3>
+              <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
+                <Clock className="h-4 w-4 text-accent" />
+                <span>{story.timeline} transformation</span>
+              </div>
+            </div>
+            {showSaveButton && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => toggleSaveStory(story)}
+                className={saved ? 'text-destructive hover:text-destructive/80' : 'text-muted-foreground hover:text-accent'}
+              >
+                {saved ? <Heart className="h-5 w-5 fill-current" /> : <Heart className="h-5 w-5" />}
+              </Button>
+            )}
+          </div>
+
+          <div className="mb-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Target className="h-4 w-4 text-accent" />
+              <span className="text-sm font-medium text-foreground">Starting Point</span>
+            </div>
+            <p className="text-sm text-muted-foreground">{story.startingPoint}</p>
+          </div>
+
+          <div className="mb-6">
+            <div className="flex items-center gap-2 mb-2">
+              <TrendingUp className="h-4 w-4 text-accent" />
+              <span className="text-sm font-medium text-foreground">Results Achieved</span>
+            </div>
+            <p className="text-sm text-muted-foreground">{story.results}</p>
+          </div>
+
+          <div className="bg-secondary/50 rounded-lg p-4 relative">
+            <Quote className="h-6 w-6 text-accent/30 absolute top-3 left-3" />
+            <p className="text-sm italic text-foreground/80 pl-6">
+              "{story.quote}"
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
   return (
-    <section id="success-stories" className="py-20 bg-cream">
+    <section id="success-stories" className="py-20 bg-background">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-heading font-bold text-navy mb-4">
+          <h2 className="text-3xl md:text-4xl font-heading font-bold text-foreground mb-4">
             Real Transformations
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
@@ -69,7 +187,7 @@ const SuccessStories = () => {
             onClick={generateStories}
             disabled={isLoading}
             size="lg"
-            className="bg-bronze hover:bg-bronze/90 text-white"
+            className="bg-accent hover:bg-accent/90 text-accent-foreground"
           >
             {isLoading ? (
               <>
@@ -90,47 +208,22 @@ const SuccessStories = () => {
         {stories.length > 0 && (
           <div className="grid md:grid-cols-3 gap-8 mt-12">
             {stories.map((story, index) => (
-              <Card key={index} className="bg-white border-border/40 shadow-elegant overflow-hidden">
-                <CardContent className="p-6">
-                  {/* Header */}
-                  <div className="mb-6 pb-4 border-b border-border/30">
-                    <h3 className="text-xl font-heading font-semibold text-navy">
-                      {story.name}, {story.age}
-                    </h3>
-                    <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
-                      <Clock className="h-4 w-4 text-bronze" />
-                      <span>{story.timeline} transformation</span>
-                    </div>
-                  </div>
-
-                  {/* Starting Point */}
-                  <div className="mb-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Target className="h-4 w-4 text-bronze" />
-                      <span className="text-sm font-medium text-navy">Starting Point</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground">{story.startingPoint}</p>
-                  </div>
-
-                  {/* Results */}
-                  <div className="mb-6">
-                    <div className="flex items-center gap-2 mb-2">
-                      <TrendingUp className="h-4 w-4 text-bronze" />
-                      <span className="text-sm font-medium text-navy">Results Achieved</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground">{story.results}</p>
-                  </div>
-
-                  {/* Quote */}
-                  <div className="bg-cream/50 rounded-lg p-4 relative">
-                    <Quote className="h-6 w-6 text-bronze/30 absolute top-3 left-3" />
-                    <p className="text-sm italic text-navy/80 pl-6">
-                      "{story.quote}"
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
+              <StoryCard key={index} story={story} />
             ))}
+          </div>
+        )}
+
+        {user && savedStories.length > 0 && (
+          <div className="mt-16">
+            <h3 className="text-2xl font-heading font-semibold text-foreground mb-6 flex items-center gap-2">
+              <Heart className="h-6 w-6 text-accent fill-accent" />
+              Your Saved Stories
+            </h3>
+            <div className="grid md:grid-cols-3 gap-8">
+              {savedStories.map((story, index) => (
+                <StoryCard key={`saved-${index}`} story={story} />
+              ))}
+            </div>
           </div>
         )}
 
