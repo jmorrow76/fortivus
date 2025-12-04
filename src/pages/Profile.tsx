@@ -9,8 +9,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Camera, Loader2, User, Crown, Settings } from "lucide-react";
+import { ArrowLeft, Camera, Loader2, User, Crown, Settings, Calendar } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import { format } from "date-fns";
 
 const Profile = () => {
   const { user, loading: authLoading, subscription, session } = useAuth();
@@ -186,10 +187,18 @@ const Profile = () => {
                   </CardDescription>
                 </div>
                 {isElite && (
-                  <Badge className="bg-accent text-accent-foreground font-semibold px-3 py-1.5 flex items-center gap-1.5">
-                    <Crown className="h-4 w-4" />
-                    Elite Member
-                  </Badge>
+                  <div className="flex flex-col items-end gap-1">
+                    <Badge className="bg-accent text-accent-foreground font-semibold px-3 py-1.5 flex items-center gap-1.5">
+                      <Crown className="h-4 w-4" />
+                      Elite Member
+                    </Badge>
+                    {subscription.subscriptionEnd && (
+                      <span className="text-xs text-muted-foreground flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        Renews {format(new Date(subscription.subscriptionEnd), "MMM d, yyyy")}
+                      </span>
+                    )}
+                  </div>
                 )}
               </div>
             </CardHeader>
