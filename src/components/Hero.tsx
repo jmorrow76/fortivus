@@ -22,32 +22,32 @@ const Hero = () => {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-background/10 backdrop-blur-sm border border-background/20 mb-8 animate-fade-in">
             <span className="text-sm font-medium text-background/90">
-              Fitness Optimized for Men 40+
+              Elite Performance for Men Who Refuse to Settle
             </span>
           </div>
 
           {/* Headline */}
           <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6 text-background animate-fade-in-up">
-            Your Best Years
+            Strength Has
             <br />
-            <span className="text-accent">Are Ahead</span>
+            <span className="text-accent">No Expiration</span>
           </h1>
 
           {/* Subheadline */}
           <p className="text-lg md:text-xl text-background/80 max-w-xl mb-10 animate-fade-in-up delay-100 leading-relaxed">
-            Science-backed programs, AI-powered body analysis, and curated
-            supplements designed specifically for men over 40.
+            Built for men who dominate. AI-powered training, precision nutrition, 
+            and elite protocols engineered for peak masculine performance at any age.
           </p>
 
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row gap-4 animate-fade-in-up delay-200">
             <Button variant="hero" size="xl" className="group bg-accent hover:bg-accent/90">
-              Start Your Transformation
+              Forge Your Legacy
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Button>
             <Button variant="glass" size="xl" className="group bg-background/10 text-background border-background/20 hover:bg-background/20">
               <Play className="w-5 h-5" />
-              Watch Success Stories
+              See Transformations
             </Button>
           </div>
 
@@ -58,7 +58,7 @@ const Hero = () => {
                 50K+
               </div>
               <div className="text-sm text-background/70 mt-1">
-                Active Members
+                Elite Members
               </div>
             </div>
             <div>
@@ -66,7 +66,7 @@ const Hero = () => {
                 92%
               </div>
               <div className="text-sm text-background/70 mt-1">
-                Success Rate
+                Hit Their Goals
               </div>
             </div>
             <div>
