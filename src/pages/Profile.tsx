@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Camera, Loader2, User, Crown, Settings, Calendar } from "lucide-react";
+import { ArrowLeft, Camera, Loader2, User, Crown, Settings, Calendar, Sparkles } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { format } from "date-fns";
 
@@ -203,6 +203,30 @@ const Profile = () => {
               </div>
             </CardHeader>
             <CardContent className="space-y-8">
+              {/* Upgrade Prompt for non-Elite users */}
+              {!isElite && (
+                <div className="p-4 rounded-lg bg-accent/10 border border-accent/20">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 rounded-full bg-accent/20">
+                      <Sparkles className="h-5 w-5 text-accent" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-heading font-semibold text-foreground">Upgrade to Elite</h3>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Unlock AI body analysis, progress tracking, personalized build plans, and more.
+                      </p>
+                      <Button
+                        size="sm"
+                        className="mt-3"
+                        onClick={() => navigate("/#pricing")}
+                      >
+                        <Crown className="h-4 w-4 mr-2" />
+                        View Plans
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
               {/* Avatar Section */}
               <div className="flex flex-col items-center gap-4">
                 <div className="relative">
