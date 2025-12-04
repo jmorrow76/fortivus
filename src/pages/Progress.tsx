@@ -9,11 +9,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Plus, Loader2, Trash2, Calendar, Scale, LayoutGrid, Columns, LineChart, Lock, Sparkles } from "lucide-react";
+import { ArrowLeft, Plus, Loader2, Trash2, Calendar, Scale, LayoutGrid, Columns, LineChart, Lock, Sparkles, Dumbbell } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Navbar from "@/components/Navbar";
 import PhotoComparison from "@/components/PhotoComparison";
 import WeightChart from "@/components/WeightChart";
+import { WorkoutLog } from "@/components/WorkoutLog";
 import { format } from "date-fns";
 
 interface ProgressPhoto {
@@ -335,6 +336,10 @@ const Progress = () => {
                   <LineChart className="h-4 w-4" />
                   Chart
                 </TabsTrigger>
+                <TabsTrigger value="workouts" className="gap-2">
+                  <Dumbbell className="h-4 w-4" />
+                  Workouts
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="grid">
@@ -389,6 +394,10 @@ const Progress = () => {
 
               <TabsContent value="chart">
                 <WeightChart photos={photos} />
+              </TabsContent>
+
+              <TabsContent value="workouts">
+                <WorkoutLog />
               </TabsContent>
             </Tabs>
           )}
