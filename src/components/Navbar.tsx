@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X, LogOut, Settings, Camera } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import fortivusLogo from "@/assets/fortivus-logo.png";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -28,6 +29,7 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
+            <img src={fortivusLogo} alt="Fortivus" className="h-8 w-8 md:h-10 md:w-10" />
             <span className="font-heading text-xl md:text-2xl font-bold tracking-tight text-foreground">
               Fortivus
             </span>
