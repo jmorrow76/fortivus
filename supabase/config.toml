@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.reset-weekly-challenges]
 verify_jwt = false
+
+[functions.reset-monthly-challenges]
+verify_jwt = false

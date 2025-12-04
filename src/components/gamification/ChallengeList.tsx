@@ -82,6 +82,12 @@ export function ChallengeList({ challenges, userChallenges, onJoinChallenge }: C
                         Weekly
                       </span>
                     )}
+                    {challenge.reset_type === 'monthly' && (
+                      <span className="px-2 py-0.5 rounded text-xs uppercase tracking-wider bg-amber-500/20 text-amber-400 flex items-center gap-1">
+                        <RefreshCw className="h-3 w-3" />
+                        Monthly
+                      </span>
+                    )}
                     {isCompleted && (
                       <CheckCircle className="h-4 w-4 text-green-500" />
                     )}
