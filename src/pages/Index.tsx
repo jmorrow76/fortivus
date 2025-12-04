@@ -3,6 +3,7 @@ import Hero from "@/components/Hero";
 import Programs from "@/components/Programs";
 import Supplements from "@/components/Supplements";
 import AIAnalysis from "@/components/AIAnalysis";
+import BodyAnalysis from "@/components/BodyAnalysis";
 import Gear from "@/components/Gear";
 import Articles from "@/components/Articles";
 import Pricing from "@/components/Pricing";
@@ -18,6 +19,7 @@ const Index = () => {
         <Programs />
         <Supplements />
         <AIAnalysis />
+        <BodyAnalysis />
         <Gear />
         <Articles />
         <Pricing />
