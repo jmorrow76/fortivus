@@ -39,6 +39,28 @@ serve(async (req) => {
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { userId: user.id, email: user.email });
 
+    // Check for manual subscription grant first
+    const { data: grantData } = await supabaseClient
+      .from('subscription_grants')
+      .select('*')
+      .eq('user_email', user.email.toLowerCase())
+      .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`)
+      .maybeSingle();
+
+    if (grantData) {
+      logStep("Manual subscription grant found", { grantId: grantData.id });
+      return new Response(JSON.stringify({
+        subscribed: true,
+        product_id: 'manual_grant',
+        subscription_end: grantData.expires_at,
+        grant_type: 'manual'
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+
+    // Check Stripe subscription
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     

@@ -478,6 +478,33 @@ export type Database = {
         }
         Relationships: []
       }
+      subscription_grants: {
+        Row: {
+          expires_at: string | null
+          granted_at: string
+          granted_by: string | null
+          id: string
+          notes: string | null
+          user_email: string
+        }
+        Insert: {
+          expires_at?: string | null
+          granted_at?: string
+          granted_by?: string | null
+          id?: string
+          notes?: string | null
+          user_email: string
+        }
+        Update: {
+          expires_at?: string | null
+          granted_at?: string
+          granted_by?: string | null
+          id?: string
+          notes?: string | null
+          user_email?: string
+        }
+        Relationships: []
+      }
       user_badges: {
         Row: {
           badge_id: string
