@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
@@ -5,10 +6,19 @@ import Navbar from "@/components/Navbar";
 import MoodCheckin from "@/components/MoodCheckin";
 import { TrendsDashboard } from "@/components/TrendsDashboard";
 import { useAuth } from "@/hooks/useAuth";
+import { useNotifications } from "@/hooks/useNotifications";
 
 const DailyCheckin = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { checkAndNotifyStreak, permission } = useNotifications();
+
+  // Check and notify about streak when page loads
+  useEffect(() => {
+    if (user && permission === 'granted') {
+      checkAndNotifyStreak();
+    }
+  }, [user, permission, checkAndNotifyStreak]);
 
   return (
     <div className="min-h-screen bg-background">
