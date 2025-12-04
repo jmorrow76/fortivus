@@ -139,6 +139,16 @@ export function useGamification() {
         updated_at: new Date().toISOString()
       }).eq('user_id', user.id);
 
+      // Post streak milestone to activity feed for 7, 14, 30, 60 day milestones
+      if ([7, 14, 30, 60, 100].includes(newStreak)) {
+        await supabase.from('activity_feed').insert({
+          user_id: user.id,
+          activity_type: 'streak_milestone',
+          streak_count: newStreak,
+          xp_earned: 10
+        });
+      }
+
       // Check for streak badges
       await checkAndAwardBadges(newStreak, streak.total_checkins + 1);
     } else {
@@ -178,6 +188,14 @@ export function useGamification() {
           badge_id: badge.id
         });
 
+        // Post to activity feed
+        await supabase.from('activity_feed').insert({
+          user_id: user.id,
+          activity_type: 'badge_earned',
+          badge_id: badge.id,
+          xp_earned: badge.xp_value
+        });
+
         // Add XP for badge
         if (streak) {
           await supabase.from('user_streaks').update({
@@ -215,6 +233,14 @@ export function useGamification() {
           total_xp: streak.total_xp + userChallenge.challenge.xp_reward
         }).eq('user_id', user.id);
       }
+
+      // Post to activity feed
+      await supabase.from('activity_feed').insert({
+        user_id: user.id,
+        activity_type: 'challenge_completed',
+        challenge_id: userChallenge.challenge_id,
+        xp_earned: userChallenge.challenge.xp_reward
+      });
 
       toast({
         title: '🎉 Challenge Completed!',

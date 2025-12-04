@@ -14,6 +14,89 @@ export type Database = {
   }
   public: {
     Tables: {
+      achievement_comments: {
+        Row: {
+          badge_id: string | null
+          comment: string
+          created_at: string
+          id: string
+          target_user_id: string
+          user_id: string
+        }
+        Insert: {
+          badge_id?: string | null
+          comment: string
+          created_at?: string
+          id?: string
+          target_user_id: string
+          user_id: string
+        }
+        Update: {
+          badge_id?: string | null
+          comment?: string
+          created_at?: string
+          id?: string
+          target_user_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "achievement_comments_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "badges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      activity_feed: {
+        Row: {
+          activity_type: string
+          badge_id: string | null
+          challenge_id: string | null
+          created_at: string
+          id: string
+          streak_count: number | null
+          user_id: string
+          xp_earned: number | null
+        }
+        Insert: {
+          activity_type: string
+          badge_id?: string | null
+          challenge_id?: string | null
+          created_at?: string
+          id?: string
+          streak_count?: number | null
+          user_id: string
+          xp_earned?: number | null
+        }
+        Update: {
+          activity_type?: string
+          badge_id?: string | null
+          challenge_id?: string | null
+          created_at?: string
+          id?: string
+          streak_count?: number | null
+          user_id?: string
+          xp_earned?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_feed_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "badges"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activity_feed_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       badges: {
         Row: {
           category: Database["public"]["Enums"]["badge_category"]
@@ -458,6 +541,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_follows: {
+        Row: {
+          created_at: string
+          follower_id: string
+          following_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          follower_id: string
+          following_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          follower_id?: string
+          following_id?: string
+          id?: string
+        }
+        Relationships: []
       }
       user_streaks: {
         Row: {
