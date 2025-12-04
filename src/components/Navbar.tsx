@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, LogOut, User } from "lucide-react";
+import { Menu, X, LogOut, User, Settings } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 const Navbar = () => {
@@ -50,10 +50,12 @@ const Navbar = () => {
           <div className="hidden lg:flex items-center gap-3">
             {user ? (
               <>
-                <span className="text-sm text-muted-foreground flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  {user.email}
-                </span>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link to="/profile" className="flex items-center gap-2">
+                    <Settings className="h-4 w-4" />
+                    Profile
+                  </Link>
+                </Button>
                 <Button variant="ghost" size="sm" onClick={handleSignOut}>
                   <LogOut className="h-4 w-4 mr-2" />
                   Sign Out
@@ -97,10 +99,12 @@ const Navbar = () => {
               <div className="flex flex-col gap-3 pt-4 border-t border-border mt-2">
                 {user ? (
                   <>
-                    <span className="text-sm text-muted-foreground flex items-center gap-2 py-2">
-                      <User className="h-4 w-4" />
-                      {user.email}
-                    </span>
+                    <Button variant="ghost" className="justify-start" asChild>
+                      <Link to="/profile" onClick={() => setIsOpen(false)}>
+                        <Settings className="h-4 w-4 mr-2" />
+                        Profile
+                      </Link>
+                    </Button>
                     <Button variant="ghost" className="justify-start" onClick={handleSignOut}>
                       <LogOut className="h-4 w-4 mr-2" />
                       Sign Out
