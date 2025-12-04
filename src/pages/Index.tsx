@@ -22,15 +22,13 @@ const Index = () => {
       <main>
         <Hero />
         <StatsCounter />
-        
-        <Supplements />
         <AIAnalysis />
         <BodyAnalysis />
         <SuccessStories />
-        
-        <Gear />
         <Articles />
         <TestimonialCarousel />
+        <Supplements />
+        <Gear />
         <Pricing />
         <FAQ />
         <Newsletter />
