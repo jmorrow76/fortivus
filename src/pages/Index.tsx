@@ -24,7 +24,6 @@ const Index = () => {
         <AIAnalysis />
         <BodyAnalysis />
         <Pricing />
-        <FAQ />
         <SuccessStories />
         <Articles />
         
@@ -43,6 +42,7 @@ const Index = () => {
           <Gear />
         </div>
         <Newsletter />
+        <FAQ />
       </main>
       <Footer />
     </div>
