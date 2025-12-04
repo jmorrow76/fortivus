@@ -1,7 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
+
+interface Badge {
+  id: string;
+  name: string;
+  requirement_type: string;
+  requirement_value: number;
+  xp_value: number;
+}
 
 export interface WorkoutLog {
   id: string;
@@ -30,6 +38,69 @@ export function useWorkoutLog() {
   useEffect(() => {
     if (user) {
       fetchWorkouts();
+    }
+  }, [user]);
+
+  const checkWorkoutBadges = useCallback(async (totalWorkouts: number, totalMinutes: number) => {
+    if (!user) return;
+
+    // Fetch workout-related badges
+    const { data: badges } = await supabase
+      .from('badges')
+      .select('*')
+      .in('requirement_type', ['workouts', 'workout_minutes']);
+
+    if (!badges) return;
+
+    // Fetch user's earned badges
+    const { data: userBadges } = await supabase
+      .from('user_badges')
+      .select('badge_id')
+      .eq('user_id', user.id);
+
+    const earnedBadgeIds = userBadges?.map(ub => ub.badge_id) || [];
+
+    for (const badge of badges as Badge[]) {
+      if (earnedBadgeIds.includes(badge.id)) continue;
+
+      let earned = false;
+      if (badge.requirement_type === 'workouts' && totalWorkouts >= badge.requirement_value) {
+        earned = true;
+      } else if (badge.requirement_type === 'workout_minutes' && totalMinutes >= badge.requirement_value) {
+        earned = true;
+      }
+
+      if (earned) {
+        // Award badge
+        await supabase.from('user_badges').insert({
+          user_id: user.id,
+          badge_id: badge.id
+        });
+
+        // Add XP to user streaks
+        const { data: streakData } = await supabase
+          .from('user_streaks')
+          .select('total_xp')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (streakData) {
+          await supabase
+            .from('user_streaks')
+            .update({ total_xp: (streakData.total_xp || 0) + badge.xp_value })
+            .eq('user_id', user.id);
+        }
+
+        // Post to activity feed
+        await supabase.from('activity_feed').insert({
+          user_id: user.id,
+          activity_type: 'badge_earned',
+          badge_id: badge.id,
+          xp_earned: badge.xp_value
+        });
+
+        toast.success(`🏆 Badge Earned: ${badge.name}! +${badge.xp_value} XP`);
+      }
     }
   }, [user]);
 
@@ -110,6 +181,19 @@ export function useWorkoutLog() {
     });
 
     toast.success(`Workout logged! +${xpEarned} XP`);
+    
+    // Fetch updated workouts and check for badges
+    const { data: allWorkouts } = await supabase
+      .from('workout_logs')
+      .select('duration_minutes')
+      .eq('user_id', user.id);
+
+    if (allWorkouts) {
+      const totalWorkouts = allWorkouts.length;
+      const totalMinutes = allWorkouts.reduce((sum, w) => sum + w.duration_minutes, 0);
+      await checkWorkoutBadges(totalWorkouts, totalMinutes);
+    }
+
     fetchWorkouts();
     return workout;
   };
