@@ -30,6 +30,7 @@ interface Challenge {
   target_count: number;
   xp_reward: number;
   is_active: boolean;
+  reset_type?: string;
 }
 
 interface UserChallenge {
@@ -95,10 +96,19 @@ export function useGamification() {
   const joinChallenge = async (challengeId: string) => {
     if (!user) return;
 
+    // Get current week key for weekly challenges
+    const now = new Date();
+    const year = now.getFullYear();
+    const weekNumber = Math.ceil(
+      ((now.getTime() - new Date(year, 0, 1).getTime()) / 86400000 + new Date(year, 0, 1).getDay() + 1) / 7
+    );
+    const currentWeek = `${year}-W${weekNumber}`;
+
     const { error } = await supabase.from('user_challenges').insert({
       user_id: user.id,
       challenge_id: challengeId,
-      progress: 0
+      progress: 0,
+      reset_week: currentWeek
     });
 
     if (error) {
