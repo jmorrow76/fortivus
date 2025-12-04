@@ -38,14 +38,13 @@ const Hero = () => {
           </p>
 
           {/* CTAs */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up delay-200">
-            <Button variant="hero" size="xl" className="group">
-              Start Your Journey
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </Button>
-            <Button variant="glass" size="xl">
-              View Programs
-            </Button>
+          <div className="flex justify-center animate-fade-in-up delay-200">
+            <a href="#pricing">
+              <Button variant="hero" size="xl" className="group">
+                Start Your Journey
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </a>
           </div>
 
           {/* Stats */}
