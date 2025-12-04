@@ -6,6 +6,7 @@ import Supplements from "@/components/Supplements";
 import AIAnalysis from "@/components/AIAnalysis";
 import BodyAnalysis from "@/components/BodyAnalysis";
 import SuccessStories from "@/components/SuccessStories";
+import TransformationGallery from "@/components/TransformationGallery";
 import Gear from "@/components/Gear";
 import Articles from "@/components/Articles";
 import TestimonialCarousel from "@/components/TestimonialCarousel";
@@ -25,6 +26,7 @@ const Index = () => {
         <AIAnalysis />
         <BodyAnalysis />
         <SuccessStories />
+        <TransformationGallery />
         <Gear />
         <Articles />
         <TestimonialCarousel />
