@@ -23,7 +23,7 @@ const Footer = () => {
           <div className="col-span-2">
             <a href="/" className="flex items-center gap-2 mb-6">
               <span className="font-heading text-xl font-bold tracking-tight">
-                Prime<span className="text-accent">Fit</span>
+                Prime<span className="text-accent">Forge</span>
               </span>
             </a>
             <p className="text-background/70 text-sm mb-6 max-w-xs leading-relaxed">
@@ -67,7 +67,7 @@ const Footer = () => {
         {/* Bottom */}
         <div className="pt-8 border-t border-background/10 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-background/60">
-            © {new Date().getFullYear()} PrimeFit. All rights reserved.
+            © {new Date().getFullYear()} Prime Forge. All rights reserved.
           </p>
           <p className="text-xs text-background/50">
             Affiliate Disclosure: We may earn commissions from qualifying purchases.

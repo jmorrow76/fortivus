@@ -41,7 +41,7 @@ const AIAnalysis = () => {
             <p className="text-muted-foreground text-lg mb-10 leading-relaxed">
               Stop guessing. Our proprietary AI analyzes your physique and creates
               a science-backed transformation plan. Available exclusively for
-              PrimeFit members.
+              Prime Forge members.
             </p>
 
             {/* Features */}
