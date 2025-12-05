@@ -18,6 +18,7 @@ interface Article {
   slug: string;
   published_at: string | null;
   read_time_minutes: number;
+  image_url: string | null;
 }
 
 const ArticleDetail = () => {
@@ -54,6 +55,7 @@ const ArticleDetail = () => {
         <main className="pt-24 pb-16">
           <div className="container mx-auto px-4 max-w-3xl">
             <Skeleton className="h-8 w-48 mb-8" />
+            <Skeleton className="h-64 w-full mb-8 rounded-lg" />
             <Skeleton className="h-12 w-full mb-4" />
             <Skeleton className="h-6 w-64 mb-8" />
             <div className="space-y-4">
@@ -104,6 +106,17 @@ const ArticleDetail = () => {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Knowledge Hub
           </Link>
+
+          {/* Hero Image */}
+          {article.image_url && (
+            <div className="mb-8 rounded-xl overflow-hidden">
+              <img 
+                src={article.image_url} 
+                alt={article.title}
+                className="w-full h-64 md:h-80 object-cover"
+              />
+            </div>
+          )}
 
           {/* Category */}
           <span className="text-accent text-sm font-semibold uppercase tracking-wider">

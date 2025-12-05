@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Clock, ArrowRight, User, Loader2 } from "lucide-react";
-import { format } from "date-fns";
 
 interface Article {
   id: string;
@@ -16,6 +15,7 @@ interface Article {
   read_time_minutes: number;
   is_featured: boolean;
   published_at: string | null;
+  image_url: string | null;
 }
 
 const Articles = () => {
@@ -26,7 +26,7 @@ const Articles = () => {
     const fetchArticles = async () => {
       const { data, error } = await supabase
         .from("articles")
-        .select("id, title, excerpt, category, author, slug, read_time_minutes, is_featured, published_at")
+        .select("id, title, excerpt, category, author, slug, read_time_minutes, is_featured, published_at, image_url")
         .eq("is_published", true)
         .order("published_at", { ascending: false })
         .limit(4);
@@ -100,7 +100,16 @@ const Articles = () => {
             <Link to={`/knowledge/${featuredArticle.slug}`} className="lg:row-span-2">
               <Card variant="premium" className="h-full overflow-hidden group cursor-pointer">
                 <CardContent className="p-0 h-full flex flex-col">
-                  <div className="h-56 bg-gradient-to-br from-secondary to-muted relative overflow-hidden">
+                  <div className="h-56 relative overflow-hidden">
+                    {featuredArticle.image_url ? (
+                      <img 
+                        src={featuredArticle.image_url} 
+                        alt={featuredArticle.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-secondary to-muted" />
+                    )}
                     <div className="absolute inset-0 bg-gradient-to-t from-card to-transparent" />
                     <div className="absolute top-4 left-4">
                       <span className="px-3 py-1 rounded-md bg-accent text-accent-foreground text-xs font-semibold">
@@ -145,25 +154,36 @@ const Articles = () => {
           {/* Other Articles */}
           {otherArticles.map((article) => (
             <Link key={article.id} to={`/knowledge/${article.slug}`}>
-              <Card variant="interactive" className="group h-full cursor-pointer">
-                <CardContent className="p-6">
-                  <span className="text-accent text-sm font-semibold mb-2 block">
-                    {article.category}
-                  </span>
-                  <h3 className="font-heading text-lg font-bold mb-3 group-hover:text-accent transition-colors">
-                    {article.title}
-                  </h3>
-                  <p className="text-muted-foreground text-sm mb-6 leading-relaxed">
-                    {article.excerpt}
-                  </p>
-                  <div className="flex items-center justify-between pt-4 border-t border-border">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <User className="w-4 h-4" />
-                      {article.author}
+              <Card variant="interactive" className="group h-full cursor-pointer overflow-hidden">
+                <CardContent className="p-0">
+                  {article.image_url && (
+                    <div className="h-32 overflow-hidden">
+                      <img 
+                        src={article.image_url} 
+                        alt={article.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Clock className="w-4 h-4" />
-                      {article.read_time_minutes} min
+                  )}
+                  <div className="p-6">
+                    <span className="text-accent text-sm font-semibold mb-2 block">
+                      {article.category}
+                    </span>
+                    <h3 className="font-heading text-lg font-bold mb-3 group-hover:text-accent transition-colors">
+                      {article.title}
+                    </h3>
+                    <p className="text-muted-foreground text-sm mb-6 leading-relaxed line-clamp-2">
+                      {article.excerpt}
+                    </p>
+                    <div className="flex items-center justify-between pt-4 border-t border-border">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <User className="w-4 h-4" />
+                        {article.author}
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Clock className="w-4 h-4" />
+                        {article.read_time_minutes} min
+                      </div>
                     </div>
                   </div>
                 </CardContent>
