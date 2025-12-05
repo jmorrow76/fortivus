@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Camera, Loader2, User, Crown, Settings, Calendar, Sparkles } from "lucide-react";
+import { ArrowLeft, Camera, Loader2, User, Crown, Settings, Calendar, Sparkles, Flame } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import HealthDashboard from "@/components/HealthDashboard";
 import { NotificationSettings } from "@/components/NotificationSettings";
@@ -26,6 +26,10 @@ const Profile = () => {
   
   const [displayName, setDisplayName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [calorieGoal, setCalorieGoal] = useState(2000);
+  const [proteinGoal, setProteinGoal] = useState(150);
+  const [carbsGoal, setCarbsGoal] = useState(200);
+  const [fatGoal, setFatGoal] = useState(65);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -73,7 +77,7 @@ const Profile = () => {
     try {
       const { data, error } = await supabase
         .from("profiles")
-        .select("display_name, avatar_url")
+        .select("display_name, avatar_url, calorie_goal, protein_goal, carbs_goal, fat_goal")
         .eq("user_id", user!.id)
         .maybeSingle();
 
@@ -82,6 +86,10 @@ const Profile = () => {
       if (data) {
         setDisplayName(data.display_name || "");
         setAvatarUrl(data.avatar_url);
+        setCalorieGoal(data.calorie_goal || 2000);
+        setProteinGoal(data.protein_goal || 150);
+        setCarbsGoal(data.carbs_goal || 200);
+        setFatGoal(data.fat_goal || 65);
       }
     } catch (error) {
       console.error("Error fetching profile:", error);
@@ -140,14 +148,20 @@ const Profile = () => {
     try {
       const { error } = await supabase
         .from("profiles")
-        .update({ display_name: displayName.trim() || null })
+        .update({ 
+          display_name: displayName.trim() || null,
+          calorie_goal: calorieGoal,
+          protein_goal: proteinGoal,
+          carbs_goal: carbsGoal,
+          fat_goal: fatGoal
+        })
         .eq("user_id", user.id);
 
       if (error) throw error;
 
       toast({
         title: "Profile updated",
-        description: "Your display name has been saved.",
+        description: "Your settings have been saved.",
       });
     } catch (error: any) {
       toast({
@@ -290,6 +304,65 @@ const Profile = () => {
                   Email cannot be changed
                 </p>
               </div>
+
+              {/* Macro Goals Section */}
+              {isElite && (
+                <div className="space-y-4 pt-4 border-t">
+                  <div className="flex items-center gap-2">
+                    <Flame className="h-5 w-5 text-orange-500" />
+                    <h3 className="font-semibold">Daily Nutrition Goals</h3>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 max-w-md">
+                    <div className="space-y-2">
+                      <Label htmlFor="calorieGoal">Calories (kcal)</Label>
+                      <Input
+                        id="calorieGoal"
+                        type="number"
+                        min="1000"
+                        max="10000"
+                        value={calorieGoal}
+                        onChange={(e) => setCalorieGoal(parseInt(e.target.value) || 2000)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="proteinGoal">Protein (g)</Label>
+                      <Input
+                        id="proteinGoal"
+                        type="number"
+                        min="0"
+                        max="500"
+                        value={proteinGoal}
+                        onChange={(e) => setProteinGoal(parseInt(e.target.value) || 150)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="carbsGoal">Carbs (g)</Label>
+                      <Input
+                        id="carbsGoal"
+                        type="number"
+                        min="0"
+                        max="1000"
+                        value={carbsGoal}
+                        onChange={(e) => setCarbsGoal(parseInt(e.target.value) || 200)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="fatGoal">Fat (g)</Label>
+                      <Input
+                        id="fatGoal"
+                        type="number"
+                        min="0"
+                        max="500"
+                        value={fatGoal}
+                        onChange={(e) => setFatGoal(parseInt(e.target.value) || 65)}
+                      />
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Customize your daily targets for the calorie tracker
+                  </p>
+                </div>
+              )}
 
               {/* Save Button */}
               <div className="flex flex-col sm:flex-row gap-3">

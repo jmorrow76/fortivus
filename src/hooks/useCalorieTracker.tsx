@@ -48,11 +48,26 @@ export interface FrequentFood extends Food {
   logCount: number;
 }
 
+export interface MacroGoals {
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+}
+
+const DEFAULT_GOALS: MacroGoals = {
+  calories: 2000,
+  protein: 150,
+  carbs: 200,
+  fat: 65
+};
+
 export function useCalorieTracker() {
   const { user } = useAuth();
   const [foods, setFoods] = useState<Food[]>([]);
   const [mealLogs, setMealLogs] = useState<MealLog[]>([]);
   const [frequentFoods, setFrequentFoods] = useState<FrequentFood[]>([]);
+  const [macroGoals, setMacroGoals] = useState<MacroGoals>(DEFAULT_GOALS);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
@@ -166,6 +181,30 @@ export function useCalorieTracker() {
     }
   }, [user]);
 
+  const fetchMacroGoals = useCallback(async () => {
+    if (!user) return;
+    
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('calorie_goal, protein_goal, carbs_goal, fat_goal')
+      .eq('user_id', user.id)
+      .maybeSingle();
+    
+    if (error) {
+      console.error('Error fetching macro goals:', error);
+      return;
+    }
+    
+    if (data) {
+      setMacroGoals({
+        calories: data.calorie_goal || DEFAULT_GOALS.calories,
+        protein: data.protein_goal || DEFAULT_GOALS.protein,
+        carbs: data.carbs_goal || DEFAULT_GOALS.carbs,
+        fat: data.fat_goal || DEFAULT_GOALS.fat
+      });
+    }
+  }, [user]);
+
   useEffect(() => {
     const loadInitialData = async () => {
       setLoading(true);
@@ -173,13 +212,14 @@ export function useCalorieTracker() {
       setFoods(allFoods);
       await fetchMealLogs(selectedDate);
       await fetchFrequentFoods();
+      await fetchMacroGoals();
       setLoading(false);
     };
     
     if (user) {
       loadInitialData();
     }
-  }, [user, selectedDate, fetchFoods, fetchMealLogs, fetchFrequentFoods]);
+  }, [user, selectedDate, fetchFoods, fetchMealLogs, fetchFrequentFoods, fetchMacroGoals]);
 
   const searchFoods = async (query: string) => {
     const results = await fetchFoods(query);
@@ -299,6 +339,7 @@ export function useCalorieTracker() {
     foods,
     mealLogs,
     frequentFoods,
+    macroGoals,
     loading,
     selectedDate,
     setSelectedDate,
