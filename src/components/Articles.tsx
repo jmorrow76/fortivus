@@ -81,7 +81,7 @@ const Articles = () => {
               Expert <span className="text-accent">Insights</span>
             </h2>
             <p className="section-description text-left mx-0">
-              AI-powered articles and expert contributions covering training,
+              Expert articles and contributions covering training,
               nutrition, and lifestyle optimization.
             </p>
           </div>
