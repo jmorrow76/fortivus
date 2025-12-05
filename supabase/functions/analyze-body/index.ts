@@ -107,6 +107,32 @@ Your response MUST be valid JSON with this exact structure:
     
     console.log('AI response received:', content?.substring(0, 200));
 
+    // Check for refusal or non-analyzable responses
+    const refusalPhrases = [
+      'cannot perform',
+      'cannot analyze',
+      'unable to analyze',
+      'cannot provide',
+      'not able to',
+      'i cannot',
+      "i can't",
+      'inappropriate',
+      'not suitable'
+    ];
+    
+    const contentLower = content?.toLowerCase() || '';
+    const isRefusal = refusalPhrases.some(phrase => contentLower.includes(phrase));
+    
+    if (isRefusal || !content) {
+      console.log('AI refused to analyze image:', content?.substring(0, 300));
+      return new Response(
+        JSON.stringify({ 
+          error: 'Unable to analyze this image. Please upload a clear photo of a male physique for body composition analysis. Ensure proper lighting and that the subject is clearly visible.' 
+        }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     // Parse the JSON response from the AI
     let analysis;
     try {
@@ -115,10 +141,10 @@ Your response MUST be valid JSON with this exact structure:
       const jsonStr = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : content;
       analysis = JSON.parse(jsonStr);
     } catch (parseError) {
-      console.error('Failed to parse AI response:', parseError);
+      console.error('Failed to parse AI response:', parseError, 'Content:', content?.substring(0, 500));
       return new Response(
-        JSON.stringify({ error: 'Failed to process analysis results' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: 'Unable to process the image. Please try again with a different photo.' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
