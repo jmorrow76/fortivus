@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Upload, Camera, Loader2, TrendingUp, Apple, Dumbbell, Moon, AlertCircle, CheckCircle, Target } from 'lucide-react';
+import { Upload, Camera, Loader2, TrendingUp, Apple, Dumbbell, Moon, AlertCircle, CheckCircle, Target, Lightbulb, User, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
@@ -193,8 +193,38 @@ const BodyAnalysis = () => {
                 </Button>
               </div>
 
-              <div className="text-xs text-muted-foreground space-y-1">
-                <p>💡 For best results, use a well-lit front or side photo</p>
+              {/* Photo Tips */}
+              <div className="bg-secondary/50 rounded-lg p-4 space-y-3">
+                <h4 className="font-semibold text-sm flex items-center gap-2">
+                  <Lightbulb className="w-4 h-4 text-accent" />
+                  Photo Tips for Best Results
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="flex items-start gap-2">
+                    <User className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-xs font-medium">Pose</p>
+                      <p className="text-xs text-muted-foreground">Stand relaxed, arms at sides or slightly away. Front or 45° angle works best.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Sun className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-xs font-medium">Lighting</p>
+                      <p className="text-xs text-muted-foreground">Natural light or bright, even lighting. Avoid harsh shadows or backlight.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Camera className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-xs font-medium">Framing</p>
+                      <p className="text-xs text-muted-foreground">Torso clearly visible. Minimal clothing for accurate assessment.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="text-xs text-muted-foreground">
                 <p>🔒 Your photo is processed securely and not stored</p>
               </div>
             </CardContent>
