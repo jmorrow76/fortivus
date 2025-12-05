@@ -151,16 +151,15 @@ const Pricing = () => {
     },
     {
       name: "Lifetime",
-      description: "One payment, forever access",
+      description: "One payment, forever Elite access",
       price: "$499",
       period: "one-time",
       icon: Crown,
       features: [
-        "Everything in Elite",
+        "All Elite features included",
         "Lifetime access guaranteed",
-        "Early access to new features",
-        "VIP community access",
-        "1-on-1 coaching session",
+        "No monthly payments ever",
+        "Lock in current pricing forever",
       ],
       cta: "Coming Soon",
       variant: "outline" as const,
@@ -332,9 +331,6 @@ const Pricing = () => {
                   { feature: "Comeback protocol system", free: false, elite: true, lifetime: true },
                   { feature: "Executive performance mode", free: false, elite: true, lifetime: true },
                   { feature: "Priority support", free: false, elite: true, lifetime: true },
-                  { feature: "Early access to features", free: false, elite: false, lifetime: true },
-                  { feature: "VIP community access", free: false, elite: false, lifetime: true },
-                  { feature: "1-on-1 coaching session", free: false, elite: false, lifetime: true },
                 ].map((row) => (
                   <TableRow key={row.feature}>
                     <TableCell className="font-medium">{row.feature}</TableCell>
