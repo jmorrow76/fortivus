@@ -290,6 +290,129 @@ export type Database = {
           },
         ]
       }
+      cognitive_metrics: {
+        Row: {
+          ai_insights: string | null
+          assessment_date: string
+          caffeine_intake: number | null
+          cognitive_load_score: number | null
+          created_at: string
+          decision_fatigue: number | null
+          focus_rating: number | null
+          id: string
+          meetings_count: number | null
+          mental_clarity: number | null
+          optimal_workout_windows: Json | null
+          productivity_recommendations: Json | null
+          screen_time_hours: number | null
+          stress_management_protocol: Json | null
+          user_id: string
+          work_hours: number | null
+        }
+        Insert: {
+          ai_insights?: string | null
+          assessment_date?: string
+          caffeine_intake?: number | null
+          cognitive_load_score?: number | null
+          created_at?: string
+          decision_fatigue?: number | null
+          focus_rating?: number | null
+          id?: string
+          meetings_count?: number | null
+          mental_clarity?: number | null
+          optimal_workout_windows?: Json | null
+          productivity_recommendations?: Json | null
+          screen_time_hours?: number | null
+          stress_management_protocol?: Json | null
+          user_id: string
+          work_hours?: number | null
+        }
+        Update: {
+          ai_insights?: string | null
+          assessment_date?: string
+          caffeine_intake?: number | null
+          cognitive_load_score?: number | null
+          created_at?: string
+          decision_fatigue?: number | null
+          focus_rating?: number | null
+          id?: string
+          meetings_count?: number | null
+          mental_clarity?: number | null
+          optimal_workout_windows?: Json | null
+          productivity_recommendations?: Json | null
+          screen_time_hours?: number | null
+          stress_management_protocol?: Json | null
+          user_id?: string
+          work_hours?: number | null
+        }
+        Relationships: []
+      }
+      comeback_protocols: {
+        Row: {
+          ai_guidance: string | null
+          created_at: string
+          current_fitness_level: number | null
+          days_off: number
+          goals: string | null
+          id: string
+          injury_details: string | null
+          is_active: boolean | null
+          nutrition_adjustments: Json | null
+          previous_training_frequency: number | null
+          progression_milestones: Json | null
+          reason_for_break: string | null
+          recovery_priorities: Json | null
+          user_id: string
+          warning_signs: string[] | null
+          week_1_protocol: Json | null
+          week_2_protocol: Json | null
+          week_3_protocol: Json | null
+          week_4_protocol: Json | null
+        }
+        Insert: {
+          ai_guidance?: string | null
+          created_at?: string
+          current_fitness_level?: number | null
+          days_off: number
+          goals?: string | null
+          id?: string
+          injury_details?: string | null
+          is_active?: boolean | null
+          nutrition_adjustments?: Json | null
+          previous_training_frequency?: number | null
+          progression_milestones?: Json | null
+          reason_for_break?: string | null
+          recovery_priorities?: Json | null
+          user_id: string
+          warning_signs?: string[] | null
+          week_1_protocol?: Json | null
+          week_2_protocol?: Json | null
+          week_3_protocol?: Json | null
+          week_4_protocol?: Json | null
+        }
+        Update: {
+          ai_guidance?: string | null
+          created_at?: string
+          current_fitness_level?: number | null
+          days_off?: number
+          goals?: string | null
+          id?: string
+          injury_details?: string | null
+          is_active?: boolean | null
+          nutrition_adjustments?: Json | null
+          previous_training_frequency?: number | null
+          progression_milestones?: Json | null
+          reason_for_break?: string | null
+          recovery_priorities?: Json | null
+          user_id?: string
+          warning_signs?: string[] | null
+          week_1_protocol?: Json | null
+          week_2_protocol?: Json | null
+          week_3_protocol?: Json | null
+          week_4_protocol?: Json | null
+        }
+        Relationships: []
+      }
       exercise_sets: {
         Row: {
           completed_at: string | null
@@ -545,6 +668,117 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      hormonal_profiles: {
+        Row: {
+          age: number | null
+          ai_insights: string | null
+          assessment_date: string
+          created_at: string
+          energy_afternoon: number | null
+          energy_evening: number | null
+          energy_morning: number | null
+          id: string
+          libido_level: number | null
+          nutrition_recommendations: Json | null
+          recovery_quality: number | null
+          sleep_hours: number | null
+          stress_level: number | null
+          supplement_recommendations: Json | null
+          training_intensity_recommendation: string | null
+          user_id: string
+        }
+        Insert: {
+          age?: number | null
+          ai_insights?: string | null
+          assessment_date?: string
+          created_at?: string
+          energy_afternoon?: number | null
+          energy_evening?: number | null
+          energy_morning?: number | null
+          id?: string
+          libido_level?: number | null
+          nutrition_recommendations?: Json | null
+          recovery_quality?: number | null
+          sleep_hours?: number | null
+          stress_level?: number | null
+          supplement_recommendations?: Json | null
+          training_intensity_recommendation?: string | null
+          user_id: string
+        }
+        Update: {
+          age?: number | null
+          ai_insights?: string | null
+          assessment_date?: string
+          created_at?: string
+          energy_afternoon?: number | null
+          energy_evening?: number | null
+          energy_morning?: number | null
+          id?: string
+          libido_level?: number | null
+          nutrition_recommendations?: Json | null
+          recovery_quality?: number | null
+          sleep_hours?: number | null
+          stress_level?: number | null
+          supplement_recommendations?: Json | null
+          training_intensity_recommendation?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      joint_health_scores: {
+        Row: {
+          ai_analysis: string | null
+          assessment_date: string
+          created_at: string
+          exercises_to_avoid: string[] | null
+          id: string
+          joint_name: string
+          mobility_protocol: Json | null
+          pain_level: number | null
+          preventive_recommendations: Json | null
+          range_of_motion: number | null
+          recent_training_load: number | null
+          risk_factors: Json | null
+          risk_score: number | null
+          stiffness_level: number | null
+          user_id: string
+        }
+        Insert: {
+          ai_analysis?: string | null
+          assessment_date?: string
+          created_at?: string
+          exercises_to_avoid?: string[] | null
+          id?: string
+          joint_name: string
+          mobility_protocol?: Json | null
+          pain_level?: number | null
+          preventive_recommendations?: Json | null
+          range_of_motion?: number | null
+          recent_training_load?: number | null
+          risk_factors?: Json | null
+          risk_score?: number | null
+          stiffness_level?: number | null
+          user_id: string
+        }
+        Update: {
+          ai_analysis?: string | null
+          assessment_date?: string
+          created_at?: string
+          exercises_to_avoid?: string[] | null
+          id?: string
+          joint_name?: string
+          mobility_protocol?: Json | null
+          pain_level?: number | null
+          preventive_recommendations?: Json | null
+          range_of_motion?: number | null
+          recent_training_load?: number | null
+          risk_factors?: Json | null
+          risk_score?: number | null
+          stiffness_level?: number | null
+          user_id?: string
+        }
+        Relationships: []
       }
       meal_logs: {
         Row: {
@@ -974,6 +1208,66 @@ export type Database = {
           id?: string
           story_data?: Json
           user_id?: string
+        }
+        Relationships: []
+      }
+      sleep_workout_adaptations: {
+        Row: {
+          adaptation_date: string
+          adapted_workout_plan: Json | null
+          ai_reasoning: string | null
+          created_at: string
+          exercise_swaps: Json | null
+          hrv_reading: number | null
+          id: string
+          intensity_modifier: number | null
+          original_workout_plan: Json | null
+          readiness_score: number | null
+          recovery_additions: Json | null
+          resting_heart_rate: number | null
+          sleep_disruptions: number | null
+          sleep_hours: number | null
+          sleep_quality: number | null
+          user_id: string
+          volume_modifier: number | null
+        }
+        Insert: {
+          adaptation_date?: string
+          adapted_workout_plan?: Json | null
+          ai_reasoning?: string | null
+          created_at?: string
+          exercise_swaps?: Json | null
+          hrv_reading?: number | null
+          id?: string
+          intensity_modifier?: number | null
+          original_workout_plan?: Json | null
+          readiness_score?: number | null
+          recovery_additions?: Json | null
+          resting_heart_rate?: number | null
+          sleep_disruptions?: number | null
+          sleep_hours?: number | null
+          sleep_quality?: number | null
+          user_id: string
+          volume_modifier?: number | null
+        }
+        Update: {
+          adaptation_date?: string
+          adapted_workout_plan?: Json | null
+          ai_reasoning?: string | null
+          created_at?: string
+          exercise_swaps?: Json | null
+          hrv_reading?: number | null
+          id?: string
+          intensity_modifier?: number | null
+          original_workout_plan?: Json | null
+          readiness_score?: number | null
+          recovery_additions?: Json | null
+          resting_heart_rate?: number | null
+          sleep_disruptions?: number | null
+          sleep_hours?: number | null
+          sleep_quality?: number | null
+          user_id?: string
+          volume_modifier?: number | null
         }
         Relationships: []
       }
