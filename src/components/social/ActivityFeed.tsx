@@ -36,10 +36,11 @@ export function ActivityFeed() {
       ? `🏆 I just earned the "${badgeName}" badge on Fortivus! #Fortivus #FitnessGoals #Achievement`
       : `🏆 ${name} just earned the "${badgeName}" badge on Fortivus! #Fortivus #FitnessGoals`;
     
-    console.log('Attempting share:', { platform, shareText, hasNavigatorShare: !!navigator.share });
+    // Try native share API first (works on mobile, but not in iframes)
+    // Skip in iframe/preview environments to avoid NotAllowedError
+    const isInIframe = window.self !== window.top;
     
-    // Try native share API first (works on mobile)
-    if (navigator.share) {
+    if (navigator.share && !isInIframe) {
       try {
         await navigator.share({
           title: `${badgeName} Badge Earned!`,
@@ -52,29 +53,36 @@ export function ActivityFeed() {
         });
         return;
       } catch (err) {
-        console.log('Share API error:', err);
-        // User cancelled - don't show error
         if ((err as Error).name === 'AbortError') return;
       }
     }
     
-    // Fallback: copy to clipboard
+    // Copy to clipboard
     try {
       await navigator.clipboard.writeText(shareText);
       toast({
-        title: "Copied to clipboard!",
+        title: "✅ Copied to clipboard!",
         description: platform === 'instagram' 
-          ? "Open Instagram and paste to share your achievement."
+          ? "Now open Instagram and paste to share your achievement."
           : "Paste anywhere to share this achievement.",
+        duration: 5000,
       });
-    } catch (err) {
-      console.log('Clipboard error:', err);
-      // Final fallback - show in toast
-      toast({
-        title: "Share this!",
-        description: shareText,
-        duration: 10000,
-      });
+    } catch {
+      // Final fallback - open in new window for Instagram
+      if (platform === 'instagram') {
+        window.open(`https://www.instagram.com/`, '_blank');
+        toast({
+          title: "Share on Instagram",
+          description: shareText,
+          duration: 10000,
+        });
+      } else {
+        toast({
+          title: "Share this achievement!",
+          description: shareText,
+          duration: 10000,
+        });
+      }
     }
   };
 
