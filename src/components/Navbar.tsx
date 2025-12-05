@@ -19,7 +19,7 @@ const Navbar = () => {
     { name: "Community", href: "/community", isPage: true },
     { name: "Supplements", href: "/supplements", isPage: true },
     { name: "Gear", href: "#gear" },
-    { name: "Pricing", href: "#pricing" },
+    { name: "Pricing", href: "/pricing", isPage: true },
   ];
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
