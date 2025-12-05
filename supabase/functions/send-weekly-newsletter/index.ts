@@ -185,6 +185,11 @@ Return ONLY a JSON object (no markdown, no code blocks):
         ${newsletterContent.closing}
       </p>
       
+      <!-- CTA Button -->
+      <div style="text-align: center; margin: 35px 0;">
+        <a href="https://fortivus.app" style="display: inline-block; background: linear-gradient(135deg, #c9a227 0%, #d4af37 100%); color: #1a1a2e; text-decoration: none; padding: 14px 35px; border-radius: 6px; font-weight: bold; font-size: 14px; letter-spacing: 1px;">VISIT FORTIVUS</a>
+      </div>
+      
       <p style="color: #666; font-size: 14px; margin-top: 30px;">
         Stay strong,<br>
         <strong style="color: #1a1a2e;">The Fortivus Team</strong>
@@ -193,9 +198,12 @@ Return ONLY a JSON object (no markdown, no code blocks):
     
     <!-- Footer -->
     <div style="background: #f8f8f8; padding: 20px 30px; text-align: center; border-top: 1px solid #eee;">
+      <p style="margin: 0 0 10px 0; color: #666; font-size: 13px;">
+        <a href="https://fortivus.app" style="color: #1a1a2e; text-decoration: none; font-weight: bold;">fortivus.app</a>
+      </p>
       <p style="margin: 0; color: #999; font-size: 12px;">
         You're receiving this because you subscribed to The Fortivus Weekly.<br>
-        <a href="#" style="color: #666;">Unsubscribe</a>
+        <a href="https://fortivus.app/unsubscribe" style="color: #666;">Unsubscribe</a>
       </p>
     </div>
   </div>
