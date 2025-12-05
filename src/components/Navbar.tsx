@@ -55,7 +55,7 @@ const Navbar = () => {
                 className="text-xs font-medium tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-200 flex items-center gap-1"
               >
                 {link.name}
-                {link.name === "AI Coach" && (
+                {["AI Coach", "Workouts", "Run Tracker"].includes(link.name) && (
                   <Crown className="h-3 w-3 text-amber-500" />
                 )}
               </Link>
@@ -126,7 +126,7 @@ const Navbar = () => {
                   onClick={() => setIsOpen(false)}
                 >
                   {link.name}
-                  {link.name === "AI Coach" && (
+                  {["AI Coach", "Workouts", "Run Tracker"].includes(link.name) && (
                     <Crown className="h-3 w-3 text-amber-500" />
                   )}
                 </Link>
