@@ -57,40 +57,14 @@ function RecenterMap({ position }: { position: [number, number] }) {
   return null;
 }
 
-// Map content component to avoid context consumer issues
-function MapContent({ 
-  currentPosition, 
-  routeCoordinates,
-  defaultIcon 
-}: { 
-  currentPosition: { lat: number; lng: number } | null;
-  routeCoordinates: [number, number][];
-  defaultIcon: Icon;
-}) {
-  return (
-    <>
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      {currentPosition && (
-        <Marker 
-          position={[currentPosition.lat, currentPosition.lng]} 
-          icon={defaultIcon}
-        />
-      )}
-      {currentPosition && (
-        <RecenterMap position={[currentPosition.lat, currentPosition.lng]} />
-      )}
-      {routeCoordinates.length > 1 && (
-        <Polyline 
-          positions={routeCoordinates}
-          color="hsl(var(--primary))"
-          weight={4}
-        />
-      )}
-    </>
-  );
+// Marker component wrapper
+function CurrentPositionMarker({ position, icon }: { position: { lat: number; lng: number }; icon: Icon }) {
+  return <Marker position={[position.lat, position.lng]} icon={icon} />;
+}
+
+// Polyline wrapper
+function RoutePolyline({ positions }: { positions: [number, number][] }) {
+  return <Polyline positions={positions} color="hsl(var(--primary))" weight={4} />;
 }
 
 // Format seconds to mm:ss or hh:mm:ss
@@ -531,11 +505,13 @@ export const RunTracker = () => {
               zoom={15}
               style={{ height: '100%', width: '100%' }}
             >
-              <MapContent 
-                currentPosition={currentPosition}
-                routeCoordinates={routeCoordinates}
-                defaultIcon={defaultIcon}
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
+              {currentPosition ? <CurrentPositionMarker position={currentPosition} icon={defaultIcon} /> : null}
+              {currentPosition ? <RecenterMap position={[currentPosition.lat, currentPosition.lng]} /> : null}
+              {routeCoordinates.length > 1 ? <RoutePolyline positions={routeCoordinates} /> : null}
             </MapContainer>
           </div>
 
