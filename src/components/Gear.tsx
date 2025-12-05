@@ -3,6 +3,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Star, Shield } from "lucide-react";
 
+// Product images
+import trainingHoodie from "@/assets/gear/training-hoodie.jpg";
+import athleticShorts from "@/assets/gear/athletic-shorts.jpg";
+import dumbbells from "@/assets/gear/dumbbells.jpg";
+import massageGun from "@/assets/gear/massage-gun.jpg";
+import barbell from "@/assets/gear/barbell.jpg";
+import foamRoller from "@/assets/gear/foam-roller.jpg";
+
 type FilterCategory = "all" | "apparel" | "equipment" | "recovery";
 
 const partnerBrands = [
@@ -12,6 +20,7 @@ const partnerBrands = [
     description: "Mark Wahlberg's premium athletic brand. Built for those who demand excellence in training and life.",
     category: "Performance Apparel",
     filterCategory: "apparel" as FilterCategory,
+    image: trainingHoodie,
     featured: [
       { name: "Training Hoodie", price: "$88", rating: 4.9 },
       { name: "Performance Tee", price: "$48", rating: 4.8 },
@@ -29,6 +38,7 @@ const partnerBrands = [
     description: "Premium performance apparel that transitions seamlessly from gym to life. Sustainable and incredibly comfortable.",
     category: "Lifestyle Athletic",
     filterCategory: "apparel" as FilterCategory,
+    image: athleticShorts,
     featured: [
       { name: "Kore Short", price: "$68", rating: 4.9 },
       { name: "Strato Tech Tee", price: "$58", rating: 4.8 },
@@ -46,6 +56,7 @@ const partnerBrands = [
     description: "Premium yoga and athleisure wear. Designed in LA for those who value quality, style, and mindful living.",
     category: "Yoga & Recovery",
     filterCategory: "recovery" as FilterCategory,
+    image: trainingHoodie,
     featured: [
       { name: "Warrior Compression", price: "$118", rating: 4.8 },
       { name: "Revival Tank", price: "$62", rating: 4.7 },
@@ -66,6 +77,7 @@ const amazonPicks = [
     price: "$349", 
     rating: 4.8,
     filterCategory: "equipment" as FilterCategory,
+    image: dumbbells,
     affiliateUrl: "https://amazon.com/dp/PRODUCTID?tag=YOURAMAZONID"
   },
   { 
@@ -74,6 +86,7 @@ const amazonPicks = [
     price: "$299", 
     rating: 4.8,
     filterCategory: "recovery" as FilterCategory,
+    image: massageGun,
     affiliateUrl: "https://amazon.com/dp/PRODUCTID?tag=YOURAMAZONID"
   },
   { 
@@ -82,6 +95,7 @@ const amazonPicks = [
     price: "$295", 
     rating: 4.9,
     filterCategory: "equipment" as FilterCategory,
+    image: barbell,
     affiliateUrl: "https://amazon.com/dp/PRODUCTID?tag=YOURAMAZONID"
   },
   { 
@@ -90,6 +104,7 @@ const amazonPicks = [
     price: "$45", 
     rating: 4.7,
     filterCategory: "recovery" as FilterCategory,
+    image: foamRoller,
     affiliateUrl: "https://amazon.com/dp/PRODUCTID?tag=YOURAMAZONID"
   },
 ];
@@ -145,10 +160,18 @@ const Gear = () => {
                 key={brand.name} 
                 className={`overflow-hidden ${brand.bgColor} ${brand.borderColor} border`}
               >
+                {/* Product Image */}
+                <div className="aspect-square overflow-hidden">
+                  <img 
+                    src={brand.image} 
+                    alt={brand.name}
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
                 <CardContent className="p-6">
                   {/* Brand Logo */}
-                  <div className={`h-14 rounded-lg ${brand.logoBg} flex items-center justify-center mb-4`}>
-                    <span className="font-heading text-lg font-bold tracking-[0.15em] uppercase text-white">
+                  <div className={`h-12 rounded-lg ${brand.logoBg} flex items-center justify-center mb-4`}>
+                    <span className="font-heading text-base font-bold tracking-[0.15em] uppercase text-white">
                       {brand.name}
                     </span>
                   </div>
@@ -220,18 +243,28 @@ const Gear = () => {
                 <div
                   key={item.name}
                   onClick={() => handleShopClick(item.affiliateUrl)}
-                  className="p-4 rounded-lg bg-card border border-border hover:border-accent/30 hover:shadow-subtle transition-all cursor-pointer group"
+                  className="rounded-lg bg-card border border-border hover:border-accent/30 hover:shadow-subtle transition-all cursor-pointer group overflow-hidden"
                 >
-                  <p className="text-xs text-muted-foreground mb-1">{item.brand}</p>
-                  <h4 className="font-semibold text-sm mb-2 group-hover:text-accent transition-colors">
-                    {item.name}
-                  </h4>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1">
-                      <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
-                      <span className="text-xs text-muted-foreground">{item.rating}</span>
+                  {/* Product Image */}
+                  <div className="aspect-square overflow-hidden bg-muted">
+                    <img 
+                      src={item.image} 
+                      alt={item.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                  <div className="p-4">
+                    <p className="text-xs text-muted-foreground mb-1">{item.brand}</p>
+                    <h4 className="font-semibold text-sm mb-2 group-hover:text-accent transition-colors">
+                      {item.name}
+                    </h4>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1">
+                        <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
+                        <span className="text-xs text-muted-foreground">{item.rating}</span>
+                      </div>
+                      <span className="font-heading font-bold text-accent">{item.price}</span>
                     </div>
-                    <span className="font-heading font-bold text-accent">{item.price}</span>
                   </div>
                 </div>
               ))}
