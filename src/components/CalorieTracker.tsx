@@ -18,16 +18,12 @@ import { useCalorieTracker, Food, MealType, MEAL_TYPES } from '@/hooks/useCalori
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 
-const CALORIE_GOAL = 2000;
-const PROTEIN_GOAL = 150;
-const CARBS_GOAL = 200;
-const FAT_GOAL = 65;
-
 export function CalorieTracker() {
   const {
     foods,
     mealLogs,
     frequentFoods,
+    macroGoals,
     loading,
     selectedDate,
     setSelectedDate,
@@ -195,7 +191,7 @@ export function CalorieTracker() {
                   strokeWidth="8"
                   fill="none"
                   strokeDasharray={251}
-                  strokeDashoffset={251 - (251 * Math.min(totals.calories / CALORIE_GOAL, 1))}
+                  strokeDashoffset={251 - (251 * Math.min(totals.calories / macroGoals.calories, 1))}
                   className="text-accent transition-all duration-500"
                   strokeLinecap="round"
                 />
@@ -207,14 +203,14 @@ export function CalorieTracker() {
             </div>
             <div className="flex-1 space-y-2">
               <div className="text-sm text-muted-foreground">
-                {CALORIE_GOAL - totals.calories > 0 
-                  ? `${CALORIE_GOAL - totals.calories} kcal remaining`
-                  : `${totals.calories - CALORIE_GOAL} kcal over goal`
+                {macroGoals.calories - totals.calories > 0 
+                  ? `${macroGoals.calories - totals.calories} kcal remaining`
+                  : `${totals.calories - macroGoals.calories} kcal over goal`
                 }
               </div>
-              <MacroBar label="Protein" current={totals.protein} goal={PROTEIN_GOAL} color="text-red-500" icon={Beef} />
-              <MacroBar label="Carbs" current={totals.carbs} goal={CARBS_GOAL} color="text-amber-500" icon={Cookie} />
-              <MacroBar label="Fat" current={totals.fat} goal={FAT_GOAL} color="text-blue-500" icon={Droplets} />
+              <MacroBar label="Protein" current={totals.protein} goal={macroGoals.protein} color="text-red-500" icon={Beef} />
+              <MacroBar label="Carbs" current={totals.carbs} goal={macroGoals.carbs} color="text-amber-500" icon={Cookie} />
+              <MacroBar label="Fat" current={totals.fat} goal={macroGoals.fat} color="text-blue-500" icon={Droplets} />
             </div>
           </div>
         </CardContent>
