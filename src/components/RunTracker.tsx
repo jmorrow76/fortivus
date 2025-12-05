@@ -441,7 +441,9 @@ export const RunTracker = () => {
       )}
 
       {/* Running Leaderboard */}
-      {!isTracking && <RunningLeaderboard />}
+      {!isTracking && (
+        <RunningLeaderboard />
+      )}
 
       {/* Active Run Stats */}
       {isTracking && activeRun && (
