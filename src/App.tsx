@@ -24,6 +24,7 @@ import KnowledgeHub from "./pages/KnowledgeHub";
 import PricingPage from "./pages/PricingPage";
 import SubscriptionSuccess from "./pages/SubscriptionSuccess";
 import CalorieTracking from "./pages/CalorieTracking";
+import Workouts from "./pages/Workouts";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -55,6 +56,7 @@ const App = () => (
             <Route path="/pricing" element={<PricingPage />} />
             <Route path="/subscription-success" element={<SubscriptionSuccess />} />
             <Route path="/calories" element={<CalorieTracking />} />
+            <Route path="/workouts" element={<Workouts />} />
             <Route path="/admin" element={<AdminDashboard />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

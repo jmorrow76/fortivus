@@ -12,6 +12,7 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const navLinks = [
+    { name: "Workouts", href: "/workouts", isPage: true },
     { name: "Knowledge Hub", href: "/knowledge", isPage: true },
     { name: "Forum", href: "/forum", isPage: true },
     { name: "Community", href: "/community", isPage: true },
@@ -20,6 +21,7 @@ const Navbar = () => {
   ];
 
   const mobileNavLinks = [
+    { name: "Workouts", href: "/workouts", isPage: true },
     { name: "Knowledge Hub", href: "/knowledge", isPage: true },
     { name: "Forum", href: "/forum", isPage: true },
     { name: "Community", href: "/community", isPage: true },
