@@ -16,7 +16,6 @@ const Navbar = () => {
     { name: "Community", href: "/community", isPage: true },
     { name: "Supplements", href: "/supplements", isPage: true },
     { name: "Gear", href: "/gear", isPage: true },
-    { name: "Pricing", href: "/pricing", isPage: true },
   ];
 
   const mobileNavLinks = [
@@ -25,7 +24,6 @@ const Navbar = () => {
     { name: "Community", href: "/community", isPage: true },
     { name: "Supplements", href: "/supplements", isPage: true },
     { name: "Gear", href: "/gear", isPage: true },
-    { name: "Pricing", href: "/pricing", isPage: true },
   ];
 
   const handleSignOut = async () => {
