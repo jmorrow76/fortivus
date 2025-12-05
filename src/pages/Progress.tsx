@@ -9,12 +9,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Plus, Loader2, Trash2, Calendar, Scale, LayoutGrid, Columns, LineChart, Lock, Sparkles, Dumbbell } from "lucide-react";
+import { ArrowLeft, Plus, Loader2, Trash2, Calendar, Scale, LayoutGrid, Columns, LineChart, Lock, Sparkles } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Navbar from "@/components/Navbar";
 import PhotoComparison from "@/components/PhotoComparison";
 import WeightChart from "@/components/WeightChart";
-import { WorkoutLog } from "@/components/WorkoutLog";
 import { format } from "date-fns";
 
 interface ProgressPhoto {
@@ -31,7 +30,7 @@ const Progress = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
-  const defaultTab = searchParams.get('tab') || 'workouts';
+  const defaultTab = searchParams.get('tab') || 'grid';
 
   const [photos, setPhotos] = useState<ProgressPhoto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -316,10 +315,6 @@ const Progress = () => {
 
           <Tabs defaultValue={defaultTab} className="w-full">
             <TabsList className="mb-6">
-              <TabsTrigger value="workouts" className="gap-2">
-                <Dumbbell className="h-4 w-4" />
-                Workouts
-              </TabsTrigger>
               <TabsTrigger value="grid" className="gap-2">
                 <LayoutGrid className="h-4 w-4" />
                 Gallery
@@ -333,10 +328,6 @@ const Progress = () => {
                 Weight
               </TabsTrigger>
             </TabsList>
-
-            <TabsContent value="workouts">
-              <WorkoutLog />
-            </TabsContent>
 
             <TabsContent value="grid">
               {photos.length === 0 ? (
