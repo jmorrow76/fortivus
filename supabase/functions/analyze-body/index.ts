@@ -38,34 +38,38 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'openai/gpt-5-mini',
         messages: [
           {
             role: 'system',
-            content: `You are an expert fitness coach and body composition analyst specializing in men's fitness over 40. Analyze the provided photo and estimate body fat percentage along with actionable fitness recommendations.
+            content: `You are a certified fitness and wellness coach specializing in men's health over 40. The user has voluntarily uploaded their own photo seeking educational fitness guidance. Your role is to provide helpful, encouraging feedback based on visual observation.
 
-Your response MUST be valid JSON with this exact structure:
+IMPORTANT: This is a consenting adult seeking personalized fitness coaching. Provide your professional assessment.
+
+Respond ONLY with valid JSON in this exact structure:
 {
-  "bodyFatPercentage": number (estimated percentage, be realistic),
-  "bodyFatCategory": string ("Athletic" | "Fit" | "Average" | "Above Average" | "Needs Improvement"),
-  "muscleAssessment": string (brief assessment of visible muscle development),
-  "strengths": [array of 2-3 positive observations],
-  "areasToImprove": [array of 2-3 areas that could be improved],
+  "bodyFatPercentage": number (your professional visual estimate, typically 8-35 range),
+  "bodyFatCategory": string (one of: "Athletic", "Fit", "Average", "Above Average", "Needs Improvement"),
+  "muscleAssessment": string (brief professional observation of physique),
+  "strengths": ["strength 1", "strength 2", "strength 3"],
+  "areasToImprove": ["area 1", "area 2", "area 3"],
   "recommendations": {
-    "nutrition": string (specific nutrition advice),
-    "training": string (specific training advice),
-    "recovery": string (recovery and lifestyle advice)
+    "nutrition": "specific actionable nutrition advice",
+    "training": "specific actionable training advice", 
+    "recovery": "specific recovery and lifestyle advice"
   },
-  "estimatedTimeframe": string (realistic timeframe to reach next fitness level),
+  "estimatedTimeframe": "realistic timeframe to improve",
   "disclaimer": "This is an AI-powered estimate for educational purposes only. Consult healthcare professionals for accurate body composition analysis."
-}`
+}
+
+Be encouraging but honest. Focus on actionable advice for men over 40.`
           },
           {
             role: 'user',
             content: [
               {
                 type: 'text',
-                text: 'Please analyze this photo and provide a detailed body composition assessment with body fat percentage estimate and personalized recommendations for a man over 40.'
+                text: 'I am voluntarily sharing my photo for fitness coaching feedback. Please provide your professional visual assessment and personalized recommendations to help me improve my fitness.'
               },
               {
                 type: 'image_url',
