@@ -4,7 +4,6 @@ import StatsCounter from "@/components/StatsCounter";
 import AIAnalysis from "@/components/AIAnalysis";
 import SuccessStories from "@/components/SuccessStories";
 import Pricing from "@/components/Pricing";
-import FAQ from "@/components/FAQ";
 import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
 
@@ -19,7 +18,6 @@ const Index = () => {
         <Pricing />
         <SuccessStories />
         <Newsletter />
-        <FAQ />
       </main>
       <Footer />
     </div>
