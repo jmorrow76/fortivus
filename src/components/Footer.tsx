@@ -1,17 +1,33 @@
-import { Instagram, Youtube, Twitter, Linkedin } from "lucide-react";
+import { Instagram, Youtube, Twitter } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const footerLinks = {
-  Programs: ["Foundation Builder", "Prime Strength", "Metabolic Reset", "Custom Plans"],
-  Resources: ["Articles", "Supplement Guide", "Gear Reviews", "Free Downloads"],
-  Company: ["About Us", "Affiliate Program", "Careers", "Contact"],
-  Legal: ["Privacy Policy", "Terms of Service", "Disclaimer", "Cookie Policy"],
+  Platform: [
+    { label: "Dashboard", href: "/dashboard" },
+    { label: "Knowledge Hub", href: "/knowledge-hub" },
+    { label: "Forum", href: "/forum" },
+    { label: "Leaderboard", href: "/leaderboard" },
+  ],
+  Features: [
+    { label: "Body Analysis", href: "/body-analysis" },
+    { label: "Personal Plan", href: "/personal-plan" },
+    { label: "Progress Tracking", href: "/progress" },
+    { label: "Daily Check-in", href: "/daily-checkin" },
+  ],
+  Shop: [
+    { label: "Supplements", href: "/supplements" },
+    { label: "Gear & Apparel", href: "/gear" },
+  ],
+  Company: [
+    { label: "About Us", href: "/about" },
+    { label: "Pricing", href: "/pricing" },
+  ],
 };
 
 const socialLinks = [
   { icon: Instagram, href: "#", label: "Instagram" },
   { icon: Youtube, href: "#", label: "YouTube" },
-  { icon: Twitter, href: "#", label: "Twitter" },
-  { icon: Linkedin, href: "#", label: "LinkedIn" },
+  { icon: Twitter, href: "#", label: "X" },
 ];
 
 const Footer = () => {
@@ -21,11 +37,11 @@ const Footer = () => {
         <div className="grid grid-cols-2 md:grid-cols-6 gap-8 mb-16">
           {/* Brand */}
           <div className="col-span-2">
-            <a href="/" className="inline-block mb-8">
+            <Link to="/" className="inline-block mb-8">
               <span className="text-lg font-medium tracking-[0.25em] uppercase">
                 Fortivus
               </span>
-            </a>
+            </Link>
             <p className="text-background/60 text-sm mb-8 max-w-xs leading-relaxed">
               The premier fitness platform for men over 40. Transform your body,
               optimize your health, and live your best years.
@@ -50,13 +66,13 @@ const Footer = () => {
               <h3 className="text-xs font-medium tracking-[0.15em] uppercase mb-6">{category}</h3>
               <ul className="space-y-3">
                 {links.map((link) => (
-                  <li key={link}>
-                    <a
-                      href="#"
+                  <li key={link.label}>
+                    <Link
+                      to={link.href}
                       className="text-sm text-background/50 hover:text-background transition-colors"
                     >
-                      {link}
-                    </a>
+                      {link.label}
+                    </Link>
                   </li>
                 ))}
               </ul>
