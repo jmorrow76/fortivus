@@ -44,10 +44,15 @@ export interface DailyTotals {
 export const MEAL_TYPES = ['breakfast', 'lunch', 'dinner', 'snack'] as const;
 export type MealType = typeof MEAL_TYPES[number];
 
+export interface FrequentFood extends Food {
+  logCount: number;
+}
+
 export function useCalorieTracker() {
   const { user } = useAuth();
   const [foods, setFoods] = useState<Food[]>([]);
   const [mealLogs, setMealLogs] = useState<MealLog[]>([]);
+  const [frequentFoods, setFrequentFoods] = useState<FrequentFood[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
@@ -115,19 +120,66 @@ export function useCalorieTracker() {
     setMealLogs(logsWithFoods);
   }, [user]);
 
+  const fetchFrequentFoods = useCallback(async () => {
+    if (!user) return;
+    
+    // Get all meal logs for this user to find frequently logged foods
+    const { data: allLogs, error } = await supabase
+      .from('meal_logs')
+      .select('food_id')
+      .eq('user_id', user.id)
+      .not('food_id', 'is', null);
+    
+    if (error || !allLogs) return;
+    
+    // Count food occurrences
+    const foodCounts: Record<string, number> = {};
+    allLogs.forEach(log => {
+      if (log.food_id) {
+        foodCounts[log.food_id] = (foodCounts[log.food_id] || 0) + 1;
+      }
+    });
+    
+    // Get top 6 most frequent food IDs
+    const topFoodIds = Object.entries(foodCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 6)
+      .map(([id]) => id);
+    
+    if (topFoodIds.length === 0) return;
+    
+    // Fetch the food details
+    const { data: foodsData } = await supabase
+      .from('foods')
+      .select('*')
+      .in('id', topFoodIds);
+    
+    if (foodsData) {
+      const frequentWithCounts = foodsData.map(food => ({
+        ...food,
+        logCount: foodCounts[food.id] || 0
+      })) as FrequentFood[];
+      
+      // Sort by log count
+      frequentWithCounts.sort((a, b) => b.logCount - a.logCount);
+      setFrequentFoods(frequentWithCounts);
+    }
+  }, [user]);
+
   useEffect(() => {
     const loadInitialData = async () => {
       setLoading(true);
       const allFoods = await fetchFoods();
       setFoods(allFoods);
       await fetchMealLogs(selectedDate);
+      await fetchFrequentFoods();
       setLoading(false);
     };
     
     if (user) {
       loadInitialData();
     }
-  }, [user, selectedDate, fetchFoods, fetchMealLogs]);
+  }, [user, selectedDate, fetchFoods, fetchMealLogs, fetchFrequentFoods]);
 
   const searchFoods = async (query: string) => {
     const results = await fetchFoods(query);
@@ -246,6 +298,7 @@ export function useCalorieTracker() {
   return {
     foods,
     mealLogs,
+    frequentFoods,
     loading,
     selectedDate,
     setSelectedDate,
@@ -255,6 +308,9 @@ export function useCalorieTracker() {
     deleteMealLog,
     getDailyTotals,
     getMealsByType,
-    refreshLogs: () => fetchMealLogs(selectedDate)
+    refreshLogs: async () => {
+      await fetchMealLogs(selectedDate);
+      await fetchFrequentFoods();
+    }
   };
 }
