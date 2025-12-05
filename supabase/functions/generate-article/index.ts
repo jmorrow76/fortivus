@@ -79,13 +79,94 @@ const articleTool = {
         read_time_minutes: {
           type: "number",
           description: "Estimated reading time in minutes"
+        },
+        image_prompt: {
+          type: "string",
+          description: "A detailed prompt for generating a cover image for this article. Should describe a professional fitness-related scene."
         }
       },
-      required: ["title", "excerpt", "content", "category", "read_time_minutes"],
+      required: ["title", "excerpt", "content", "category", "read_time_minutes", "image_prompt"],
       additionalProperties: false
     }
   }
 };
+
+async function generateArticleImage(prompt: string, apiKey: string): Promise<string | null> {
+  try {
+    console.log("[GENERATE-ARTICLE] Generating cover image...");
+    
+    const imagePrompt = `Professional fitness photography style: ${prompt}. High quality, dramatic lighting, masculine aesthetic, no text overlays, suitable for article header.`;
+    
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash-image-preview",
+        messages: [
+          { role: "user", content: imagePrompt }
+        ],
+        modalities: ["image", "text"]
+      }),
+    });
+
+    if (!response.ok) {
+      console.error("[GENERATE-ARTICLE] Image generation failed:", response.status);
+      return null;
+    }
+
+    const data = await response.json();
+    const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+    
+    if (imageUrl) {
+      console.log("[GENERATE-ARTICLE] Image generated successfully");
+      return imageUrl;
+    }
+    
+    return null;
+  } catch (error) {
+    console.error("[GENERATE-ARTICLE] Image generation error:", error);
+    return null;
+  }
+}
+
+async function uploadImageToStorage(
+  supabase: any, 
+  base64Data: string, 
+  slug: string
+): Promise<string | null> {
+  try {
+    // Extract the base64 content (remove data:image/png;base64, prefix)
+    const base64Content = base64Data.replace(/^data:image\/\w+;base64,/, "");
+    const imageBuffer = Uint8Array.from(atob(base64Content), c => c.charCodeAt(0));
+    
+    const fileName = `articles/${slug}.png`;
+    
+    const { error: uploadError } = await supabase.storage
+      .from("progress-photos") // Reusing existing bucket
+      .upload(fileName, imageBuffer, {
+        contentType: "image/png",
+        upsert: true
+      });
+
+    if (uploadError) {
+      console.error("[GENERATE-ARTICLE] Upload error:", uploadError);
+      return null;
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from("progress-photos")
+      .getPublicUrl(fileName);
+
+    console.log("[GENERATE-ARTICLE] Image uploaded:", publicUrl);
+    return publicUrl;
+  } catch (error) {
+    console.error("[GENERATE-ARTICLE] Upload error:", error);
+    return null;
+  }
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -120,6 +201,8 @@ Structure your article with:
 5. A motivating conclusion with key takeaways
 
 The article should be approximately 1500-2000 words. Make it genuinely valuable and shareable.
+
+Also provide an image_prompt describing an ideal cover image for this article - it should be a professional fitness/health related scene that captures the essence of the article.
 
 Use the publish_article function to submit your article.`;
 
@@ -193,6 +276,15 @@ Use the publish_article function to submit your article.`;
       .replace(/^-|-$/g, "") + 
       "-" + Date.now().toString(36);
 
+    // Generate cover image if we have a prompt
+    let imageUrl: string | null = null;
+    if (articleData.image_prompt) {
+      const base64Image = await generateArticleImage(articleData.image_prompt, LOVABLE_API_KEY);
+      if (base64Image) {
+        imageUrl = await uploadImageToStorage(supabase, base64Image, slug);
+      }
+    }
+
     // Insert into database
     const { data: article, error: insertError } = await supabase
       .from("articles")
@@ -207,6 +299,7 @@ Use the publish_article function to submit your article.`;
         is_published: true,
         is_featured: Math.random() > 0.7, // 30% chance of being featured
         published_at: new Date().toISOString(),
+        image_url: imageUrl,
       })
       .select()
       .single();
