@@ -55,6 +55,14 @@ interface ExerciseChartData {
   maxWeight: number;
 }
 
+interface RecentPR {
+  id: string;
+  exerciseName: string;
+  value: number;
+  reps: number | null;
+  achievedAt: string;
+}
+
 export default function Dashboard() {
   const navigate = useNavigate();
   const { user, loading: authLoading, subscription } = useAuth();
@@ -68,6 +76,7 @@ export default function Dashboard() {
   const [progressPhotos, setProgressPhotos] = useState<number>(0);
   const [runningStats, setRunningStats] = useState<RunningStats>({ totalRuns: 0, totalDistanceKm: 0, totalDurationMinutes: 0, runningBadges: 0 });
   const [exerciseChart, setExerciseChart] = useState<ExerciseChartData | null>(null);
+  const [recentPRs, setRecentPRs] = useState<RecentPR[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -86,7 +95,7 @@ export default function Dashboard() {
     if (!user) return;
 
     try {
-      const [profileRes, leaderboardRes, planRes, checkinRes, photosRes, runsRes, runningBadgesRes] = await Promise.all([
+      const [profileRes, leaderboardRes, planRes, checkinRes, photosRes, runsRes, runningBadgesRes, prsRes] = await Promise.all([
         supabase.from('profiles').select('display_name, avatar_url').eq('user_id', user.id).maybeSingle(),
         supabase.from('leaderboard_view').select('*').order('total_xp', { ascending: false }),
         supabase.from('personal_plans').select('id, goals, created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(1).maybeSingle(),
@@ -94,12 +103,24 @@ export default function Dashboard() {
         supabase.from('progress_photos').select('id', { count: 'exact' }).eq('user_id', user.id),
         supabase.from('running_sessions').select('distance_meters, duration_seconds').eq('user_id', user.id),
         supabase.from('user_badges').select('badge:badges(requirement_type)').eq('user_id', user.id),
+        supabase.from('personal_records').select('id, value, reps_at_weight, achieved_at, exercises(name)').eq('user_id', user.id).order('achieved_at', { ascending: false }).limit(5),
       ]);
 
       if (profileRes.data) setProfile(profileRes.data);
       if (planRes.data) setPersonalPlan(planRes.data);
       if (checkinRes.data) setLatestCheckin(checkinRes.data);
       if (photosRes.count !== null) setProgressPhotos(photosRes.count);
+      
+      // Set recent PRs
+      if (prsRes.data) {
+        setRecentPRs(prsRes.data.map((pr: any) => ({
+          id: pr.id,
+          exerciseName: pr.exercises?.name || 'Unknown Exercise',
+          value: pr.value,
+          reps: pr.reps_at_weight,
+          achievedAt: pr.achieved_at,
+        })));
+      }
 
       // Calculate running stats
       if (runsRes.data) {
@@ -489,6 +510,59 @@ export default function Dashboard() {
                   </CardContent>
                 </Card>
               )}
+
+              {/* Recent Personal Records */}
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Trophy className="h-5 w-5 text-amber-500" />
+                      Recent Personal Records
+                    </CardTitle>
+                    <CardDescription>Your latest PRs</CardDescription>
+                  </div>
+                  <Button variant="ghost" size="sm" asChild>
+                    <Link to="/workouts" className="flex items-center gap-1">
+                      View All <ChevronRight className="h-4 w-4" />
+                    </Link>
+                  </Button>
+                </CardHeader>
+                <CardContent>
+                  {recentPRs.length === 0 ? (
+                    <div className="text-center py-6 text-muted-foreground">
+                      <Trophy className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                      <p>No PRs yet</p>
+                      <Button variant="link" asChild>
+                        <Link to="/workouts">Start tracking workouts</Link>
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {recentPRs.map((pr) => (
+                        <div key={pr.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 rounded-full bg-amber-500/20">
+                              <Trophy className="h-4 w-4 text-amber-500" />
+                            </div>
+                            <div>
+                              <p className="font-medium">{pr.exerciseName}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {format(new Date(pr.achievedAt), 'MMM d, yyyy')}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-bold text-primary">{pr.value} lbs</p>
+                            {pr.reps && (
+                              <p className="text-xs text-muted-foreground">{pr.reps} reps</p>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
 
               {/* Recent Badges */}
               <Card>
