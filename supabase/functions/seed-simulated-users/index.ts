@@ -61,105 +61,185 @@ const simulatedUsers = [
 ];
 
 serve(async (req) => {
+  console.log('[SEED-USERS] Function invoked');
+  
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    console.log('[SEED-USERS] Getting environment variables...');
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.error('[SEED-USERS] Missing environment variables');
+      throw new Error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
+    }
+    
+    console.log('[SEED-USERS] Creating Supabase client...');
+    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    });
 
-    console.log('Starting to seed simulated users...');
+    console.log('[SEED-USERS] Starting to seed simulated users...');
+
+    // First, check how many simulated users already exist
+    const { count: existingCount } = await supabase
+      .from('profiles')
+      .select('*', { count: 'exact', head: true })
+      .eq('is_simulated', true);
+
+    console.log(`[SEED-USERS] Existing simulated users: ${existingCount || 0}`);
+
+    if ((existingCount || 0) >= 50) {
+      return new Response(JSON.stringify({ 
+        success: true, 
+        message: 'Simulated users already exist',
+        count: existingCount 
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
     const createdUsers = [];
+    const errors = [];
 
     for (const user of simulatedUsers) {
-      // Generate a unique UUID for this simulated user
-      const id = crypto.randomUUID();
-      
-      // Create profile
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert({
-          id: crypto.randomUUID(),
-          user_id: id,
-          display_name: user.name,
-          is_simulated: true,
-        });
-
-      if (profileError) {
-        console.error(`Error creating profile for ${user.name}:`, profileError);
-        continue;
-      }
-
-      // Create initial streak with random values
-      const currentStreak = Math.floor(Math.random() * 30) + 1;
-      const totalCheckins = Math.floor(Math.random() * 100) + currentStreak;
-      const totalXp = totalCheckins * 10 + Math.floor(Math.random() * 500);
-
-      const { error: streakError } = await supabase
-        .from('user_streaks')
-        .insert({
-          user_id: id,
-          current_streak: currentStreak,
-          longest_streak: Math.max(currentStreak, Math.floor(Math.random() * 45) + currentStreak),
-          total_checkins: totalCheckins,
-          total_xp: totalXp,
-          show_on_leaderboard: true,
-          last_checkin_date: new Date().toISOString().split('T')[0],
-        });
-
-      if (streakError) {
-        console.error(`Error creating streak for ${user.name}:`, streakError);
-      }
-
-      // Award some random badges
-      const { data: badges } = await supabase.from('badges').select('id');
-      if (badges && badges.length > 0) {
-        const numBadges = Math.floor(Math.random() * 5) + 1;
-        const selectedBadges = badges.sort(() => 0.5 - Math.random()).slice(0, numBadges);
+      try {
+        // Generate a deterministic UUID based on user name to avoid duplicates
+        const encoder = new TextEncoder();
+        const data = encoder.encode(user.name + '_simulated_fortivus');
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = new Uint8Array(hashBuffer);
         
-        for (const badge of selectedBadges) {
-          await supabase.from('user_badges').insert({
-            user_id: id,
-            badge_id: badge.id,
-          });
-        }
-      }
+        // Create a UUID-like string from the hash
+        const id = [
+          Array.from(hashArray.slice(0, 4)).map(b => b.toString(16).padStart(2, '0')).join(''),
+          Array.from(hashArray.slice(4, 6)).map(b => b.toString(16).padStart(2, '0')).join(''),
+          '4' + Array.from(hashArray.slice(6, 8)).map(b => b.toString(16).padStart(2, '0')).join('').slice(1),
+          ((hashArray[8] & 0x3f) | 0x80).toString(16).padStart(2, '0') + Array.from(hashArray.slice(9, 10)).map(b => b.toString(16).padStart(2, '0')).join(''),
+          Array.from(hashArray.slice(10, 16)).map(b => b.toString(16).padStart(2, '0')).join('')
+        ].join('-');
 
-      // Join some random challenges
-      const { data: challenges } = await supabase.from('challenges').select('id, target_count').eq('is_active', true);
-      if (challenges && challenges.length > 0) {
-        const numChallenges = Math.floor(Math.random() * 3) + 1;
-        const selectedChallenges = challenges.sort(() => 0.5 - Math.random()).slice(0, numChallenges);
+        // Check if this user already exists
+        const { data: existing } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('user_id', id)
+          .single();
+
+        if (existing) {
+          console.log(`[SEED-USERS] User ${user.name} already exists, skipping`);
+          continue;
+        }
         
-        for (const challenge of selectedChallenges) {
-          const progress = Math.floor(Math.random() * challenge.target_count);
-          await supabase.from('user_challenges').insert({
+        // Create profile - using the ID as both id and user_id for simulated users
+        // Since these aren't real auth users, we use the same ID
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            id: id,
             user_id: id,
-            challenge_id: challenge.id,
-            progress: progress,
-            is_completed: progress >= challenge.target_count,
+            display_name: user.name,
+            is_simulated: true,
           });
-        }
-      }
 
-      createdUsers.push({ id, name: user.name, focus: user.focus });
-      console.log(`Created simulated user: ${user.name}`);
+        if (profileError) {
+          console.error(`[SEED-USERS] Error creating profile for ${user.name}:`, profileError.message);
+          errors.push({ user: user.name, error: profileError.message, step: 'profile' });
+          continue;
+        }
+
+        console.log(`[SEED-USERS] Created profile for ${user.name}`);
+
+        // Create initial streak with random values
+        const currentStreak = Math.floor(Math.random() * 30) + 1;
+        const totalCheckins = Math.floor(Math.random() * 100) + currentStreak;
+        const totalXp = totalCheckins * 10 + Math.floor(Math.random() * 500);
+
+        const { error: streakError } = await supabase
+          .from('user_streaks')
+          .insert({
+            user_id: id,
+            current_streak: currentStreak,
+            longest_streak: Math.max(currentStreak, Math.floor(Math.random() * 45) + currentStreak),
+            total_checkins: totalCheckins,
+            total_xp: totalXp,
+            show_on_leaderboard: true,
+            last_checkin_date: new Date().toISOString().split('T')[0],
+          });
+
+        if (streakError) {
+          console.error(`[SEED-USERS] Error creating streak for ${user.name}:`, streakError.message);
+          errors.push({ user: user.name, error: streakError.message, step: 'streak' });
+        }
+
+        // Award some random badges
+        const { data: badges } = await supabase.from('badges').select('id');
+        if (badges && badges.length > 0) {
+          const numBadges = Math.floor(Math.random() * 5) + 1;
+          const selectedBadges = badges.sort(() => 0.5 - Math.random()).slice(0, numBadges);
+          
+          for (const badge of selectedBadges) {
+            const { error: badgeError } = await supabase.from('user_badges').insert({
+              user_id: id,
+              badge_id: badge.id,
+            });
+            if (badgeError) {
+              console.log(`[SEED-USERS] Badge insert error (may be duplicate):`, badgeError.message);
+            }
+          }
+        }
+
+        // Join some random challenges
+        const { data: challenges } = await supabase.from('challenges').select('id, target_count').eq('is_active', true);
+        if (challenges && challenges.length > 0) {
+          const numChallenges = Math.floor(Math.random() * 3) + 1;
+          const selectedChallenges = challenges.sort(() => 0.5 - Math.random()).slice(0, numChallenges);
+          
+          for (const challenge of selectedChallenges) {
+            const progress = Math.floor(Math.random() * challenge.target_count);
+            const { error: challengeError } = await supabase.from('user_challenges').insert({
+              user_id: id,
+              challenge_id: challenge.id,
+              progress: progress,
+              is_completed: progress >= challenge.target_count,
+            });
+            if (challengeError) {
+              console.log(`[SEED-USERS] Challenge insert error (may be duplicate):`, challengeError.message);
+            }
+          }
+        }
+
+        createdUsers.push({ id, name: user.name, focus: user.focus });
+        console.log(`[SEED-USERS] Successfully created simulated user: ${user.name}`);
+      } catch (userError: any) {
+        console.error(`[SEED-USERS] Unexpected error for ${user.name}:`, userError.message);
+        errors.push({ user: user.name, error: userError.message, step: 'unknown' });
+      }
     }
+
+    console.log(`[SEED-USERS] Completed. Created: ${createdUsers.length}, Errors: ${errors.length}`);
 
     return new Response(JSON.stringify({ 
       success: true, 
       message: `Created ${createdUsers.length} simulated users`,
-      users: createdUsers 
+      users: createdUsers,
+      errors: errors.length > 0 ? errors : undefined
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
-  } catch (error) {
-    console.error('Error seeding simulated users:', error);
-    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }), {
+  } catch (error: any) {
+    console.error('[SEED-USERS] Fatal error:', error.message, error.stack);
+    return new Response(JSON.stringify({ 
+      error: error.message || 'Unknown error',
+      stack: error.stack 
+    }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
