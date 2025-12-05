@@ -57,14 +57,43 @@ function RecenterMap({ position }: { position: [number, number] }) {
   return null;
 }
 
-// Marker component wrapper
-function CurrentPositionMarker({ position, icon }: { position: { lat: number; lng: number }; icon: Icon }) {
-  return <Marker position={[position.lat, position.lng]} icon={icon} />;
-}
+// All map layers in one component to avoid context issues
+function MapLayers({ 
+  currentPosition, 
+  routeCoordinates 
+}: { 
+  currentPosition: { lat: number; lng: number } | null;
+  routeCoordinates: [number, number][];
+}) {
+  const map = useMap();
+  
+  useEffect(() => {
+    if (currentPosition) {
+      map.setView([currentPosition.lat, currentPosition.lng], map.getZoom());
+    }
+  }, [currentPosition, map]);
 
-// Polyline wrapper
-function RoutePolyline({ positions }: { positions: [number, number][] }) {
-  return <Polyline positions={positions} color="hsl(var(--primary))" weight={4} />;
+  return (
+    <>
+      <TileLayer
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      />
+      {currentPosition !== null && (
+        <Marker 
+          position={[currentPosition.lat, currentPosition.lng]} 
+          icon={defaultIcon}
+        />
+      )}
+      {routeCoordinates.length > 1 && (
+        <Polyline 
+          positions={routeCoordinates}
+          color="#3b82f6"
+          weight={4}
+        />
+      )}
+    </>
+  );
 }
 
 // Format seconds to mm:ss or hh:mm:ss
@@ -505,13 +534,10 @@ export const RunTracker = () => {
               zoom={15}
               style={{ height: '100%', width: '100%' }}
             >
-              <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              <MapLayers 
+                currentPosition={currentPosition}
+                routeCoordinates={routeCoordinates}
               />
-              {currentPosition ? <CurrentPositionMarker position={currentPosition} icon={defaultIcon} /> : null}
-              {currentPosition ? <RecenterMap position={[currentPosition.lat, currentPosition.lng]} /> : null}
-              {routeCoordinates.length > 1 ? <RoutePolyline positions={routeCoordinates} /> : null}
             </MapContainer>
           </div>
 
