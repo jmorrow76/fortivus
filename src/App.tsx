@@ -36,6 +36,7 @@ import ComebackProtocol from "./pages/ComebackProtocol";
 import ExecutiveMode from "./pages/ExecutiveMode";
 import NotFound from "./pages/NotFound";
 import SupportButton from "./components/SupportButton";
+import ReferralButton from "./components/ReferralButton";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <SupportButton />
+        <ReferralButton />
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
