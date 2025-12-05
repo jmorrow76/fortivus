@@ -93,17 +93,30 @@ const ReferralButton = () => {
   const shareOnTwitter = () => {
     const text = encodeURIComponent("Check out Fortivus - AI-powered fitness for men over 40! 💪");
     const url = encodeURIComponent(referralLink);
-    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, "_blank");
+    const shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
+    // Use location.href as fallback if window.open is blocked
+    const newWindow = window.open(shareUrl, "_blank", "noopener,noreferrer");
+    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+      window.location.href = shareUrl;
+    }
   };
 
   const shareOnFacebook = () => {
     const url = encodeURIComponent(referralLink);
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, "_blank");
+    const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+    const newWindow = window.open(shareUrl, "_blank", "noopener,noreferrer");
+    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+      window.location.href = shareUrl;
+    }
   };
 
   const shareOnWhatsApp = () => {
     const text = encodeURIComponent(`Check out Fortivus - AI-powered fitness for men over 40! 💪 ${referralLink}`);
-    window.open(`https://wa.me/?text=${text}`, "_blank");
+    const shareUrl = `https://wa.me/?text=${text}`;
+    const newWindow = window.open(shareUrl, "_blank", "noopener,noreferrer");
+    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+      window.location.href = shareUrl;
+    }
   };
 
   const shareOnInstagram = async () => {
