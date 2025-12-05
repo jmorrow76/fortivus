@@ -16,6 +16,7 @@ import {
   Timer, Check, X, ChevronRight, Minus, Clock, FileText, Trash2, Save, TrendingUp
 } from 'lucide-react';
 import ExerciseProgressChart from '@/components/ExerciseProgressChart';
+import PRCelebration from '@/components/PRCelebration';
 import { Navigate } from 'react-router-dom';
 import { format, formatDistanceToNow } from 'date-fns';
 
@@ -47,6 +48,8 @@ const Workouts = () => {
     deleteTemplate,
     startWorkoutFromTemplate,
     saveWorkoutAsTemplate,
+    prCelebration,
+    clearPrCelebration,
   } = useWorkoutTracker();
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -154,6 +157,16 @@ const Workouts = () => {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
+        
+        {/* PR Celebration Animation */}
+        <PRCelebration
+          isVisible={!!prCelebration}
+          exerciseName={prCelebration?.exerciseName || ''}
+          weight={prCelebration?.weight || 0}
+          reps={prCelebration?.reps || 0}
+          onComplete={clearPrCelebration}
+        />
+        
         <main className="container mx-auto px-4 pt-24 pb-32">
           {/* Workout Header */}
           <div className="flex items-center justify-between mb-6">
