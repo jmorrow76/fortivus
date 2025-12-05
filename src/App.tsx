@@ -35,6 +35,7 @@ import SleepAdaptive from "./pages/SleepAdaptive";
 import ComebackProtocol from "./pages/ComebackProtocol";
 import ExecutiveMode from "./pages/ExecutiveMode";
 import NotFound from "./pages/NotFound";
+import SupportButton from "./components/SupportButton";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +45,7 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
+        <SupportButton />
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
