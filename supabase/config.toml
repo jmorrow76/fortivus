@@ -56,3 +56,18 @@ verify_jwt = false
 
 [functions.unsubscribe-newsletter]
 verify_jwt = false
+
+[functions.analyze-hormonal]
+verify_jwt = false
+
+[functions.analyze-joint-health]
+verify_jwt = false
+
+[functions.generate-comeback-protocol]
+verify_jwt = false
+
+[functions.analyze-sleep-adaptation]
+verify_jwt = false
+
+[functions.analyze-executive-performance]
+verify_jwt = false
