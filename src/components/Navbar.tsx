@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, LogOut, Settings, Camera, Trophy, Users, LayoutDashboard, Shield } from "lucide-react";
+import { Menu, X, LogOut, Settings, LayoutDashboard, Shield } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useAdmin } from "@/hooks/useAdmin";
 
@@ -9,36 +9,22 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, signOut } = useAuth();
   const { isAdmin } = useAdmin();
-  const location = useLocation();
-  const navigate = useNavigate();
 
   const navLinks = [
+    { name: "About", href: "/about", isPage: true },
+    { name: "Forum", href: "/forum", isPage: true },
+    { name: "Supplements", href: "/supplements", isPage: true },
+    { name: "Pricing", href: "/pricing", isPage: true },
+  ];
+
+  const mobileNavLinks = [
     { name: "About", href: "/about", isPage: true },
     { name: "Forum", href: "/forum", isPage: true },
     { name: "Check-in", href: "/checkin", isPage: true },
     { name: "Community", href: "/community", isPage: true },
     { name: "Supplements", href: "/supplements", isPage: true },
-    { name: "Gear", href: "#gear" },
     { name: "Pricing", href: "/pricing", isPage: true },
   ];
-
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    e.preventDefault();
-    setIsOpen(false);
-    
-    // If not on home page, navigate there first
-    if (location.pathname !== "/") {
-      navigate("/" + href);
-      return;
-    }
-    
-    // Smooth scroll to section
-    const targetId = href.replace("#", "");
-    const element = document.getElementById(targetId);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
-  };
 
   const handleSignOut = async () => {
     await signOut();
@@ -57,31 +43,20 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-10">
+          <div className="hidden lg:flex items-center gap-6">
             {navLinks.map((link) => (
-              link.isPage ? (
-                <Link
-                  key={link.name}
-                  to={link.href}
-                  className="text-xs font-medium tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-200"
-                >
-                  {link.name}
-                </Link>
-              ) : (
-                <a
-                  key={link.name}
-                  href={link.href}
-                  onClick={(e) => handleNavClick(e, link.href)}
-                  className="text-xs font-medium tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-200 cursor-pointer"
-                >
-                  {link.name}
-                </a>
-              )
+              <Link
+                key={link.name}
+                to={link.href}
+                className="text-xs font-medium tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-200"
+              >
+                {link.name}
+              </Link>
             ))}
           </div>
 
           {/* Desktop CTA */}
-          <div className="hidden lg:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-2">
             {user ? (
               <>
                 <Button variant="default" size="sm" asChild>
@@ -91,22 +66,19 @@ const Navbar = () => {
                   </Link>
                 </Button>
                 {isAdmin && (
-                  <Button variant="outline" size="sm" asChild>
-                    <Link to="/admin" className="flex items-center gap-2">
+                  <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                    <Link to="/admin">
                       <Shield className="h-4 w-4" />
-                      Admin
                     </Link>
                   </Button>
                 )}
-                <Button variant="ghost" size="sm" asChild>
-                  <Link to="/profile" className="flex items-center gap-2">
+                <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                  <Link to="/profile">
                     <Settings className="h-4 w-4" />
-                    Profile
                   </Link>
                 </Button>
-                <Button variant="ghost" size="sm" onClick={handleSignOut}>
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Sign Out
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleSignOut}>
+                  <LogOut className="h-4 w-4" />
                 </Button>
               </>
             ) : (
@@ -134,26 +106,15 @@ const Navbar = () => {
         {isOpen && (
           <div className="lg:hidden py-6 border-t border-border animate-fade-in">
             <div className="flex flex-col gap-4">
-              {navLinks.map((link) => (
-                link.isPage ? (
-                  <Link
-                    key={link.name}
-                    to={link.href}
-                    className="text-xs font-medium tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors py-2"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    {link.name}
-                  </Link>
-                ) : (
-                  <a
-                    key={link.name}
-                    href={link.href}
-                    className="text-xs font-medium tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors py-2 cursor-pointer"
-                    onClick={(e) => handleNavClick(e, link.href)}
-                  >
-                    {link.name}
-                  </a>
-                )
+              {mobileNavLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  to={link.href}
+                  className="text-xs font-medium tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors py-2"
+                  onClick={() => setIsOpen(false)}
+                >
+                  {link.name}
+                </Link>
               ))}
               <div className="flex flex-col gap-3 pt-4 border-t border-border mt-2">
                 {user ? (
