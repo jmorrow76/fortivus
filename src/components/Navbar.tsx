@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, LogOut, Settings, LayoutDashboard, Shield, Home } from "lucide-react";
+import { Menu, X, LogOut, Settings, LayoutDashboard, Shield, Home, MessageCircle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useAdmin } from "@/hooks/useAdmin";
 
@@ -12,21 +12,21 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const navLinks = [
+    { name: "AI Coach", href: "/coaching", isPage: true },
     { name: "Workouts", href: "/workouts", isPage: true },
     { name: "Run Tracker", href: "/running", isPage: true },
     { name: "Knowledge Hub", href: "/knowledge", isPage: true },
     { name: "Forum", href: "/forum", isPage: true },
     { name: "Community", href: "/community", isPage: true },
-    { name: "Supplements", href: "/supplements", isPage: true },
   ];
 
   const mobileNavLinks = [
+    { name: "AI Coach", href: "/coaching", isPage: true },
     { name: "Workouts", href: "/workouts", isPage: true },
     { name: "Run Tracker", href: "/running", isPage: true },
     { name: "Knowledge Hub", href: "/knowledge", isPage: true },
     { name: "Forum", href: "/forum", isPage: true },
     { name: "Community", href: "/community", isPage: true },
-    { name: "Supplements", href: "/supplements", isPage: true },
   ];
 
   const handleSignOut = async () => {
