@@ -102,7 +102,7 @@ export function useSocial() {
     const challengeIds = [...new Set((data || []).filter(a => a.challenge_id).map(a => a.challenge_id))];
 
     const [profilesRes, badgesRes, challengesRes] = await Promise.all([
-      userIds.length > 0 ? supabase.from('profiles').select('user_id, display_name, avatar_url').in('user_id', userIds) : { data: [] },
+      userIds.length > 0 ? supabase.rpc('get_public_profiles', { user_ids: userIds }) : { data: [] },
       badgeIds.length > 0 ? supabase.from('badges').select('id, name, icon').in('id', badgeIds) : { data: [] },
       challengeIds.length > 0 ? supabase.from('challenges').select('id, title').in('id', challengeIds) : { data: [] }
     ]);
@@ -190,12 +190,9 @@ export function useSocial() {
     const { data, error } = await query;
     if (error) return [];
 
-    // Fetch profiles
+    // Fetch profiles using secure function
     const userIds = [...new Set((data || []).map(c => c.user_id))];
-    const { data: profiles } = await supabase
-      .from('profiles')
-      .select('user_id, display_name, avatar_url')
-      .in('user_id', userIds);
+    const { data: profiles } = await supabase.rpc('get_public_profiles', { user_ids: userIds });
 
     const profilesMap = new Map((profiles || []).map(p => [p.user_id, p]));
 
