@@ -194,11 +194,18 @@ serve(async (req) => {
 "${topic}"
 
 Structure your article with:
-1. An engaging introduction that hooks the reader
+1. An engaging introduction that hooks the reader (2-3 short paragraphs)
 2. Clear sections with subheadings (use ## for headings)
 3. Specific, actionable advice and protocols
 4. Scientific backing where relevant (cite general research, not specific papers)
 5. A motivating conclusion with key takeaways
+
+CRITICAL FORMATTING REQUIREMENTS:
+- Break content into SHORT paragraphs (2-4 sentences each)
+- Add blank lines between paragraphs for readability
+- Use bullet points or numbered lists where appropriate
+- Never write walls of text - keep paragraphs digestible
+- Each section should have multiple paragraphs, not one long block
 
 The article should be approximately 1500-2000 words. Make it genuinely valuable and shareable.
 
