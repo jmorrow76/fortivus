@@ -217,6 +217,71 @@ export const useRunTracker = (): UseRunTrackerReturn => {
     }
   };
 
+  // Update running streak
+  const updateRunningStreak = async () => {
+    if (!user) return;
+
+    const today = new Date().toISOString().split('T')[0];
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+    // Get current running goal/streak data
+    const { data: goalData } = await supabase
+      .from('running_goals')
+      .select('current_streak, longest_streak, last_run_date, streak_type')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (goalData) {
+      let newStreak = goalData.current_streak;
+      const lastDate = goalData.last_run_date;
+
+      // Check if already ran today
+      if (lastDate === today) {
+        return; // Already counted for today
+      }
+
+      // Calculate new streak
+      if (lastDate === yesterdayStr) {
+        newStreak += 1; // Consecutive day
+      } else if (!lastDate) {
+        newStreak = 1; // First run
+      } else {
+        newStreak = 1; // Streak broken, start over
+      }
+
+      const longestStreak = Math.max(newStreak, goalData.longest_streak);
+
+      await supabase
+        .from('running_goals')
+        .update({
+          current_streak: newStreak,
+          longest_streak: longestStreak,
+          last_run_date: today,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('user_id', user.id);
+
+      if (newStreak > 1) {
+        toast({
+          title: `🔥 ${newStreak} Day Running Streak!`,
+          description: newStreak === goalData.longest_streak + 1 
+            ? "New personal record!" 
+            : "Keep it up!",
+        });
+      }
+    } else {
+      // Create initial record
+      await supabase.from('running_goals').insert({
+        user_id: user.id,
+        current_streak: 1,
+        longest_streak: 1,
+        last_run_date: today,
+      });
+    }
+  };
+
   const fetchRunHistory = useCallback(async () => {
     if (!user) return;
     
@@ -384,6 +449,9 @@ export const useRunTracker = (): UseRunTrackerReturn => {
 
       // Award XP and check for badges
       await awardRunXPAndBadges(distanceMeters, durationSeconds, avgPace);
+      
+      // Update running streak
+      await updateRunningStreak();
 
       setActiveRun(null);
       await fetchRunHistory();

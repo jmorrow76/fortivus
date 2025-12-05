@@ -87,7 +87,12 @@ export const RunTracker = () => {
   const [showHistory, setShowHistory] = useState(false);
   
   // Weekly goal state
-  const [weeklyGoal, setWeeklyGoal] = useState<{ weekly_distance_km: number; weekly_runs: number } | null>(null);
+  const [weeklyGoal, setWeeklyGoal] = useState<{ 
+    weekly_distance_km: number; 
+    weekly_runs: number;
+    current_streak: number;
+    longest_streak: number;
+  } | null>(null);
   const [goalDistanceInput, setGoalDistanceInput] = useState('10');
   const [goalRunsInput, setGoalRunsInput] = useState('3');
   const [savingGoal, setSavingGoal] = useState(false);
@@ -103,7 +108,7 @@ export const RunTracker = () => {
     if (!user) return;
     const { data } = await supabase
       .from('running_goals')
-      .select('weekly_distance_km, weekly_runs')
+      .select('weekly_distance_km, weekly_runs, current_streak, longest_streak')
       .eq('user_id', user.id)
       .maybeSingle();
     
@@ -132,7 +137,12 @@ export const RunTracker = () => {
     if (error) {
       toast({ title: 'Error', description: 'Failed to save goal', variant: 'destructive' });
     } else {
-      setWeeklyGoal({ weekly_distance_km: goalData.weekly_distance_km, weekly_runs: goalData.weekly_runs });
+      setWeeklyGoal(prev => ({ 
+        weekly_distance_km: goalData.weekly_distance_km, 
+        weekly_runs: goalData.weekly_runs,
+        current_streak: prev?.current_streak || 0,
+        longest_streak: prev?.longest_streak || 0,
+      }));
       setShowGoalDialog(false);
       toast({ title: 'Goal saved!', description: 'Your weekly running goal has been updated.' });
     }
@@ -162,6 +172,8 @@ export const RunTracker = () => {
     await stopRun(notes);
     setNotes('');
     setShowStopDialog(false);
+    // Refresh goal data to show updated streak
+    await fetchWeeklyGoal();
   };
 
   const mapCenter: [number, number] = currentPosition 
@@ -200,6 +212,25 @@ export const RunTracker = () => {
           <CardContent>
             {weeklyGoal ? (
               <div className="space-y-4">
+                {/* Streak Display */}
+                <div className="flex items-center justify-center gap-6 p-3 bg-gradient-to-r from-orange-500/10 to-red-500/10 rounded-lg">
+                  <div className="text-center">
+                    <div className="flex items-center justify-center gap-1">
+                      <Flame className="h-5 w-5 text-orange-500" />
+                      <span className="text-2xl font-bold">{weeklyGoal.current_streak}</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Day Streak</p>
+                  </div>
+                  <div className="h-8 w-px bg-border" />
+                  <div className="text-center">
+                    <div className="flex items-center justify-center gap-1">
+                      <TrendingUp className="h-5 w-5 text-primary" />
+                      <span className="text-2xl font-bold">{weeklyGoal.longest_streak}</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Best Streak</p>
+                  </div>
+                </div>
+
                 <div>
                   <div className="flex justify-between text-sm mb-1">
                     <span>Distance: {weeklyProgress.totalDistanceKm.toFixed(1)} / {weeklyGoal.weekly_distance_km} km</span>
