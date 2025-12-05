@@ -3,7 +3,8 @@ import { Link, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Clock, ArrowRight, User, Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Clock, ArrowRight, User, Loader2, Search, X } from "lucide-react";
 
 interface Article {
   id: string;
@@ -22,6 +23,7 @@ const Articles = () => {
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const location = useLocation();
   const isKnowledgeHubPage = location.pathname === "/knowledge";
 
@@ -57,14 +59,36 @@ const Articles = () => {
     return ["All", ...uniqueCategories.sort()];
   }, [articles]);
 
-  // Filter articles by selected category
+  // Filter articles by selected category and search query
   const filteredArticles = useMemo(() => {
-    if (selectedCategory === "All") return articles;
-    return articles.filter(a => a.category === selectedCategory);
-  }, [articles, selectedCategory]);
+    let filtered = articles;
+    
+    // Filter by category
+    if (selectedCategory !== "All") {
+      filtered = filtered.filter(a => a.category === selectedCategory);
+    }
+    
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      filtered = filtered.filter(a => 
+        a.title.toLowerCase().includes(query) ||
+        a.excerpt.toLowerCase().includes(query) ||
+        a.category.toLowerCase().includes(query) ||
+        a.author.toLowerCase().includes(query)
+      );
+    }
+    
+    return filtered;
+  }, [articles, selectedCategory, searchQuery]);
 
   const featuredArticle = filteredArticles.find(a => a.is_featured) || filteredArticles[0];
   const otherArticles = filteredArticles.filter(a => a.id !== featuredArticle?.id);
+
+  const clearFilters = () => {
+    setSelectedCategory("All");
+    setSearchQuery("");
+  };
 
   if (loading) {
     return (
@@ -120,20 +144,45 @@ const Articles = () => {
           )}
         </div>
 
-        {/* Category Filter - Only on Knowledge Hub */}
-        {isKnowledgeHubPage && categories.length > 2 && (
-          <div className="flex flex-wrap gap-2 mb-10">
-            {categories.map((category) => (
-              <Button
-                key={category}
-                variant={selectedCategory === category ? "default" : "outline"}
-                size="sm"
-                onClick={() => setSelectedCategory(category)}
-                className="rounded-full"
-              >
-                {category}
-              </Button>
-            ))}
+        {/* Search and Category Filter - Only on Knowledge Hub */}
+        {isKnowledgeHubPage && (
+          <div className="space-y-4 mb-10">
+            {/* Search Bar */}
+            <div className="relative max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search articles..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 pr-10"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+            
+            {/* Category Filters */}
+            {categories.length > 2 && (
+              <div className="flex flex-wrap gap-2">
+                {categories.map((category) => (
+                  <Button
+                    key={category}
+                    variant={selectedCategory === category ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setSelectedCategory(category)}
+                    className="rounded-full"
+                  >
+                    {category}
+                  </Button>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -141,14 +190,14 @@ const Articles = () => {
         {filteredArticles.length === 0 && (
           <div className="text-center py-12">
             <p className="text-muted-foreground">
-              No articles found in this category.
+              {searchQuery ? `No articles found for "${searchQuery}"` : "No articles found in this category."}
             </p>
             <Button 
               variant="outline" 
               className="mt-4"
-              onClick={() => setSelectedCategory("All")}
+              onClick={clearFilters}
             >
-              View All Articles
+              Clear Filters
             </Button>
           </div>
         )}
