@@ -13,7 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { Shield, Users, Crown, TrendingUp, Calendar, Trash2, Plus, Loader2, Bot, Play, UserPlus } from 'lucide-react';
+import { Shield, Users, Crown, TrendingUp, Calendar, Trash2, Plus, Loader2, Bot, Play, UserPlus, FileText, Mail, Send } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface SubscriptionGrant {
@@ -55,6 +55,12 @@ const AdminDashboard = () => {
   const [seedingUsers, setSeedingUsers] = useState(false);
   const [generatingActivity, setGeneratingActivity] = useState(false);
 
+  // Content management
+  const [generatingArticle, setGeneratingArticle] = useState(false);
+  const [sendingNewsletter, setSendingNewsletter] = useState(false);
+  const [subscriberCount, setSubscriberCount] = useState(0);
+  const [articleCount, setArticleCount] = useState(0);
+
   useEffect(() => {
     if (!authLoading && !user) {
       navigate('/auth');
@@ -73,8 +79,51 @@ const AdminDashboard = () => {
       fetchGrants();
       fetchAnalytics();
       fetchSimulatedCount();
+      fetchContentStats();
     }
   }, [isAdmin]);
+
+  const fetchContentStats = async () => {
+    const [{ count: subs }, { count: articles }] = await Promise.all([
+      supabase.from('newsletter_subscribers').select('*', { count: 'exact', head: true }).eq('is_active', true),
+      supabase.from('articles').select('*', { count: 'exact', head: true }).eq('is_published', true)
+    ]);
+    setSubscriberCount(subs || 0);
+    setArticleCount(articles || 0);
+  };
+
+  const handleGenerateArticle = async () => {
+    setGeneratingArticle(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-article');
+      if (error) throw error;
+      toast.success(`Article published: ${data?.article?.title || 'New article'}`);
+      fetchContentStats();
+    } catch (error: any) {
+      console.error('Error generating article:', error);
+      toast.error(error.message || 'Failed to generate article');
+    } finally {
+      setGeneratingArticle(false);
+    }
+  };
+
+  const handleSendNewsletter = async () => {
+    if (subscriberCount === 0) {
+      toast.error('No subscribers to send to');
+      return;
+    }
+    setSendingNewsletter(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-weekly-newsletter');
+      if (error) throw error;
+      toast.success(`Newsletter sent to ${data?.sent_count || 0} subscribers`);
+    } catch (error: any) {
+      console.error('Error sending newsletter:', error);
+      toast.error(error.message || 'Failed to send newsletter');
+    } finally {
+      setSendingNewsletter(false);
+    }
+  };
 
   const fetchSimulatedCount = async () => {
     const { count } = await supabase
@@ -260,6 +309,10 @@ const AdminDashboard = () => {
             <TabsTrigger value="simulated" className="gap-2">
               <Bot className="h-4 w-4" />
               Simulated Users
+            </TabsTrigger>
+            <TabsTrigger value="content" className="gap-2">
+              <FileText className="h-4 w-4" />
+              Content
             </TabsTrigger>
           </TabsList>
 
@@ -541,6 +594,110 @@ const AdminDashboard = () => {
                   </ul>
                   <p className="text-xs text-muted-foreground mt-3">
                     Tip: Run this daily to maintain community activity. Uses Lovable AI credits.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Content Management Tab */}
+          <TabsContent value="content" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5" />
+                  Content & Newsletter Management
+                </CardTitle>
+                <CardDescription>
+                  Generate expert fitness articles and send weekly newsletters to subscribers
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="p-4 bg-muted rounded-lg">
+                    <p className="font-medium">Published Articles</p>
+                    <p className="text-3xl font-bold">{articleCount}</p>
+                  </div>
+                  <div className="p-4 bg-muted rounded-lg">
+                    <p className="font-medium">Active Subscribers</p>
+                    <p className="text-3xl font-bold">{subscriberCount}</p>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <FileText className="h-4 w-4" />
+                        Generate Article
+                      </CardTitle>
+                      <CardDescription>
+                        AI generates expert fitness content for men over 40
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <Button 
+                        onClick={handleGenerateArticle} 
+                        disabled={generatingArticle}
+                        className="w-full"
+                      >
+                        {generatingArticle ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Generating...
+                          </>
+                        ) : (
+                          <>
+                            <FileText className="h-4 w-4 mr-2" />
+                            Generate & Publish Article
+                          </>
+                        )}
+                      </Button>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <Mail className="h-4 w-4" />
+                        Send Newsletter
+                      </CardTitle>
+                      <CardDescription>
+                        Send weekly newsletter to {subscriberCount} subscribers
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <Button 
+                        onClick={handleSendNewsletter} 
+                        disabled={sendingNewsletter || subscriberCount === 0}
+                        className="w-full"
+                        variant={subscriberCount > 0 ? "default" : "secondary"}
+                      >
+                        {sendingNewsletter ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Sending...
+                          </>
+                        ) : (
+                          <>
+                            <Send className="h-4 w-4 mr-2" />
+                            Send Newsletter Now
+                          </>
+                        )}
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <div className="p-4 border border-border rounded-lg">
+                  <h4 className="font-medium mb-2">Content System:</h4>
+                  <ul className="text-sm text-muted-foreground space-y-1">
+                    <li>• Articles: Expert fitness content for training, nutrition, recovery, mindset, and health</li>
+                    <li>• Newsletter: Weekly tips, recent articles, and motivational content</li>
+                    <li>• Both use AI to generate high-quality, research-backed content</li>
+                  </ul>
+                  <p className="text-xs text-muted-foreground mt-3">
+                    Tip: Set up external scheduling (e.g., cron-job.org) to automate weekly content generation.
                   </p>
                 </div>
               </CardContent>
