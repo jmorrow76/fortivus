@@ -28,6 +28,7 @@ import CalorieTracking from "./pages/CalorieTracking";
 import Workouts from "./pages/Workouts";
 import Running from "./pages/Running";
 import Coaching from "./pages/Coaching";
+import Unsubscribe from "./pages/Unsubscribe";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -64,6 +65,7 @@ const App = () => (
             <Route path="/running" element={<Running />} />
             <Route path="/coaching" element={<Coaching />} />
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/unsubscribe" element={<Unsubscribe />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
