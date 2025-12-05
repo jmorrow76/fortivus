@@ -1,7 +1,4 @@
-import { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Polyline, Marker, useMap } from 'react-leaflet';
-import { Icon } from 'leaflet';
-import 'leaflet/dist/leaflet.css';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -18,6 +15,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 
+// Lazy load the map component to avoid context issues
+const RunMap = lazy(() => import('@/components/RunMap'));
+
 interface Challenge {
   id: string;
   title: string;
@@ -33,28 +33,6 @@ interface UserChallenge {
   progress: number;
   is_completed: boolean;
   challenge: Challenge;
-}
-
-// Fix for default marker icon
-const defaultIcon = new Icon({
-  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-});
-
-// Simple map recenter hook component
-function MapController({ center }: { center: [number, number] | null }) {
-  const map = useMap();
-  
-  useEffect(() => {
-    if (center) {
-      map.setView(center, map.getZoom());
-    }
-  }, [center, map]);
-
-  return null;
 }
 
 // Format seconds to mm:ss or hh:mm:ss
@@ -490,30 +468,13 @@ export const RunTracker = () => {
         </CardHeader>
         <CardContent>
           <div className="h-[300px] md:h-[400px] rounded-lg overflow-hidden mb-4">
-            <MapContainer
-              center={mapCenter}
-              zoom={15}
-              style={{ height: '100%', width: '100%' }}
-            >
-              <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            <Suspense fallback={<div className="h-full w-full bg-muted animate-pulse rounded-lg" />}>
+              <RunMap
+                center={mapCenter}
+                currentPosition={currentPosition}
+                routeCoordinates={routeCoordinates}
               />
-              <MapController center={currentPosition ? [currentPosition.lat, currentPosition.lng] : null} />
-              {currentPosition && (
-                <Marker 
-                  position={[currentPosition.lat, currentPosition.lng]} 
-                  icon={defaultIcon}
-                />
-              )}
-              {routeCoordinates.length > 1 && (
-                <Polyline 
-                  positions={routeCoordinates}
-                  color="#3b82f6"
-                  weight={4}
-                />
-              )}
-            </MapContainer>
+            </Suspense>
           </div>
 
           {/* Controls */}
