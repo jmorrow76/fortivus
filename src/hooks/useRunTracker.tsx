@@ -140,24 +140,26 @@ export const useRunTracker = (): UseRunTrackerReturn => {
   const checkRunningBadges = async (
     distanceMeters: number, 
     durationSeconds: number, 
-    paceSecondsPerKm: number
+    paceSecondsPerKm: number,
+    currentStreak: number = 0
   ) => {
     if (!user) return;
 
-    // Get all badges and user badges
-    const [{ data: allBadges }, { data: userBadges }, { data: allRuns }] = await Promise.all([
+    // Get all badges, user badges, all runs, and running goals
+    const [{ data: allBadges }, { data: userBadges }, { data: allRuns }, { data: goalData }] = await Promise.all([
       supabase.from('badges').select('*'),
       supabase.from('user_badges').select('badge_id').eq('user_id', user.id),
-      supabase.from('running_sessions').select('distance_meters, duration_seconds, avg_pace_seconds_per_km').eq('user_id', user.id),
+      supabase.from('running_sessions').select('distance_meters').eq('user_id', user.id),
+      supabase.from('running_goals').select('current_streak, longest_streak').eq('user_id', user.id).maybeSingle(),
     ]);
 
     if (!allBadges) return;
 
     const earnedBadgeIds = new Set(userBadges?.map(ub => ub.badge_id) || []);
-    const totalRuns = (allRuns?.length || 0) + 1;
-    const totalDistanceKm = ((allRuns || []).reduce((sum, r) => sum + (r.distance_meters || 0), 0) + distanceMeters) / 1000;
+    const totalRuns = (allRuns?.length || 0);
+    const totalDistanceKm = (allRuns || []).reduce((sum, r) => sum + (r.distance_meters || 0), 0) / 1000;
     const currentDistanceKm = distanceMeters / 1000;
-    const durationMinutes = durationSeconds / 60;
+    const runStreak = goalData?.current_streak || currentStreak;
 
     for (const badge of allBadges) {
       if (earnedBadgeIds.has(badge.id)) continue;
@@ -165,20 +167,21 @@ export const useRunTracker = (): UseRunTrackerReturn => {
       let shouldAward = false;
 
       switch (badge.requirement_type) {
-        case 'runs_completed':
+        // Running session count badges
+        case 'running_sessions':
           shouldAward = totalRuns >= badge.requirement_value;
           break;
-        case 'total_distance_km':
+        // Single run distance badges (5K, 10K, half marathon, marathon)
+        case 'running_distance_single':
+          shouldAward = currentDistanceKm >= badge.requirement_value;
+          break;
+        // Running streak badges
+        case 'running_streak':
+          shouldAward = runStreak >= badge.requirement_value;
+          break;
+        // Total distance badges
+        case 'running_total_distance':
           shouldAward = totalDistanceKm >= badge.requirement_value;
-          break;
-        case 'pace_under_6':
-          shouldAward = paceSecondsPerKm > 0 && paceSecondsPerKm < 360; // Under 6 min/km
-          break;
-        case 'run_duration_30':
-          shouldAward = durationMinutes >= 30;
-          break;
-        case 'single_run_5km':
-          shouldAward = currentDistanceKm >= 5;
           break;
       }
 
