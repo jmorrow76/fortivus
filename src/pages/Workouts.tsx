@@ -1,18 +1,19 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { useAuth } from '@/hooks/useAuth';
-import { useWorkoutTracker } from '@/hooks/useWorkoutTracker';
+import { useWorkoutTracker, WorkoutTemplate } from '@/hooks/useWorkoutTracker';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
 import { 
   Dumbbell, Play, History, Trophy, Plus, Search, 
-  Timer, Check, X, ChevronRight, Minus, Clock
+  Timer, Check, X, ChevronRight, Minus, Clock, FileText, Trash2, Save
 } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
 import { format, formatDistanceToNow } from 'date-fns';
@@ -26,6 +27,7 @@ const Workouts = () => {
   const { user, loading: authLoading } = useAuth();
   const {
     exercises,
+    templates,
     workoutHistory,
     personalRecords,
     activeSession,
@@ -37,6 +39,12 @@ const Workouts = () => {
     deleteSet,
     finishWorkout,
     cancelWorkout,
+    createTemplate,
+    addExerciseToTemplate,
+    removeExerciseFromTemplate,
+    deleteTemplate,
+    startWorkoutFromTemplate,
+    saveWorkoutAsTemplate,
   } = useWorkoutTracker();
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -46,6 +54,15 @@ const Workouts = () => {
   const [editingSets, setEditingSets] = useState<Record<string, { reps: string; weight: string }>>({});
   const [restTimer, setRestTimer] = useState<number | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
+  
+  // Template state
+  const [showCreateTemplate, setShowCreateTemplate] = useState(false);
+  const [newTemplateName, setNewTemplateName] = useState('');
+  const [newTemplateDesc, setNewTemplateDesc] = useState('');
+  const [editingTemplate, setEditingTemplate] = useState<WorkoutTemplate | null>(null);
+  const [showAddExerciseToTemplate, setShowAddExerciseToTemplate] = useState(false);
+  const [showSaveAsTemplate, setShowSaveAsTemplate] = useState(false);
+  const [saveTemplateName, setSaveTemplateName] = useState('');
 
   // Auth redirect
   if (!authLoading && !user) {
@@ -80,8 +97,29 @@ const Workouts = () => {
     setRestTimer(90);
   };
 
+  // Create template handler
+  const handleCreateTemplate = async () => {
+    if (!newTemplateName.trim()) return;
+    const template = await createTemplate(newTemplateName.trim(), newTemplateDesc.trim());
+    if (template) {
+      setShowCreateTemplate(false);
+      setNewTemplateName('');
+      setNewTemplateDesc('');
+      setEditingTemplate({ ...template, exercises: [] });
+      setShowAddExerciseToTemplate(true);
+    }
+  };
+
+  // Save workout as template handler
+  const handleSaveAsTemplate = async () => {
+    if (!saveTemplateName.trim()) return;
+    await saveWorkoutAsTemplate(saveTemplateName.trim());
+    setShowSaveAsTemplate(false);
+    setSaveTemplateName('');
+  };
+
   // Rest timer effect
-  useState(() => {
+  useEffect(() => {
     if (restTimer === null) return;
     if (restTimer <= 0) {
       setRestTimer(null);
@@ -91,17 +129,17 @@ const Workouts = () => {
       setRestTimer(prev => (prev !== null && prev > 0) ? prev - 1 : null);
     }, 1000);
     return () => clearInterval(interval);
-  });
+  }, [restTimer]);
 
   // Elapsed time effect
-  useState(() => {
+  useEffect(() => {
     if (!activeSession) return;
     const interval = setInterval(() => {
       const start = new Date(activeSession.started_at).getTime();
       setElapsedTime(Math.floor((Date.now() - start) / 1000));
     }, 1000);
     return () => clearInterval(interval);
-  });
+  }, [activeSession]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -303,6 +341,41 @@ const Workouts = () => {
               </div>
             </DialogContent>
           </Dialog>
+
+          {/* Save as Template Button */}
+          {activeExercises.length > 0 && (
+            <Dialog open={showSaveAsTemplate} onOpenChange={setShowSaveAsTemplate}>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="w-full mt-3">
+                  <Save className="w-5 h-5 mr-2" />
+                  Save as Template
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Save as Template</DialogTitle>
+                  <DialogDescription>
+                    Save this workout as a reusable template for future sessions.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <Input
+                    placeholder="Template name"
+                    value={saveTemplateName}
+                    onChange={(e) => setSaveTemplateName(e.target.value)}
+                  />
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setShowSaveAsTemplate(false)}>
+                    Cancel
+                  </Button>
+                  <Button onClick={handleSaveAsTemplate} disabled={!saveTemplateName.trim()}>
+                    Save Template
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          )}
         </main>
       </div>
     );
@@ -340,18 +413,22 @@ const Workouts = () => {
           </Card>
 
           <Tabs defaultValue="history" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="history" className="flex items-center gap-2">
                 <History className="w-4 h-4" />
-                History
+                <span className="hidden sm:inline">History</span>
+              </TabsTrigger>
+              <TabsTrigger value="templates" className="flex items-center gap-2">
+                <FileText className="w-4 h-4" />
+                <span className="hidden sm:inline">Templates</span>
               </TabsTrigger>
               <TabsTrigger value="exercises" className="flex items-center gap-2">
                 <Dumbbell className="w-4 h-4" />
-                Exercises
+                <span className="hidden sm:inline">Exercises</span>
               </TabsTrigger>
               <TabsTrigger value="records" className="flex items-center gap-2">
                 <Trophy className="w-4 h-4" />
-                Records
+                <span className="hidden sm:inline">Records</span>
               </TabsTrigger>
             </TabsList>
 
@@ -388,6 +465,206 @@ const Workouts = () => {
                   ))}
                 </div>
               )}
+            </TabsContent>
+
+            {/* Templates Tab */}
+            <TabsContent value="templates">
+              <div className="space-y-4">
+                {/* Create Template Button */}
+                <Dialog open={showCreateTemplate} onOpenChange={setShowCreateTemplate}>
+                  <DialogTrigger asChild>
+                    <Button className="w-full">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Create New Template
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Create Template</DialogTitle>
+                      <DialogDescription>
+                        Create a workout template you can reuse.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <Input
+                        placeholder="Template name"
+                        value={newTemplateName}
+                        onChange={(e) => setNewTemplateName(e.target.value)}
+                      />
+                      <Textarea
+                        placeholder="Description (optional)"
+                        value={newTemplateDesc}
+                        onChange={(e) => setNewTemplateDesc(e.target.value)}
+                      />
+                    </div>
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => setShowCreateTemplate(false)}>
+                        Cancel
+                      </Button>
+                      <Button onClick={handleCreateTemplate} disabled={!newTemplateName.trim()}>
+                        Create & Add Exercises
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+
+                {/* Add Exercises to Template Dialog */}
+                <Dialog open={showAddExerciseToTemplate} onOpenChange={(open) => {
+                  setShowAddExerciseToTemplate(open);
+                  if (!open) setEditingTemplate(null);
+                }}>
+                  <DialogContent className="max-w-lg max-h-[80vh]">
+                    <DialogHeader>
+                      <DialogTitle>
+                        {editingTemplate ? `Edit: ${editingTemplate.name}` : 'Add Exercises'}
+                      </DialogTitle>
+                      <DialogDescription>
+                        {editingTemplate?.exercises?.length || 0} exercises added
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      {/* Current exercises in template */}
+                      {editingTemplate?.exercises && editingTemplate.exercises.length > 0 && (
+                        <div className="space-y-2">
+                          <p className="text-sm font-medium">Exercises in template:</p>
+                          {editingTemplate.exercises.map((te) => (
+                            <div key={te.id} className="flex items-center justify-between p-2 bg-muted rounded-lg">
+                              <div>
+                                <p className="font-medium text-sm">{te.exercise.name}</p>
+                                <p className="text-xs text-muted-foreground">
+                                  {te.target_sets} sets × {te.target_reps} reps
+                                </p>
+                              </div>
+                              <Button 
+                                size="icon" 
+                                variant="ghost"
+                                onClick={() => removeExerciseFromTemplate(te.id)}
+                              >
+                                <Trash2 className="w-4 h-4 text-destructive" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      
+                      {/* Search and add exercises */}
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Input
+                          placeholder="Search exercises..."
+                          className="pl-10"
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                      </div>
+                      <ScrollArea className="h-[200px]">
+                        <div className="space-y-1">
+                          {filteredExercises.map(exercise => (
+                            <button
+                              key={exercise.id}
+                              className="w-full p-3 text-left hover:bg-muted rounded-lg flex items-center justify-between"
+                              onClick={() => {
+                                if (editingTemplate) {
+                                  addExerciseToTemplate(editingTemplate.id, exercise.id);
+                                }
+                              }}
+                            >
+                              <div>
+                                <p className="font-medium">{exercise.name}</p>
+                                <p className="text-sm text-muted-foreground capitalize">
+                                  {exercise.muscle_group}
+                                </p>
+                              </div>
+                              <Plus className="w-4 h-4 text-muted-foreground" />
+                            </button>
+                          ))}
+                        </div>
+                      </ScrollArea>
+                    </div>
+                    <DialogFooter>
+                      <Button onClick={() => {
+                        setShowAddExerciseToTemplate(false);
+                        setEditingTemplate(null);
+                      }}>
+                        Done
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+
+                {/* Templates List */}
+                {templates.length === 0 ? (
+                  <Card>
+                    <CardContent className="py-12 text-center">
+                      <FileText className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                      <h3 className="text-lg font-semibold mb-2">No templates yet</h3>
+                      <p className="text-muted-foreground">
+                        Create templates to quickly start your favorite workouts.
+                      </p>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <div className="space-y-3">
+                    {templates.map(template => (
+                      <Card key={template.id} className="overflow-hidden">
+                        <CardHeader className="pb-2">
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <CardTitle className="text-lg">{template.name}</CardTitle>
+                              {template.description && (
+                                <CardDescription>{template.description}</CardDescription>
+                              )}
+                            </div>
+                            <div className="flex gap-1">
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                onClick={() => {
+                                  setEditingTemplate(template);
+                                  setShowAddExerciseToTemplate(true);
+                                }}
+                              >
+                                <Plus className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                onClick={() => deleteTemplate(template.id)}
+                              >
+                                <Trash2 className="w-4 h-4 text-destructive" />
+                              </Button>
+                            </div>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          {template.exercises && template.exercises.length > 0 ? (
+                            <div className="space-y-2 mb-4">
+                              {template.exercises.map((te) => (
+                                <div key={te.id} className="flex items-center justify-between text-sm">
+                                  <span>{te.exercise.name}</span>
+                                  <span className="text-muted-foreground">
+                                    {te.target_sets} × {te.target_reps}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-sm text-muted-foreground mb-4">No exercises added yet</p>
+                          )}
+                          <Button 
+                            className="w-full" 
+                            onClick={() => startWorkoutFromTemplate(template)}
+                            disabled={!template.exercises || template.exercises.length === 0}
+                          >
+                            <Play className="w-4 h-4 mr-2" />
+                            Start Workout
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </div>
             </TabsContent>
 
             {/* Exercises Tab */}

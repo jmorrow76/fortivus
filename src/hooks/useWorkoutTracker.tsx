@@ -37,12 +37,25 @@ export interface WorkoutSession {
   notes: string | null;
 }
 
+export interface TemplateExercise {
+  id: string;
+  template_id: string;
+  exercise_id: string;
+  sort_order: number;
+  target_sets: number | null;
+  target_reps: number | null;
+  target_weight: number | null;
+  rest_seconds: number | null;
+  notes: string | null;
+}
+
 export interface WorkoutTemplate {
   id: string;
   user_id: string;
   name: string;
   description: string | null;
   created_at: string;
+  exercises?: (TemplateExercise & { exercise: Exercise })[];
 }
 
 export interface PersonalRecord {
@@ -87,13 +100,19 @@ export const useWorkoutTracker = () => {
     setExercises(data || []);
   }, []);
 
-  // Fetch user's workout templates
+  // Fetch user's workout templates with exercises
   const fetchTemplates = useCallback(async () => {
     if (!user) return;
     
     const { data, error } = await supabase
       .from('workout_templates')
-      .select('*')
+      .select(`
+        *,
+        template_exercises(
+          *,
+          exercises(*)
+        )
+      `)
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
     
@@ -101,7 +120,17 @@ export const useWorkoutTracker = () => {
       console.error('Error fetching templates:', error);
       return;
     }
-    setTemplates(data || []);
+    
+    // Transform data to match interface
+    const templatesWithExercises = (data || []).map(t => ({
+      ...t,
+      exercises: (t.template_exercises || []).map((te: any) => ({
+        ...te,
+        exercise: te.exercises
+      })).sort((a: TemplateExercise, b: TemplateExercise) => a.sort_order - b.sort_order)
+    }));
+    
+    setTemplates(templatesWithExercises);
   }, [user]);
 
   // Fetch workout history
@@ -360,6 +389,188 @@ export const useWorkoutTracker = () => {
     toast({ title: 'Workout Cancelled', description: 'Your workout was discarded' });
   };
 
+  // Create a new template
+  const createTemplate = async (name: string, description?: string) => {
+    if (!user) return null;
+    
+    const { data, error } = await supabase
+      .from('workout_templates')
+      .insert({
+        user_id: user.id,
+        name,
+        description: description || null,
+      })
+      .select()
+      .single();
+    
+    if (error) {
+      toast({ title: 'Error', description: 'Failed to create template', variant: 'destructive' });
+      return null;
+    }
+    
+    toast({ title: 'Template Created', description: `${name} is ready to use` });
+    await fetchTemplates();
+    return data;
+  };
+
+  // Add exercise to template
+  const addExerciseToTemplate = async (
+    templateId: string, 
+    exerciseId: string, 
+    options?: { targetSets?: number; targetReps?: number; targetWeight?: number }
+  ) => {
+    if (!user) return;
+    
+    // Get current exercise count for sort order
+    const template = templates.find(t => t.id === templateId);
+    const sortOrder = template?.exercises?.length || 0;
+    
+    const { error } = await supabase
+      .from('template_exercises')
+      .insert({
+        template_id: templateId,
+        exercise_id: exerciseId,
+        sort_order: sortOrder,
+        target_sets: options?.targetSets || 3,
+        target_reps: options?.targetReps || 10,
+        target_weight: options?.targetWeight || null,
+      });
+    
+    if (error) {
+      toast({ title: 'Error', description: 'Failed to add exercise', variant: 'destructive' });
+      return;
+    }
+    
+    await fetchTemplates();
+  };
+
+  // Remove exercise from template
+  const removeExerciseFromTemplate = async (templateExerciseId: string) => {
+    const { error } = await supabase
+      .from('template_exercises')
+      .delete()
+      .eq('id', templateExerciseId);
+    
+    if (error) {
+      toast({ title: 'Error', description: 'Failed to remove exercise', variant: 'destructive' });
+      return;
+    }
+    
+    await fetchTemplates();
+  };
+
+  // Delete template
+  const deleteTemplate = async (templateId: string) => {
+    const { error } = await supabase
+      .from('workout_templates')
+      .delete()
+      .eq('id', templateId);
+    
+    if (error) {
+      toast({ title: 'Error', description: 'Failed to delete template', variant: 'destructive' });
+      return;
+    }
+    
+    toast({ title: 'Template Deleted' });
+    await fetchTemplates();
+  };
+
+  // Start workout from template
+  const startWorkoutFromTemplate = async (template: WorkoutTemplate) => {
+    if (!user || !template.exercises) return null;
+    
+    setLoading(true);
+    
+    // Create session
+    const { data: session, error: sessionError } = await supabase
+      .from('workout_sessions')
+      .insert({
+        user_id: user.id,
+        name: template.name,
+        template_id: template.id,
+        started_at: new Date().toISOString(),
+      })
+      .select()
+      .single();
+    
+    if (sessionError || !session) {
+      setLoading(false);
+      toast({ title: 'Error', description: 'Failed to start workout', variant: 'destructive' });
+      return null;
+    }
+    
+    // Create sets for each exercise in template
+    const exercisesWithSets: ActiveWorkoutExercise[] = [];
+    
+    for (const te of template.exercises) {
+      const sets: ExerciseSet[] = [];
+      const numSets = te.target_sets || 3;
+      
+      for (let i = 0; i < numSets; i++) {
+        const { data: setData } = await supabase
+          .from('exercise_sets')
+          .insert({
+            session_id: session.id,
+            exercise_id: te.exercise_id,
+            set_number: i + 1,
+            weight: te.target_weight,
+            reps: te.target_reps,
+            is_warmup: false,
+            is_completed: false,
+          })
+          .select()
+          .single();
+        
+        if (setData) {
+          sets.push(setData);
+        }
+      }
+      
+      exercisesWithSets.push({
+        exercise: te.exercise,
+        sets,
+      });
+    }
+    
+    setLoading(false);
+    setActiveSession(session);
+    setActiveExercises(exercisesWithSets);
+    toast({ title: 'Workout Started', description: `Let's crush ${template.name}!` });
+    return session;
+  };
+
+  // Save current workout as template
+  const saveWorkoutAsTemplate = async (name: string, description?: string) => {
+    if (!user || activeExercises.length === 0) return;
+    
+    const template = await createTemplate(name, description);
+    if (!template) return;
+    
+    // Add each exercise to the template
+    for (let i = 0; i < activeExercises.length; i++) {
+      const ae = activeExercises[i];
+      const completedSets = ae.sets.filter(s => s.is_completed);
+      const avgWeight = completedSets.length > 0
+        ? Math.round(completedSets.reduce((sum, s) => sum + (s.weight || 0), 0) / completedSets.length)
+        : null;
+      const avgReps = completedSets.length > 0
+        ? Math.round(completedSets.reduce((sum, s) => sum + (s.reps || 0), 0) / completedSets.length)
+        : null;
+      
+      await supabase.from('template_exercises').insert({
+        template_id: template.id,
+        exercise_id: ae.exercise.id,
+        sort_order: i,
+        target_sets: ae.sets.length,
+        target_reps: avgReps,
+        target_weight: avgWeight,
+      });
+    }
+    
+    await fetchTemplates();
+    toast({ title: 'Template Saved', description: `${name} saved from your workout` });
+  };
+
   // Get previous workout data for an exercise
   const getPreviousWorkoutData = async (exerciseId: string): Promise<ExerciseSet[]> => {
     if (!user) return [];
@@ -419,6 +630,12 @@ export const useWorkoutTracker = () => {
     deleteSet,
     finishWorkout,
     cancelWorkout,
+    createTemplate,
+    addExerciseToTemplate,
+    removeExerciseFromTemplate,
+    deleteTemplate,
+    startWorkoutFromTemplate,
+    saveWorkoutAsTemplate,
     getPreviousWorkoutData,
     getWorkoutDetails,
     fetchExercises,
