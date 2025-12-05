@@ -93,13 +93,17 @@ const Articles = () => {
               nutrition, and lifestyle optimization.
             </p>
           </div>
-          {!isKnowledgeHubPage && (
+          {!isKnowledgeHubPage ? (
             <Link to="/knowledge">
               <Button variant="outline" size="lg" className="shrink-0 self-start md:self-auto">
                 Browse All Articles
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </Link>
+          ) : (
+            <div className="text-muted-foreground text-sm shrink-0 self-start md:self-auto">
+              Showing all {articles.length} articles
+            </div>
           )}
         </div>
 
