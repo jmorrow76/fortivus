@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
@@ -7,6 +7,13 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Clock, User, Calendar } from "lucide-react";
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
+import { marked } from "marked";
+
+// Configure marked for better output
+marked.setOptions({
+  breaks: true,
+  gfm: true,
+});
 
 interface Article {
   id: string;
@@ -20,6 +27,19 @@ interface Article {
   read_time_minutes: number;
   image_url: string | null;
 }
+
+const ArticleContent = ({ content }: { content: string }) => {
+  const htmlContent = useMemo(() => {
+    return marked(content) as string;
+  }, [content]);
+
+  return (
+    <div 
+      className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-a:text-accent prose-p:text-muted-foreground prose-p:leading-relaxed"
+      dangerouslySetInnerHTML={{ __html: htmlContent }}
+    />
+  );
+};
 
 const ArticleDetail = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -147,10 +167,7 @@ const ArticleDetail = () => {
           </div>
 
           {/* Content */}
-          <div 
-            className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-a:text-accent prose-p:text-muted-foreground prose-p:leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: article.content }}
-          />
+          <ArticleContent content={article.content} />
         </article>
       </main>
       <Footer />
