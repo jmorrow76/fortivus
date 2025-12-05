@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, LogOut, Settings, LayoutDashboard, Shield, Home, Crown } from "lucide-react";
+import { 
+  Menu, X, LogOut, Settings, LayoutDashboard, Shield, Home, Crown,
+  ChevronDown, Battery, Moon, RotateCcw, Briefcase, MessageCircle,
+  Dumbbell, MapPin, Camera, Utensils
+} from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useAdmin } from "@/hooks/useAdmin";
 import {
@@ -10,6 +14,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -17,19 +29,26 @@ const Navbar = () => {
   const { isAdmin } = useAdmin();
   const navigate = useNavigate();
 
+  const eliteFeatures = [
+    { name: "AI Coach", href: "/coaching", icon: MessageCircle },
+    { name: "Workouts", href: "/workouts", icon: Dumbbell },
+    { name: "Run Tracker", href: "/running", icon: MapPin },
+    { name: "Calorie Tracker", href: "/calories", icon: Utensils },
+    { name: "Body Analysis", href: "/body-analysis", icon: Camera },
+    { name: "Hormonal Optimization", href: "/hormonal", icon: Battery },
+    { name: "Joint Health Analytics", href: "/joint-health", icon: Shield },
+    { name: "Sleep-Adaptive Workouts", href: "/sleep-adaptive", icon: Moon },
+    { name: "Comeback Protocol", href: "/comeback", icon: RotateCcw },
+    { name: "Executive Performance", href: "/executive-mode", icon: Briefcase },
+  ];
+
   const navLinks = [
-    { name: "AI Coach", href: "/coaching", isPage: true },
-    { name: "Workouts", href: "/workouts", isPage: true },
-    { name: "Run Tracker", href: "/running", isPage: true },
     { name: "Knowledge Hub", href: "/knowledge", isPage: true },
     { name: "Forum", href: "/forum", isPage: true },
     { name: "Community", href: "/community", isPage: true },
   ];
 
   const mobileNavLinks = [
-    { name: "AI Coach", href: "/coaching", isPage: true },
-    { name: "Workouts", href: "/workouts", isPage: true },
-    { name: "Run Tracker", href: "/running", isPage: true },
     { name: "Knowledge Hub", href: "/knowledge", isPage: true },
     { name: "Forum", href: "/forum", isPage: true },
     { name: "Community", href: "/community", isPage: true },
@@ -54,27 +73,38 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-6">
-            <TooltipProvider>
-              {navLinks.map((link) => (
-                <Link
-                  key={link.name}
-                  to={link.href}
-                  className="text-xs font-medium tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-200 flex items-center gap-1"
-                >
-                  {link.name}
-                  {["AI Coach", "Workouts", "Run Tracker"].includes(link.name) && (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Crown className="h-3 w-3 text-amber-500 transition-transform duration-200 hover:scale-125 hover:rotate-12" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Elite Feature</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  )}
-                </Link>
-              ))}
-            </TooltipProvider>
+            {/* Elite Features Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="text-xs font-medium tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-200 flex items-center gap-1 outline-none">
+                <Crown className="h-3 w-3 text-amber-500" />
+                Elite Features
+                <ChevronDown className="h-3 w-3" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-56 bg-background border-border">
+                <DropdownMenuLabel className="text-xs tracking-wider uppercase text-muted-foreground">
+                  Premium Features
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {eliteFeatures.map((feature) => (
+                  <DropdownMenuItem key={feature.name} asChild>
+                    <Link to={feature.href} className="flex items-center gap-2 cursor-pointer">
+                      <feature.icon className="h-4 w-4 text-accent" />
+                      {feature.name}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {navLinks.map((link) => (
+              <Link
+                key={link.name}
+                to={link.href}
+                className="text-xs font-medium tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-200"
+              >
+                {link.name}
+              </Link>
+            ))}
           </div>
 
           {/* Desktop CTA */}
@@ -133,28 +163,37 @@ const Navbar = () => {
         {isOpen && (
           <div className="lg:hidden py-6 border-t border-border animate-fade-in">
             <div className="flex flex-col gap-4">
-            <TooltipProvider>
+              {/* Mobile Elite Features Section */}
+              <div className="pb-4 border-b border-border">
+                <p className="text-xs font-medium tracking-[0.1em] uppercase text-amber-500 flex items-center gap-1 mb-3">
+                  <Crown className="h-3 w-3" />
+                  Elite Features
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  {eliteFeatures.map((feature) => (
+                    <Link
+                      key={feature.name}
+                      to={feature.href}
+                      className="text-xs text-muted-foreground hover:text-foreground transition-colors py-2 flex items-center gap-2"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <feature.icon className="h-3 w-3 text-accent" />
+                      {feature.name}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+
               {mobileNavLinks.map((link) => (
                 <Link
                   key={link.name}
                   to={link.href}
-                  className="text-xs font-medium tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors py-2 flex items-center gap-1"
+                  className="text-xs font-medium tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors py-2"
                   onClick={() => setIsOpen(false)}
                 >
                   {link.name}
-                  {["AI Coach", "Workouts", "Run Tracker"].includes(link.name) && (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Crown className="h-3 w-3 text-amber-500 transition-transform duration-200 hover:scale-125 hover:rotate-12" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Elite Feature</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  )}
                 </Link>
               ))}
-            </TooltipProvider>
               <div className="flex flex-col gap-3 pt-4 border-t border-border mt-2">
                 {user ? (
                   <>
