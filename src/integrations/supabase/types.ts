@@ -510,6 +510,7 @@ export type Database = {
           display_name: string | null
           fat_goal: number | null
           id: string
+          is_simulated: boolean | null
           protein_goal: number | null
           updated_at: string
           user_id: string
@@ -522,6 +523,7 @@ export type Database = {
           display_name?: string | null
           fat_goal?: number | null
           id?: string
+          is_simulated?: boolean | null
           protein_goal?: number | null
           updated_at?: string
           user_id: string
@@ -534,6 +536,7 @@ export type Database = {
           display_name?: string | null
           fat_goal?: number | null
           id?: string
+          is_simulated?: boolean | null
           protein_goal?: number | null
           updated_at?: string
           user_id?: string

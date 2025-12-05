@@ -13,7 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { Shield, Users, Crown, TrendingUp, Calendar, Trash2, Plus, Loader2 } from 'lucide-react';
+import { Shield, Users, Crown, TrendingUp, Calendar, Trash2, Plus, Loader2, Bot, Play, UserPlus } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface SubscriptionGrant {
@@ -50,6 +50,11 @@ const AdminDashboard = () => {
   const [newExpiresAt, setNewExpiresAt] = useState('');
   const [addingGrant, setAddingGrant] = useState(false);
 
+  // Simulated users
+  const [simulatedCount, setSimulatedCount] = useState(0);
+  const [seedingUsers, setSeedingUsers] = useState(false);
+  const [generatingActivity, setGeneratingActivity] = useState(false);
+
   useEffect(() => {
     if (!authLoading && !user) {
       navigate('/auth');
@@ -67,8 +72,48 @@ const AdminDashboard = () => {
     if (isAdmin) {
       fetchGrants();
       fetchAnalytics();
+      fetchSimulatedCount();
     }
   }, [isAdmin]);
+
+  const fetchSimulatedCount = async () => {
+    const { count } = await supabase
+      .from('profiles')
+      .select('*', { count: 'exact', head: true })
+      .eq('is_simulated', true);
+    setSimulatedCount(count || 0);
+  };
+
+  const handleSeedUsers = async () => {
+    setSeedingUsers(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('seed-simulated-users');
+      if (error) throw error;
+      toast.success(`Created ${data?.users?.length || 50} simulated users`);
+      fetchSimulatedCount();
+      fetchAnalytics();
+    } catch (error: any) {
+      console.error('Error seeding users:', error);
+      toast.error(error.message || 'Failed to seed users');
+    } finally {
+      setSeedingUsers(false);
+    }
+  };
+
+  const handleGenerateActivity = async () => {
+    setGeneratingActivity(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('simulate-community-activity');
+      if (error) throw error;
+      toast.success(`Generated ${data?.activitiesGenerated || 0} activities`);
+      fetchAnalytics();
+    } catch (error: any) {
+      console.error('Error generating activity:', error);
+      toast.error(error.message || 'Failed to generate activity');
+    } finally {
+      setGeneratingActivity(false);
+    }
+  };
 
   const fetchGrants = async () => {
     try {
@@ -211,6 +256,10 @@ const AdminDashboard = () => {
             <TabsTrigger value="grants" className="gap-2">
               <Crown className="h-4 w-4" />
               Subscription Grants
+            </TabsTrigger>
+            <TabsTrigger value="simulated" className="gap-2">
+              <Bot className="h-4 w-4" />
+              Simulated Users
             </TabsTrigger>
           </TabsList>
 
@@ -385,6 +434,115 @@ const AdminDashboard = () => {
                     </TableBody>
                   </Table>
                 )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Simulated Users Tab */}
+          <TabsContent value="simulated" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Bot className="h-5 w-5" />
+                  Community Simulation
+                </CardTitle>
+                <CardDescription>
+                  Manage AI-powered simulated users that create authentic community engagement
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
+                  <div>
+                    <p className="font-medium">Simulated Users</p>
+                    <p className="text-sm text-muted-foreground">
+                      {simulatedCount} users currently active
+                    </p>
+                  </div>
+                  <Badge variant={simulatedCount > 0 ? "default" : "secondary"}>
+                    {simulatedCount > 0 ? "Active" : "Not Seeded"}
+                  </Badge>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <UserPlus className="h-4 w-4" />
+                        Seed Users
+                      </CardTitle>
+                      <CardDescription>
+                        Create 50 simulated male users over 40 with unique personalities
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <Button 
+                        onClick={handleSeedUsers} 
+                        disabled={seedingUsers || simulatedCount > 0}
+                        className="w-full"
+                      >
+                        {seedingUsers ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Creating Users...
+                          </>
+                        ) : simulatedCount > 0 ? (
+                          "Users Already Seeded"
+                        ) : (
+                          <>
+                            <UserPlus className="h-4 w-4 mr-2" />
+                            Create 50 Users
+                          </>
+                        )}
+                      </Button>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <Play className="h-4 w-4" />
+                        Generate Activity
+                      </CardTitle>
+                      <CardDescription>
+                        Create forum posts, replies, check-ins, and badge progress
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <Button 
+                        onClick={handleGenerateActivity} 
+                        disabled={generatingActivity || simulatedCount === 0}
+                        className="w-full"
+                        variant={simulatedCount > 0 ? "default" : "secondary"}
+                      >
+                        {generatingActivity ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Generating...
+                          </>
+                        ) : (
+                          <>
+                            <Play className="h-4 w-4 mr-2" />
+                            Generate Activity Now
+                          </>
+                        )}
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <div className="p-4 border border-border rounded-lg">
+                  <h4 className="font-medium mb-2">What gets generated:</h4>
+                  <ul className="text-sm text-muted-foreground space-y-1">
+                    <li>• 3-5 new AI-written forum posts on fitness topics</li>
+                    <li>• 5-8 replies to existing posts (including real users)</li>
+                    <li>• 10-15 daily check-ins with mood/energy data</li>
+                    <li>• Challenge progress updates</li>
+                    <li>• 1-2 badge awards</li>
+                  </ul>
+                  <p className="text-xs text-muted-foreground mt-3">
+                    Tip: Run this daily to maintain community activity. Uses Lovable AI credits.
+                  </p>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
