@@ -71,7 +71,7 @@ const Navbar = () => {
                 <Button variant="default" size="sm" asChild>
                   <Link to="/dashboard" className="flex items-center gap-2">
                     <LayoutDashboard className="h-4 w-4" />
-                    Member Portal
+                    Member Dashboard
                   </Link>
                 </Button>
                 {isAdmin && (
@@ -137,7 +137,7 @@ const Navbar = () => {
                     <Button variant="default" className="justify-start" asChild>
                       <Link to="/dashboard" onClick={() => setIsOpen(false)}>
                         <LayoutDashboard className="h-4 w-4 mr-2" />
-                        Member Portal
+                        Member Dashboard
                       </Link>
                     </Button>
                     {isAdmin && (
