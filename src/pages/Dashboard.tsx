@@ -411,10 +411,7 @@ export default function Dashboard() {
                     </div>
                   ) : (
                     <div className="text-center">
-                      <p className="text-muted-foreground mb-3">You haven't checked in today</p>
-                      <Button asChild className="w-full">
-                        <Link to="/checkin">Check In Now</Link>
-                      </Button>
+                      <p className="text-muted-foreground">You haven't checked in today</p>
                     </div>
                   )}
                 </CardContent>
