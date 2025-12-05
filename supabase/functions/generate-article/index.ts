@@ -50,6 +50,43 @@ const TOPICS = [
   "Mental Toughness: Building Resilience Through Physical Challenge"
 ];
 
+// Tool definition for structured article output
+const articleTool = {
+  type: "function",
+  function: {
+    name: "publish_article",
+    description: "Publish a fitness article to the website",
+    parameters: {
+      type: "object",
+      properties: {
+        title: {
+          type: "string",
+          description: "The article title"
+        },
+        excerpt: {
+          type: "string",
+          description: "A compelling 2-3 sentence summary, max 200 characters"
+        },
+        content: {
+          type: "string",
+          description: "The full article content in markdown format"
+        },
+        category: {
+          type: "string",
+          enum: ["Training", "Nutrition", "Recovery", "Mindset", "Health"],
+          description: "The article category"
+        },
+        read_time_minutes: {
+          type: "number",
+          description: "Estimated reading time in minutes"
+        }
+      },
+      required: ["title", "excerpt", "content", "category", "read_time_minutes"],
+      additionalProperties: false
+    }
+  }
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -77,21 +114,14 @@ serve(async (req) => {
 
 Structure your article with:
 1. An engaging introduction that hooks the reader
-2. Clear sections with subheadings
+2. Clear sections with subheadings (use ## for headings)
 3. Specific, actionable advice and protocols
 4. Scientific backing where relevant (cite general research, not specific papers)
 5. A motivating conclusion with key takeaways
 
 The article should be approximately 1500-2000 words. Make it genuinely valuable and shareable.
 
-Return ONLY a JSON object with this exact structure (no markdown, no code blocks):
-{
-  "title": "Article title",
-  "excerpt": "A compelling 2-3 sentence summary (max 200 characters)",
-  "content": "The full article content in markdown format",
-  "category": "One of: Training, Nutrition, Recovery, Mindset, Health",
-  "read_time_minutes": estimated reading time as a number
-}`;
+Use the publish_article function to submit your article.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -105,6 +135,8 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: userPrompt },
         ],
+        tools: [articleTool],
+        tool_choice: { type: "function", function: { name: "publish_article" } },
       }),
     });
 
@@ -119,24 +151,39 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
         });
       }
       
+      if (response.status === 402) {
+        return new Response(JSON.stringify({ error: "AI credits exhausted, please add funds" }), {
+          status: 402,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      
       throw new Error(`AI API error: ${response.status}`);
     }
 
     const data = await response.json();
-    const content = data.choices?.[0]?.message?.content;
-
-    if (!content) {
-      throw new Error("No content generated");
+    
+    // Extract article data from tool call
+    const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
+    
+    if (!toolCall || toolCall.function.name !== "publish_article") {
+      console.error("[GENERATE-ARTICLE] No valid tool call in response:", JSON.stringify(data));
+      throw new Error("AI did not return article data");
     }
 
-    // Parse the JSON response
     let articleData;
     try {
-      const cleanContent = content.replace(/```json\n?|\n?```/g, "").trim();
-      articleData = JSON.parse(cleanContent);
+      articleData = JSON.parse(toolCall.function.arguments);
+      console.log("[GENERATE-ARTICLE] Parsed article data:", articleData.title);
     } catch (parseError) {
       console.error("[GENERATE-ARTICLE] Parse error:", parseError);
-      throw new Error("Failed to parse article JSON");
+      console.error("[GENERATE-ARTICLE] Raw arguments:", toolCall.function.arguments);
+      throw new Error("Failed to parse article data from tool call");
+    }
+
+    // Validate required fields
+    if (!articleData.title || !articleData.content) {
+      throw new Error("Article missing required fields (title or content)");
     }
 
     // Generate a unique slug
@@ -152,7 +199,7 @@ Return ONLY a JSON object with this exact structure (no markdown, no code blocks
       .insert({
         title: articleData.title,
         slug: slug,
-        excerpt: articleData.excerpt.substring(0, 200),
+        excerpt: (articleData.excerpt || articleData.title).substring(0, 200),
         content: articleData.content,
         category: articleData.category || "Training",
         read_time_minutes: articleData.read_time_minutes || 8,
