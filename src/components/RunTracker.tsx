@@ -45,7 +45,7 @@ const defaultIcon = new Icon({
 });
 
 // Component to recenter map when position changes
-const RecenterMap = ({ position }: { position: [number, number] | null }) => {
+function RecenterMap({ position }: { position: [number, number] }) {
   const map = useMap();
   
   useEffect(() => {
@@ -55,7 +55,43 @@ const RecenterMap = ({ position }: { position: [number, number] | null }) => {
   }, [position, map]);
   
   return null;
-};
+}
+
+// Map content component to avoid context consumer issues
+function MapContent({ 
+  currentPosition, 
+  routeCoordinates,
+  defaultIcon 
+}: { 
+  currentPosition: { lat: number; lng: number } | null;
+  routeCoordinates: [number, number][];
+  defaultIcon: Icon;
+}) {
+  return (
+    <>
+      <TileLayer
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      />
+      {currentPosition && (
+        <Marker 
+          position={[currentPosition.lat, currentPosition.lng]} 
+          icon={defaultIcon}
+        />
+      )}
+      {currentPosition && (
+        <RecenterMap position={[currentPosition.lat, currentPosition.lng]} />
+      )}
+      {routeCoordinates.length > 1 && (
+        <Polyline 
+          positions={routeCoordinates}
+          color="hsl(var(--primary))"
+          weight={4}
+        />
+      )}
+    </>
+  );
+}
 
 // Format seconds to mm:ss or hh:mm:ss
 const formatDuration = (seconds: number): string => {
@@ -495,26 +531,11 @@ export const RunTracker = () => {
               zoom={15}
               style={{ height: '100%', width: '100%' }}
             >
-              <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              <MapContent 
+                currentPosition={currentPosition}
+                routeCoordinates={routeCoordinates}
+                defaultIcon={defaultIcon}
               />
-              {currentPosition && (
-                <Marker 
-                  position={[currentPosition.lat, currentPosition.lng]} 
-                  icon={defaultIcon}
-                />
-              )}
-              {currentPosition && (
-                <RecenterMap position={[currentPosition.lat, currentPosition.lng]} />
-              )}
-              {routeCoordinates.length > 1 && (
-                <Polyline 
-                  positions={routeCoordinates}
-                  color="hsl(var(--primary))"
-                  weight={4}
-                />
-              )}
             </MapContainer>
           </div>
 
