@@ -1,7 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
+
+interface SocialConnection {
+  platform: string;
+  platform_username: string | null;
+  auto_post_badges: boolean;
+}
 
 interface Badge {
   id: string;
@@ -217,7 +223,59 @@ export function useGamification() {
           title: '🏆 Badge Earned!',
           description: `You earned "${badge.name}"!`
         });
+
+        // Check for auto-share social connections
+        await triggerAutoShare(badge);
       }
+    }
+  };
+
+  const triggerAutoShare = async (badge: Badge) => {
+    if (!user) return;
+
+    // Check if user has any social connections with auto_post_badges enabled
+    const { data: connections } = await supabase
+      .from('social_connections')
+      .select('platform, platform_username, auto_post_badges')
+      .eq('user_id', user.id)
+      .eq('auto_post_badges', true);
+
+    if (!connections || connections.length === 0) return;
+
+    const shareText = `🏆 I just earned the "${badge.name}" badge on Fortivus! ${badge.description} #Fortivus #FitnessGoals #Achievement`;
+
+    // Try native share API (works on mobile)
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `${badge.name} Badge Earned!`,
+          text: shareText,
+          url: window.location.origin,
+        });
+        toast({
+          title: "Shared to social media!",
+          description: "Your achievement has been shared.",
+        });
+        return;
+      } catch (err) {
+        // User cancelled or error
+        if ((err as Error).name === 'AbortError') return;
+      }
+    }
+
+    // Fallback: copy to clipboard with platform-specific prompt
+    const platforms = connections.map(c => c.platform).join(', ');
+    try {
+      await navigator.clipboard.writeText(shareText);
+      toast({
+        title: "Ready to share!",
+        description: `Copied to clipboard. Open ${platforms} to share your "${badge.name}" badge!`,
+      });
+    } catch {
+      toast({
+        title: "Share your achievement!",
+        description: `Post about earning "${badge.name}" on ${platforms}!`,
+      });
     }
   };
 
