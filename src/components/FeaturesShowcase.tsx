@@ -3,20 +3,22 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
   Activity,
-  Apple,
   ArrowRight,
   BarChart3,
+  Battery,
   Brain,
+  Briefcase,
   Calendar,
   Camera,
   Dumbbell,
-  Flame,
   Heart,
   MapPin,
   Medal,
+  Moon,
+  RotateCcw,
   Salad,
+  Shield,
   Target,
-  Timer,
   Trophy,
   Users,
   Zap,
@@ -74,6 +76,44 @@ const eliteFeatures = [
   },
 ];
 
+const advancedEliteFeatures = [
+  {
+    icon: Battery,
+    title: "Hormonal Cycle Optimization",
+    description: "AI-powered testosterone optimization with personalized training and nutrition adjustments based on your natural hormonal fluctuations.",
+    highlight: "New",
+    link: "/hormonal",
+  },
+  {
+    icon: Shield,
+    title: "Joint Health Analytics",
+    description: "Predictive injury risk analysis that identifies potential issues before they happen. Get smart exercise modifications and mobility protocols.",
+    highlight: "New",
+    link: "/joint-health",
+  },
+  {
+    icon: Moon,
+    title: "Sleep-Adaptive Workouts",
+    description: "AI automatically modifies your workouts based on sleep quality, HRV, and recovery metrics. Never push too hard when your body needs rest.",
+    highlight: "New",
+    link: "/sleep-adaptive",
+  },
+  {
+    icon: RotateCcw,
+    title: "Comeback Protocol",
+    description: "Smart return-to-fitness guidance after breaks due to injury, illness, or life. Get a personalized 4-week protocol to rebuild safely.",
+    highlight: "New",
+    link: "/comeback",
+  },
+  {
+    icon: Briefcase,
+    title: "Executive Performance Mode",
+    description: "Cognitive optimization for busy executives. Integrate fitness with demanding work schedules and maintain peak mental performance.",
+    highlight: "New",
+    link: "/executive-mode",
+  },
+];
+
 const freeFeatures = [
   {
     icon: Users,
@@ -118,7 +158,7 @@ const FeaturesShowcase = () => {
         </div>
 
         {/* Elite Features */}
-        <div className="mb-16">
+        <div className="mb-12">
           <div className="flex items-center gap-3 mb-8">
             <div className="w-10 h-10 rounded-lg bg-accent flex items-center justify-center">
               <Zap className="w-5 h-5 text-accent-foreground" />
@@ -134,6 +174,44 @@ const FeaturesShowcase = () => {
               <Card key={feature.title} className="group p-5 hover:border-accent/30 transition-all hover:shadow-card relative overflow-hidden">
                 {feature.highlight && (
                   <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-accent/10 text-accent text-xs font-medium">
+                    {feature.highlight}
+                  </div>
+                )}
+                <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center mb-4">
+                  <feature.icon className="w-5 h-5 text-accent" />
+                </div>
+                <h4 className="font-semibold mb-2">{feature.title}</h4>
+                <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+                  {feature.description}
+                </p>
+                <Link 
+                  to={feature.link} 
+                  className="text-sm text-accent font-medium inline-flex items-center gap-1 group-hover:gap-2 transition-all"
+                >
+                  Learn more <ArrowRight className="w-3 h-3" />
+                </Link>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Advanced Elite Features - Men 40+ Specific */}
+        <div className="mb-16">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="w-10 h-10 rounded-lg bg-accent flex items-center justify-center">
+              <Brain className="w-5 h-5 text-accent-foreground" />
+            </div>
+            <div>
+              <h3 className="font-heading text-xl font-bold">Advanced AI Features</h3>
+              <p className="text-sm text-muted-foreground">Designed specifically for men over 40</p>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-4">
+            {advancedEliteFeatures.map((feature) => (
+              <Card key={feature.title} className="group p-5 hover:border-accent/30 transition-all hover:shadow-card relative overflow-hidden bg-gradient-to-br from-accent/5 to-transparent">
+                {feature.highlight && (
+                  <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-green-500/20 text-green-500 text-xs font-medium">
                     {feature.highlight}
                   </div>
                 )}
