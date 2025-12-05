@@ -44,56 +44,17 @@ const defaultIcon = new Icon({
   iconAnchor: [12, 41],
 });
 
-// Component to recenter map when position changes
-function RecenterMap({ position }: { position: [number, number] }) {
+// Simple map recenter hook component
+function MapController({ center }: { center: [number, number] | null }) {
   const map = useMap();
   
   useEffect(() => {
-    if (position) {
-      map.setView(position, map.getZoom());
+    if (center) {
+      map.setView(center, map.getZoom());
     }
-  }, [position, map]);
-  
+  }, [center, map]);
+
   return null;
-}
-
-// All map layers in one component to avoid context issues
-function MapLayers({ 
-  currentPosition, 
-  routeCoordinates 
-}: { 
-  currentPosition: { lat: number; lng: number } | null;
-  routeCoordinates: [number, number][];
-}) {
-  const map = useMap();
-  
-  useEffect(() => {
-    if (currentPosition) {
-      map.setView([currentPosition.lat, currentPosition.lng], map.getZoom());
-    }
-  }, [currentPosition, map]);
-
-  return (
-    <>
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      {currentPosition !== null && (
-        <Marker 
-          position={[currentPosition.lat, currentPosition.lng]} 
-          icon={defaultIcon}
-        />
-      )}
-      {routeCoordinates.length > 1 && (
-        <Polyline 
-          positions={routeCoordinates}
-          color="#3b82f6"
-          weight={4}
-        />
-      )}
-    </>
-  );
 }
 
 // Format seconds to mm:ss or hh:mm:ss
@@ -534,10 +495,24 @@ export const RunTracker = () => {
               zoom={15}
               style={{ height: '100%', width: '100%' }}
             >
-              <MapLayers 
-                currentPosition={currentPosition}
-                routeCoordinates={routeCoordinates}
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
+              <MapController center={currentPosition ? [currentPosition.lat, currentPosition.lng] : null} />
+              {currentPosition && (
+                <Marker 
+                  position={[currentPosition.lat, currentPosition.lng]} 
+                  icon={defaultIcon}
+                />
+              )}
+              {routeCoordinates.length > 1 && (
+                <Polyline 
+                  positions={routeCoordinates}
+                  color="#3b82f6"
+                  weight={4}
+                />
+              )}
             </MapContainer>
           </div>
 
