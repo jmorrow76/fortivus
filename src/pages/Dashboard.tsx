@@ -17,6 +17,7 @@ import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
+import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 
 interface Profile {
   display_name: string | null;
@@ -48,6 +49,12 @@ interface RunningStats {
   runningBadges: number;
 }
 
+interface ExerciseChartData {
+  exerciseName: string;
+  data: { date: string; weight: number }[];
+  maxWeight: number;
+}
+
 export default function Dashboard() {
   const navigate = useNavigate();
   const { user, loading: authLoading, subscription } = useAuth();
@@ -60,6 +67,7 @@ export default function Dashboard() {
   const [latestCheckin, setLatestCheckin] = useState<MoodCheckin | null>(null);
   const [progressPhotos, setProgressPhotos] = useState<number>(0);
   const [runningStats, setRunningStats] = useState<RunningStats>({ totalRuns: 0, totalDistanceKm: 0, totalDurationMinutes: 0, runningBadges: 0 });
+  const [exerciseChart, setExerciseChart] = useState<ExerciseChartData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -113,6 +121,72 @@ export default function Dashboard() {
         const userIndex = leaderboardRes.data.findIndex(entry => entry.user_id === user.id);
         if (userIndex !== -1) {
           setLeaderboardPos({ rank: userIndex + 1, total: leaderboardRes.data.length });
+        }
+      }
+
+      // Fetch exercise progress for chart preview
+      const { data: exerciseData } = await supabase
+        .from('exercise_sets')
+        .select(`
+          weight,
+          completed_at,
+          exercise_id,
+          exercises!inner(id, name),
+          workout_sessions!inner(user_id)
+        `)
+        .eq('is_completed', true)
+        .eq('workout_sessions.user_id', user.id)
+        .not('weight', 'is', null)
+        .not('completed_at', 'is', null)
+        .order('completed_at', { ascending: false })
+        .limit(100);
+
+      if (exerciseData && exerciseData.length > 0) {
+        // Find most frequently performed exercise
+        const exerciseCounts = new Map<string, { name: string; count: number }>();
+        exerciseData.forEach((set: any) => {
+          const id = set.exercises.id;
+          const existing = exerciseCounts.get(id);
+          if (existing) {
+            existing.count++;
+          } else {
+            exerciseCounts.set(id, { name: set.exercises.name, count: 1 });
+          }
+        });
+
+        // Get top exercise
+        const topExercise = Array.from(exerciseCounts.entries())
+          .sort((a, b) => b[1].count - a[1].count)[0];
+
+        if (topExercise) {
+          const exerciseId = topExercise[0];
+          const exerciseName = topExercise[1].name;
+
+          // Get data points for this exercise
+          const dataByDate = new Map<string, number>();
+          exerciseData
+            .filter((set: any) => set.exercises.id === exerciseId)
+            .forEach((set: any) => {
+              const date = format(new Date(set.completed_at), 'MM/dd');
+              const weight = Number(set.weight) || 0;
+              const existing = dataByDate.get(date);
+              if (!existing || weight > existing) {
+                dataByDate.set(date, weight);
+              }
+            });
+
+          const chartPoints = Array.from(dataByDate.entries())
+            .map(([date, weight]) => ({ date, weight }))
+            .reverse()
+            .slice(-7); // Last 7 data points
+
+          if (chartPoints.length >= 2) {
+            setExerciseChart({
+              exerciseName,
+              data: chartPoints,
+              maxWeight: Math.max(...chartPoints.map(p => p.weight)),
+            });
+          }
         }
       }
     } catch (error) {
@@ -361,6 +435,60 @@ export default function Dashboard() {
                   )}
                 </CardContent>
               </Card>
+
+              {/* Exercise Progress Chart Preview */}
+              {exerciseChart && (
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between">
+                    <div>
+                      <CardTitle className="flex items-center gap-2">
+                        <TrendingUp className="h-5 w-5" />
+                        Exercise Progress
+                      </CardTitle>
+                      <CardDescription>{exerciseChart.exerciseName} • PR: {exerciseChart.maxWeight} lbs</CardDescription>
+                    </div>
+                    <Button variant="ghost" size="sm" asChild>
+                      <Link to="/workouts" className="flex items-center gap-1">
+                        All Charts <ChevronRight className="h-4 w-4" />
+                      </Link>
+                    </Button>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-[180px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={exerciseChart.data} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
+                          <XAxis 
+                            dataKey="date" 
+                            tick={{ fontSize: 11 }}
+                            className="fill-muted-foreground"
+                          />
+                          <YAxis 
+                            domain={['dataMin - 5', 'dataMax + 5']}
+                            tick={{ fontSize: 11 }}
+                            className="fill-muted-foreground"
+                          />
+                          <Tooltip 
+                            contentStyle={{ 
+                              backgroundColor: 'hsl(var(--card))', 
+                              border: '1px solid hsl(var(--border))',
+                              borderRadius: '8px',
+                              fontSize: '12px'
+                            }}
+                            formatter={(value: number) => [`${value} lbs`, 'Weight']}
+                          />
+                          <Line 
+                            type="monotone" 
+                            dataKey="weight" 
+                            stroke="hsl(var(--primary))" 
+                            strokeWidth={2}
+                            dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 3 }}
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Recent Badges */}
               <Card>
