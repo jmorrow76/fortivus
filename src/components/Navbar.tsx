@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X, LogOut, Settings, LayoutDashboard, Shield, Home } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -9,6 +9,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, signOut } = useAuth();
   const { isAdmin } = useAdmin();
+  const navigate = useNavigate();
 
   const navLinks = [
     { name: "Knowledge Hub", href: "/knowledge", isPage: true },
@@ -29,6 +30,7 @@ const Navbar = () => {
   const handleSignOut = async () => {
     await signOut();
     setIsOpen(false);
+    navigate("/");
   };
 
   return (
