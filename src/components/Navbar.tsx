@@ -65,7 +65,7 @@ const Navbar = () => {
                   {["AI Coach", "Workouts", "Run Tracker"].includes(link.name) && (
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Crown className="h-3 w-3 text-amber-500" />
+                        <Crown className="h-3 w-3 text-amber-500 transition-transform duration-200 hover:scale-125 hover:rotate-12" />
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>Elite Feature</p>
@@ -145,7 +145,7 @@ const Navbar = () => {
                   {["AI Coach", "Workouts", "Run Tracker"].includes(link.name) && (
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Crown className="h-3 w-3 text-amber-500" />
+                        <Crown className="h-3 w-3 text-amber-500 transition-transform duration-200 hover:scale-125 hover:rotate-12" />
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>Elite Feature</p>
