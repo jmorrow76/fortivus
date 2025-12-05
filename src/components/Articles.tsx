@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
@@ -21,6 +21,7 @@ interface Article {
 const Articles = () => {
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const location = useLocation();
   const isKnowledgeHubPage = location.pathname === "/knowledge";
 
@@ -50,8 +51,20 @@ const Articles = () => {
     fetchArticles();
   }, [isKnowledgeHubPage]);
 
-  const featuredArticle = articles.find(a => a.is_featured) || articles[0];
-  const otherArticles = articles.filter(a => a.id !== featuredArticle?.id);
+  // Get unique categories
+  const categories = useMemo(() => {
+    const uniqueCategories = [...new Set(articles.map(a => a.category))];
+    return ["All", ...uniqueCategories.sort()];
+  }, [articles]);
+
+  // Filter articles by selected category
+  const filteredArticles = useMemo(() => {
+    if (selectedCategory === "All") return articles;
+    return articles.filter(a => a.category === selectedCategory);
+  }, [articles, selectedCategory]);
+
+  const featuredArticle = filteredArticles.find(a => a.is_featured) || filteredArticles[0];
+  const otherArticles = filteredArticles.filter(a => a.id !== featuredArticle?.id);
 
   if (loading) {
     return (
@@ -82,7 +95,7 @@ const Articles = () => {
     <section id="articles" className="section-padding bg-secondary/30">
       <div className="container mx-auto px-4">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-16">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-8">
           <div className="max-w-2xl">
             <span className="section-label text-left">Knowledge Hub</span>
             <h2 className="section-title text-left">
@@ -102,13 +115,47 @@ const Articles = () => {
             </Link>
           ) : (
             <div className="text-muted-foreground text-sm shrink-0 self-start md:self-auto">
-              Showing all {articles.length} articles
+              Showing {filteredArticles.length} of {articles.length} articles
             </div>
           )}
         </div>
 
+        {/* Category Filter - Only on Knowledge Hub */}
+        {isKnowledgeHubPage && categories.length > 2 && (
+          <div className="flex flex-wrap gap-2 mb-10">
+            {categories.map((category) => (
+              <Button
+                key={category}
+                variant={selectedCategory === category ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedCategory(category)}
+                className="rounded-full"
+              >
+                {category}
+              </Button>
+            ))}
+          </div>
+        )}
+
+        {/* No results message */}
+        {filteredArticles.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">
+              No articles found in this category.
+            </p>
+            <Button 
+              variant="outline" 
+              className="mt-4"
+              onClick={() => setSelectedCategory("All")}
+            >
+              View All Articles
+            </Button>
+          </div>
+        )}
+
         {/* Articles Grid */}
-        <div className="grid lg:grid-cols-2 gap-6 lg:gap-8">
+        {filteredArticles.length > 0 && (
+          <div className="grid lg:grid-cols-2 gap-6 lg:gap-8">
           {/* Featured Article */}
           {featuredArticle && (
             <Link to={`/knowledge/${featuredArticle.slug}`} className="lg:row-span-2">
@@ -205,6 +252,7 @@ const Articles = () => {
             </Link>
           ))}
         </div>
+        )}
       </div>
     </section>
   );
