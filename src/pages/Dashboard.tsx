@@ -136,11 +136,12 @@ export default function Dashboard() {
               </Avatar>
               <div>
                 <h1 className="text-2xl font-bold">
-                  Welcome back, {profile?.display_name || 'Warrior'}
+                  Member Portal
                 </h1>
                 <p className="text-muted-foreground">
+                  Welcome back, {profile?.display_name || 'Warrior'} •{' '}
                   {subscription.subscribed ? (
-                    <span className="flex items-center gap-1">
+                    <span className="inline-flex items-center gap-1">
                       <Crown className="h-4 w-4 text-amber-500" />
                       Elite Member
                     </span>
@@ -430,6 +431,34 @@ export default function Dashboard() {
                       </Button>
                     </div>
                   )}
+                </CardContent>
+              </Card>
+
+              {/* AI Body Analysis - Premium Feature */}
+              <Card className={!subscription.subscribed ? 'relative overflow-hidden' : ''}>
+                {!subscription.subscribed && (
+                  <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
+                    <Lock className="h-6 w-6 text-muted-foreground mb-2" />
+                    <p className="text-sm text-muted-foreground mb-2">Elite Feature</p>
+                    <Button size="sm" asChild>
+                      <a href="/#pricing">Upgrade</a>
+                    </Button>
+                  </div>
+                )}
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <TrendingUp className="h-4 w-4" />
+                    AI Body Analysis
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center">
+                    <Camera className="h-8 w-8 mx-auto mb-2 text-primary/50" />
+                    <p className="text-sm text-muted-foreground mb-2">Get your body composition analysis</p>
+                    <Button size="sm" asChild className="w-full">
+                      <Link to="/body-analysis">Analyze Now</Link>
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
 

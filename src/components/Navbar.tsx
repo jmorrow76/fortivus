@@ -14,7 +14,6 @@ const Navbar = () => {
     { name: "Forum", href: "/forum", isPage: true },
     { name: "Check-in", href: "/checkin", isPage: true },
     { name: "Community", href: "/community", isPage: true },
-    { name: "Body Analysis", href: "/body-analysis", isPage: true },
     { name: "Supplements", href: "/supplements", isPage: true },
     { name: "Gear", href: "/gear", isPage: true },
     { name: "Pricing", href: "/pricing", isPage: true },
@@ -24,7 +23,6 @@ const Navbar = () => {
     { name: "Forum", href: "/forum", isPage: true },
     { name: "Check-in", href: "/checkin", isPage: true },
     { name: "Community", href: "/community", isPage: true },
-    { name: "Body Analysis", href: "/body-analysis", isPage: true },
     { name: "Supplements", href: "/supplements", isPage: true },
     { name: "Gear", href: "/gear", isPage: true },
     { name: "Pricing", href: "/pricing", isPage: true },
@@ -66,7 +64,7 @@ const Navbar = () => {
                 <Button variant="default" size="sm" asChild>
                   <Link to="/dashboard" className="flex items-center gap-2">
                     <LayoutDashboard className="h-4 w-4" />
-                    Dashboard
+                    Member Portal
                   </Link>
                 </Button>
                 {isAdmin && (
@@ -126,7 +124,7 @@ const Navbar = () => {
                     <Button variant="default" className="justify-start" asChild>
                       <Link to="/dashboard" onClick={() => setIsOpen(false)}>
                         <LayoutDashboard className="h-4 w-4 mr-2" />
-                        Dashboard
+                        Member Portal
                       </Link>
                     </Button>
                     {isAdmin && (
