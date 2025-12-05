@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -21,15 +21,23 @@ interface Article {
 const Articles = () => {
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
+  const isKnowledgeHubPage = location.pathname === "/knowledge";
 
   useEffect(() => {
     const fetchArticles = async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("articles")
         .select("id, title, excerpt, category, author, slug, read_time_minutes, is_featured, published_at, image_url")
         .eq("is_published", true)
-        .order("published_at", { ascending: false })
-        .limit(4);
+        .order("published_at", { ascending: false });
+
+      // Only limit on homepage, show all on Knowledge Hub
+      if (!isKnowledgeHubPage) {
+        query = query.limit(4);
+      }
+
+      const { data, error } = await query;
 
       if (error) {
         console.error("Error fetching articles:", error);
@@ -40,10 +48,10 @@ const Articles = () => {
     };
 
     fetchArticles();
-  }, []);
+  }, [isKnowledgeHubPage]);
 
   const featuredArticle = articles.find(a => a.is_featured) || articles[0];
-  const otherArticles = articles.filter(a => a.id !== featuredArticle?.id).slice(0, 3);
+  const otherArticles = articles.filter(a => a.id !== featuredArticle?.id);
 
   if (loading) {
     return (
@@ -85,12 +93,14 @@ const Articles = () => {
               nutrition, and lifestyle optimization.
             </p>
           </div>
-          <Link to="/knowledge">
-            <Button variant="outline" size="lg" className="shrink-0 self-start md:self-auto">
-              Browse All Articles
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
-          </Link>
+          {!isKnowledgeHubPage && (
+            <Link to="/knowledge">
+              <Button variant="outline" size="lg" className="shrink-0 self-start md:self-auto">
+                Browse All Articles
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
+          )}
         </div>
 
         {/* Articles Grid */}
