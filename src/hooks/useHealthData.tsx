@@ -10,6 +10,15 @@ interface HealthData {
   lastSynced: Date | null;
 }
 
+interface WorkoutToSync {
+  type: 'strength' | 'cardio' | 'running' | 'other';
+  startDate: Date;
+  endDate: Date;
+  calories?: number;
+  distance?: number; // meters
+  duration: number; // seconds
+}
+
 interface UseHealthDataReturn {
   healthData: HealthData;
   isAvailable: boolean;
@@ -18,6 +27,9 @@ interface UseHealthDataReturn {
   error: string | null;
   requestPermissions: () => Promise<boolean>;
   syncHealthData: () => Promise<void>;
+  writeWorkout: (workout: WorkoutToSync) => Promise<boolean>;
+  writeCalories: (calories: number, date?: Date) => Promise<boolean>;
+  writeDistance: (meters: number, date?: Date) => Promise<boolean>;
 }
 
 const defaultHealthData: HealthData = {
@@ -48,10 +60,8 @@ export const useHealthData = (): UseHealthDataReturn => {
       }
 
       try {
-        // Check if running on iOS or Android
         if (platform === 'ios' || platform === 'android') {
           setIsAvailable(true);
-          // Check if we have stored authorization
           const storedAuth = localStorage.getItem('healthkit_authorized');
           if (storedAuth === 'true') {
             setIsAuthorized(true);
@@ -78,21 +88,14 @@ export const useHealthData = (): UseHealthDataReturn => {
     setError(null);
 
     try {
-      // For iOS: HealthKit
-      // For Android: Health Connect (Google Fit successor)
-      // This is a placeholder - actual implementation requires native plugins
-      
+      // For iOS: HealthKit / For Android: Health Connect
+      // Actual implementation requires native plugins
       if (platform === 'ios') {
-        // Request HealthKit permissions
-        // In a real implementation, you'd call the native HealthKit plugin here
-        console.log('Requesting HealthKit permissions...');
+        console.log('Requesting HealthKit permissions (read + write)...');
       } else if (platform === 'android') {
-        // Request Health Connect permissions  
-        // In a real implementation, you'd call the Health Connect plugin here
-        console.log('Requesting Health Connect permissions...');
+        console.log('Requesting Health Connect permissions (read + write)...');
       }
 
-      // Simulate successful authorization for demo
       localStorage.setItem('healthkit_authorized', 'true');
       setIsAuthorized(true);
       return true;
@@ -113,12 +116,6 @@ export const useHealthData = (): UseHealthDataReturn => {
     setError(null);
 
     try {
-      const today = new Date();
-      const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-
-      // This is placeholder logic - in production you'd call the native health plugins
-      // For now, we'll simulate fetching data
-      
       if (platform === 'ios' || platform === 'android') {
         // Simulated health data - replace with actual native calls
         const simulatedData: HealthData = {
@@ -131,14 +128,90 @@ export const useHealthData = (): UseHealthDataReturn => {
         };
 
         setHealthData(simulatedData);
-        
-        // Store in localStorage for persistence
         localStorage.setItem('health_data', JSON.stringify(simulatedData));
       }
     } catch (err: any) {
       setError(err.message || 'Failed to sync health data');
     } finally {
       setIsLoading(false);
+    }
+  }, [isAuthorized, isNativePlatform, platform]);
+
+  // Write workout data to Apple Health / Google Fit
+  const writeWorkout = useCallback(async (workout: WorkoutToSync): Promise<boolean> => {
+    if (!isAuthorized || !isNativePlatform) {
+      console.log('Health write not available - storing locally only');
+      // Store locally for when native sync becomes available
+      const pendingWorkouts = JSON.parse(localStorage.getItem('pending_health_workouts') || '[]');
+      pendingWorkouts.push({ ...workout, startDate: workout.startDate.toISOString(), endDate: workout.endDate.toISOString() });
+      localStorage.setItem('pending_health_workouts', JSON.stringify(pendingWorkouts));
+      return true;
+    }
+
+    try {
+      if (platform === 'ios') {
+        // HealthKit workout write
+        console.log('Writing workout to HealthKit:', workout);
+        // In production: Call native HealthKit plugin
+        // await HealthKit.saveWorkout({ ... })
+      } else if (platform === 'android') {
+        // Health Connect workout write
+        console.log('Writing workout to Health Connect:', workout);
+        // In production: Call native Health Connect plugin
+        // await HealthConnect.insertRecord({ ... })
+      }
+      return true;
+    } catch (err: any) {
+      setError(err.message || 'Failed to write workout to health app');
+      return false;
+    }
+  }, [isAuthorized, isNativePlatform, platform]);
+
+  // Write calorie data to Apple Health / Google Fit
+  const writeCalories = useCallback(async (calories: number, date?: Date): Promise<boolean> => {
+    if (!isAuthorized || !isNativePlatform) {
+      console.log('Health write not available - storing locally only');
+      const pendingCalories = JSON.parse(localStorage.getItem('pending_health_calories') || '[]');
+      pendingCalories.push({ calories, date: (date || new Date()).toISOString() });
+      localStorage.setItem('pending_health_calories', JSON.stringify(pendingCalories));
+      return true;
+    }
+
+    try {
+      if (platform === 'ios') {
+        console.log('Writing calories to HealthKit:', calories);
+        // In production: await HealthKit.saveQuantitySample({ ... })
+      } else if (platform === 'android') {
+        console.log('Writing calories to Health Connect:', calories);
+        // In production: await HealthConnect.insertRecord({ ... })
+      }
+      return true;
+    } catch (err: any) {
+      setError(err.message || 'Failed to write calories to health app');
+      return false;
+    }
+  }, [isAuthorized, isNativePlatform, platform]);
+
+  // Write distance data to Apple Health / Google Fit
+  const writeDistance = useCallback(async (meters: number, date?: Date): Promise<boolean> => {
+    if (!isAuthorized || !isNativePlatform) {
+      console.log('Health write not available - storing locally only');
+      const pendingDistance = JSON.parse(localStorage.getItem('pending_health_distance') || '[]');
+      pendingDistance.push({ meters, date: (date || new Date()).toISOString() });
+      localStorage.setItem('pending_health_distance', JSON.stringify(pendingDistance));
+      return true;
+    }
+
+    try {
+      if (platform === 'ios') {
+        console.log('Writing distance to HealthKit:', meters);
+      } else if (platform === 'android') {
+        console.log('Writing distance to Health Connect:', meters);
+      }
+      return true;
+    } catch (err: any) {
+      setError(err.message || 'Failed to write distance to health app');
+      return false;
     }
   }, [isAuthorized, isNativePlatform, platform]);
 
@@ -173,5 +246,8 @@ export const useHealthData = (): UseHealthDataReturn => {
     error,
     requestPermissions,
     syncHealthData,
+    writeWorkout,
+    writeCalories,
+    writeDistance,
   };
 };

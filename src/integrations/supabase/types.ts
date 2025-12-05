@@ -717,6 +717,48 @@ export type Database = {
         }
         Relationships: []
       }
+      running_sessions: {
+        Row: {
+          avg_pace_seconds_per_km: number | null
+          calories_burned: number | null
+          completed_at: string | null
+          created_at: string
+          distance_meters: number | null
+          duration_seconds: number | null
+          id: string
+          notes: string | null
+          route_coordinates: Json | null
+          started_at: string
+          user_id: string
+        }
+        Insert: {
+          avg_pace_seconds_per_km?: number | null
+          calories_burned?: number | null
+          completed_at?: string | null
+          created_at?: string
+          distance_meters?: number | null
+          duration_seconds?: number | null
+          id?: string
+          notes?: string | null
+          route_coordinates?: Json | null
+          started_at?: string
+          user_id: string
+        }
+        Update: {
+          avg_pace_seconds_per_km?: number | null
+          calories_burned?: number | null
+          completed_at?: string | null
+          created_at?: string
+          distance_meters?: number | null
+          duration_seconds?: number | null
+          id?: string
+          notes?: string | null
+          route_coordinates?: Json | null
+          started_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       saved_stories: {
         Row: {
           created_at: string
