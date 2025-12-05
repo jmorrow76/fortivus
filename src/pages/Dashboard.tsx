@@ -4,7 +4,8 @@ import {
   Loader2, Trophy, Flame, Target, Dumbbell, Calendar, 
   TrendingUp, Lock, Zap, Settings,
   Crown, Medal, ChevronRight, Users, Camera,
-  Brain, Sparkles, MapPin, Utensils, MessageCircle
+  Brain, Sparkles, MapPin, Utensils, MessageCircle,
+  Battery, Shield, Moon, RotateCcw, Briefcase
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useGamification } from '@/hooks/useGamification';
@@ -837,7 +838,82 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
 
-              {/* Community */}
+              {/* Advanced Elite Features - Men 40+ */}
+              <Card className="bg-gradient-to-br from-accent/5 to-transparent">
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Crown className="h-4 w-4 text-amber-500" />
+                    Advanced AI Features
+                  </CardTitle>
+                  <CardDescription>Designed for men over 40</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {/* Hormonal Optimization */}
+                  <div className={`relative ${!subscription.subscribed ? 'opacity-60' : ''}`}>
+                    <Button variant="outline" size="sm" asChild className="w-full justify-start">
+                      <Link to="/hormonal">
+                        <Battery className="h-4 w-4 mr-2 text-accent" />
+                        Hormonal Optimization
+                        {!subscription.subscribed && <Lock className="h-3 w-3 ml-auto" />}
+                      </Link>
+                    </Button>
+                  </div>
+                  
+                  {/* Joint Health */}
+                  <div className={`relative ${!subscription.subscribed ? 'opacity-60' : ''}`}>
+                    <Button variant="outline" size="sm" asChild className="w-full justify-start">
+                      <Link to="/joint-health">
+                        <Shield className="h-4 w-4 mr-2 text-accent" />
+                        Joint Health Analytics
+                        {!subscription.subscribed && <Lock className="h-3 w-3 ml-auto" />}
+                      </Link>
+                    </Button>
+                  </div>
+                  
+                  {/* Sleep-Adaptive */}
+                  <div className={`relative ${!subscription.subscribed ? 'opacity-60' : ''}`}>
+                    <Button variant="outline" size="sm" asChild className="w-full justify-start">
+                      <Link to="/sleep-adaptive">
+                        <Moon className="h-4 w-4 mr-2 text-accent" />
+                        Sleep-Adaptive Workouts
+                        {!subscription.subscribed && <Lock className="h-3 w-3 ml-auto" />}
+                      </Link>
+                    </Button>
+                  </div>
+                  
+                  {/* Comeback Protocol */}
+                  <div className={`relative ${!subscription.subscribed ? 'opacity-60' : ''}`}>
+                    <Button variant="outline" size="sm" asChild className="w-full justify-start">
+                      <Link to="/comeback">
+                        <RotateCcw className="h-4 w-4 mr-2 text-accent" />
+                        Comeback Protocol
+                        {!subscription.subscribed && <Lock className="h-3 w-3 ml-auto" />}
+                      </Link>
+                    </Button>
+                  </div>
+                  
+                  {/* Executive Mode */}
+                  <div className={`relative ${!subscription.subscribed ? 'opacity-60' : ''}`}>
+                    <Button variant="outline" size="sm" asChild className="w-full justify-start">
+                      <Link to="/executive-mode">
+                        <Briefcase className="h-4 w-4 mr-2 text-accent" />
+                        Executive Performance
+                        {!subscription.subscribed && <Lock className="h-3 w-3 ml-auto" />}
+                      </Link>
+                    </Button>
+                  </div>
+                  
+                  {!subscription.subscribed && (
+                    <Button size="sm" asChild className="w-full mt-2">
+                      <a href="/#pricing">
+                        <Crown className="h-4 w-4 mr-2" />
+                        Unlock All Features
+                      </a>
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+
               <Card>
                 <CardHeader>
                   <CardTitle className="text-base flex items-center gap-2">
