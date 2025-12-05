@@ -268,6 +268,47 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
 
+              {/* Recent Badges */}
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Medal className="h-5 w-5" />
+                      Recent Badges
+                    </CardTitle>
+                    <CardDescription>{earnedBadgesCount} of {totalBadges} earned</CardDescription>
+                  </div>
+                  <Button variant="ghost" size="sm" asChild>
+                    <Link to="/achievements" className="flex items-center gap-1">
+                      View All <ChevronRight className="h-4 w-4" />
+                    </Link>
+                  </Button>
+                </CardHeader>
+                <CardContent>
+                  {userBadges.length === 0 ? (
+                    <div className="text-center py-6 text-muted-foreground">
+                      <Medal className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                      <p>No badges earned yet</p>
+                      <Button variant="link" asChild>
+                        <Link to="/checkin">Start your journey</Link>
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex flex-wrap gap-2">
+                      {userBadges.slice(0, 8).map((ub) => {
+                        const badge = ub.badge;
+                        return (
+                          <Badge key={ub.id} variant="secondary" className="px-3 py-2">
+                            <Trophy className="h-3 w-3 mr-1 text-amber-500" />
+                            {badge.name}
+                          </Badge>
+                        );
+                      })}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
               {/* Active Challenges */}
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
@@ -571,37 +612,6 @@ export default function Dashboard() {
 
               {/* Social Connections */}
               <SocialConnections />
-
-              {/* Recent Badges */}
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <Medal className="h-4 w-4" />
-                    Recent Badges
-                  </CardTitle>
-                  <Button variant="ghost" size="sm" asChild>
-                    <Link to="/achievements">View All</Link>
-                  </Button>
-                </CardHeader>
-                <CardContent>
-                  {userBadges.length === 0 ? (
-                    <p className="text-sm text-muted-foreground text-center py-2">
-                      No badges earned yet
-                    </p>
-                  ) : (
-                    <div className="flex flex-wrap gap-2">
-                      {userBadges.slice(0, 6).map((ub) => {
-                        const badge = ub.badge;
-                        return (
-                          <Badge key={ub.id} variant="secondary" className="px-3 py-1">
-                            {badge.name}
-                          </Badge>
-                        );
-                      })}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
             </div>
           </div>
         </div>
