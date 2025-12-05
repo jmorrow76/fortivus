@@ -20,7 +20,8 @@ const Profile = () => {
   const { user, loading: authLoading, subscription, session } = useAuth();
   const isElite = subscription.subscribed && (
     subscription.productId === FORTIVUS_ELITE.monthly.product_id ||
-    subscription.productId === FORTIVUS_ELITE.yearly.product_id
+    subscription.productId === FORTIVUS_ELITE.yearly.product_id ||
+    subscription.productId === 'manual_grant'
   );
   const navigate = useNavigate();
   const { toast } = useToast();
