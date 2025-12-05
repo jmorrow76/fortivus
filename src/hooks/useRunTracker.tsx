@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
-
+import { useToast } from './use-toast';
 interface Coordinate {
   lat: number;
   lng: number;
@@ -78,6 +78,7 @@ const estimateCalories = (distanceMeters: number): number => {
 
 export const useRunTracker = (): UseRunTrackerReturn => {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [isTracking, setIsTracking] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [activeRun, setActiveRun] = useState<ActiveRun | null>(null);
@@ -89,6 +90,132 @@ export const useRunTracker = (): UseRunTrackerReturn => {
   const watchIdRef = useRef<number | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const pausedDurationRef = useRef<number>(0);
+
+  // Award XP and check for running badges
+  const awardRunXPAndBadges = useCallback(async (
+    distanceMeters: number, 
+    durationSeconds: number, 
+    paceSecondsPerKm: number
+  ) => {
+    if (!user) return;
+
+    // Calculate XP: base 25 + 10 per km
+    const distanceKm = distanceMeters / 1000;
+    const xpEarned = Math.round(25 + distanceKm * 10);
+
+    // Update user streaks with XP
+    const { data: streakData } = await supabase
+      .from('user_streaks')
+      .select('total_xp')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (streakData) {
+      await supabase
+        .from('user_streaks')
+        .update({ total_xp: streakData.total_xp + xpEarned })
+        .eq('user_id', user.id);
+    } else {
+      await supabase
+        .from('user_streaks')
+        .insert({ user_id: user.id, total_xp: xpEarned });
+    }
+
+    // Post to activity feed
+    await supabase.from('activity_feed').insert({
+      user_id: user.id,
+      activity_type: 'run_completed',
+      xp_earned: xpEarned,
+    });
+
+    toast({
+      title: `🏃 Run Complete! +${xpEarned} XP`,
+      description: `You ran ${distanceKm.toFixed(2)} km in ${Math.floor(durationSeconds / 60)} minutes!`,
+    });
+
+    // Check for running badges
+    await checkRunningBadges(distanceMeters, durationSeconds, paceSecondsPerKm);
+  }, [user, toast]);
+
+  const checkRunningBadges = async (
+    distanceMeters: number, 
+    durationSeconds: number, 
+    paceSecondsPerKm: number
+  ) => {
+    if (!user) return;
+
+    // Get all badges and user badges
+    const [{ data: allBadges }, { data: userBadges }, { data: allRuns }] = await Promise.all([
+      supabase.from('badges').select('*'),
+      supabase.from('user_badges').select('badge_id').eq('user_id', user.id),
+      supabase.from('running_sessions').select('distance_meters, duration_seconds, avg_pace_seconds_per_km').eq('user_id', user.id),
+    ]);
+
+    if (!allBadges) return;
+
+    const earnedBadgeIds = new Set(userBadges?.map(ub => ub.badge_id) || []);
+    const totalRuns = (allRuns?.length || 0) + 1;
+    const totalDistanceKm = ((allRuns || []).reduce((sum, r) => sum + (r.distance_meters || 0), 0) + distanceMeters) / 1000;
+    const currentDistanceKm = distanceMeters / 1000;
+    const durationMinutes = durationSeconds / 60;
+
+    for (const badge of allBadges) {
+      if (earnedBadgeIds.has(badge.id)) continue;
+
+      let shouldAward = false;
+
+      switch (badge.requirement_type) {
+        case 'runs_completed':
+          shouldAward = totalRuns >= badge.requirement_value;
+          break;
+        case 'total_distance_km':
+          shouldAward = totalDistanceKm >= badge.requirement_value;
+          break;
+        case 'pace_under_6':
+          shouldAward = paceSecondsPerKm > 0 && paceSecondsPerKm < 360; // Under 6 min/km
+          break;
+        case 'run_duration_30':
+          shouldAward = durationMinutes >= 30;
+          break;
+        case 'single_run_5km':
+          shouldAward = currentDistanceKm >= 5;
+          break;
+      }
+
+      if (shouldAward) {
+        await supabase.from('user_badges').insert({
+          user_id: user.id,
+          badge_id: badge.id,
+        });
+
+        await supabase.from('activity_feed').insert({
+          user_id: user.id,
+          activity_type: 'badge_earned',
+          badge_id: badge.id,
+          xp_earned: badge.xp_value,
+        });
+
+        // Add badge XP
+        const { data: streakData } = await supabase
+          .from('user_streaks')
+          .select('total_xp')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (streakData) {
+          await supabase
+            .from('user_streaks')
+            .update({ total_xp: streakData.total_xp + badge.xp_value })
+            .eq('user_id', user.id);
+        }
+
+        toast({
+          title: '🏆 Badge Earned!',
+          description: `You earned "${badge.name}"!`,
+        });
+      }
+    }
+  };
 
   const fetchRunHistory = useCallback(async () => {
     if (!user) return;
@@ -255,6 +382,9 @@ export const useRunTracker = (): UseRunTrackerReturn => {
 
       if (insertError) throw insertError;
 
+      // Award XP and check for badges
+      await awardRunXPAndBadges(distanceMeters, durationSeconds, avgPace);
+
       setActiveRun(null);
       await fetchRunHistory();
       
@@ -266,7 +396,7 @@ export const useRunTracker = (): UseRunTrackerReturn => {
       setError(err.message || 'Failed to save run');
       return null;
     }
-  }, [user, activeRun, fetchRunHistory]);
+  }, [user, activeRun, fetchRunHistory, awardRunXPAndBadges]);
 
   // Cleanup on unmount
   useEffect(() => {
