@@ -18,6 +18,7 @@ import Social from "./pages/Social";
 import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import Supplements from "./pages/Supplements";
+import PricingPage from "./pages/PricingPage";
 import SubscriptionSuccess from "./pages/SubscriptionSuccess";
 import NotFound from "./pages/NotFound";
 
@@ -44,6 +45,7 @@ const App = () => (
             <Route path="/leaderboard" element={<LeaderboardPage />} />
             <Route path="/community" element={<Social />} />
             <Route path="/supplements" element={<Supplements />} />
+            <Route path="/pricing" element={<PricingPage />} />
             <Route path="/subscription-success" element={<SubscriptionSuccess />} />
             <Route path="/admin" element={<AdminDashboard />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
