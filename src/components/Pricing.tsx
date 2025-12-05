@@ -97,6 +97,8 @@ const Pricing = () => {
     (FORTIVUS_ELITE.monthly.price * 12)) * 100
   );
 
+  const isOnFreePlan = user && !subscription.subscribed;
+  
   const plans = [
     {
       name: "Free",
@@ -110,10 +112,11 @@ const Pricing = () => {
         "Community forum access",
         "Partner product recommendations",
       ],
-      cta: user ? "Current Plan" : "Get Started",
+      cta: isOnFreePlan ? "Current Plan" : (user ? "Downgrade" : "Get Started"),
       variant: "outline" as const,
       popular: false,
-      disabled: !!user,
+      disabled: isOnFreePlan || !user,
+      isCurrentPlan: isOnFreePlan,
     },
     {
       name: "Elite",
