@@ -13,6 +13,7 @@ import { ArrowLeft, Camera, Loader2, User, Crown, Settings, Calendar, Sparkles, 
 import Navbar from "@/components/Navbar";
 import HealthDashboard from "@/components/HealthDashboard";
 import { NotificationSettings } from "@/components/NotificationSettings";
+import { SocialConnections } from "@/components/SocialConnections";
 import { format } from "date-fns";
 
 const Profile = () => {
@@ -415,6 +416,11 @@ const Profile = () => {
           {/* Notification Settings */}
           <div className="mt-6">
             <NotificationSettings />
+          </div>
+
+          {/* Social Connections */}
+          <div className="mt-6">
+            <SocialConnections />
           </div>
         </div>
       </main>
