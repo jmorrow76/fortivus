@@ -29,6 +29,11 @@ import Workouts from "./pages/Workouts";
 import Running from "./pages/Running";
 import Coaching from "./pages/Coaching";
 import Unsubscribe from "./pages/Unsubscribe";
+import HormonalOptimization from "./pages/HormonalOptimization";
+import JointHealth from "./pages/JointHealth";
+import SleepAdaptive from "./pages/SleepAdaptive";
+import ComebackProtocol from "./pages/ComebackProtocol";
+import ExecutiveMode from "./pages/ExecutiveMode";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -66,6 +71,11 @@ const App = () => (
             <Route path="/coaching" element={<Coaching />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/unsubscribe" element={<Unsubscribe />} />
+            <Route path="/hormonal" element={<HormonalOptimization />} />
+            <Route path="/joint-health" element={<JointHealth />} />
+            <Route path="/sleep-adaptive" element={<SleepAdaptive />} />
+            <Route path="/comeback" element={<ComebackProtocol />} />
+            <Route path="/executive-mode" element={<ExecutiveMode />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
