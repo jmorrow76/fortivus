@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense } from 'react';
+import { useState, useEffect, lazy, Suspense, useRef, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -6,8 +6,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
+import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Play, Pause, Square, MapPin, Clock, Footprints, Flame, TrendingUp, Target, Settings, Trophy, Plus } from 'lucide-react';
+import { Play, Pause, Square, MapPin, Clock, Footprints, Flame, TrendingUp, Target, Settings, Trophy, Plus, Timer, Zap } from 'lucide-react';
 import { useRunTracker } from '@/hooks/useRunTracker';
 import { RunningLeaderboard } from '@/components/RunningLeaderboard';
 import { useAuth } from '@/hooks/useAuth';
@@ -33,6 +34,13 @@ interface UserChallenge {
   progress: number;
   is_completed: boolean;
   challenge: Challenge;
+}
+
+interface IntervalSettings {
+  enabled: boolean;
+  workSeconds: number;
+  restSeconds: number;
+  intervals: number; // 0 = unlimited
 }
 
 // Format seconds to mm:ss or hh:mm:ss
@@ -79,8 +87,21 @@ export const RunTracker = () => {
 
   const [showStopDialog, setShowStopDialog] = useState(false);
   const [showGoalDialog, setShowGoalDialog] = useState(false);
+  const [showIntervalDialog, setShowIntervalDialog] = useState(false);
   const [notes, setNotes] = useState('');
   const [showHistory, setShowHistory] = useState(false);
+  
+  // Interval training state
+  const [intervalSettings, setIntervalSettings] = useState<IntervalSettings>({
+    enabled: false,
+    workSeconds: 60,
+    restSeconds: 30,
+    intervals: 0,
+  });
+  const [intervalPhase, setIntervalPhase] = useState<'work' | 'rest'>('work');
+  const [intervalTimeRemaining, setIntervalTimeRemaining] = useState(0);
+  const [completedIntervals, setCompletedIntervals] = useState(0);
+  const intervalTimerRef = useRef<NodeJS.Timeout | null>(null);
   
   // Weekly goal state
   const [weeklyGoal, setWeeklyGoal] = useState<{ 
@@ -97,6 +118,57 @@ export const RunTracker = () => {
   const [runningChallenges, setRunningChallenges] = useState<Challenge[]>([]);
   const [userChallenges, setUserChallenges] = useState<UserChallenge[]>([]);
   const [joiningChallenge, setJoiningChallenge] = useState<string | null>(null);
+
+  // Interval timer effect
+  useEffect(() => {
+    if (isTracking && intervalSettings.enabled && !isPaused) {
+      // Initialize interval timer on start
+      if (intervalTimeRemaining === 0 && completedIntervals === 0) {
+        setIntervalTimeRemaining(intervalSettings.workSeconds);
+        setIntervalPhase('work');
+      }
+      
+      intervalTimerRef.current = setInterval(() => {
+        setIntervalTimeRemaining(prev => {
+          if (prev <= 1) {
+            // Switch phases
+            if (intervalPhase === 'work') {
+              // Vibrate if available
+              if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+              toast({ title: '🚶 Rest Phase', description: 'Slow down and recover!' });
+              setIntervalPhase('rest');
+              return intervalSettings.restSeconds;
+            } else {
+              // Vibrate if available
+              if (navigator.vibrate) navigator.vibrate([500]);
+              setCompletedIntervals(c => c + 1);
+              toast({ title: '🏃 Work Phase', description: 'Pick up the pace!' });
+              setIntervalPhase('work');
+              return intervalSettings.workSeconds;
+            }
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      
+      return () => {
+        if (intervalTimerRef.current) clearInterval(intervalTimerRef.current);
+      };
+    }
+  }, [isTracking, intervalSettings.enabled, isPaused, intervalPhase, intervalSettings.workSeconds, intervalSettings.restSeconds]);
+
+  // Reset interval state when run stops
+  useEffect(() => {
+    if (!isTracking) {
+      setIntervalTimeRemaining(0);
+      setCompletedIntervals(0);
+      setIntervalPhase('work');
+      if (intervalTimerRef.current) {
+        clearInterval(intervalTimerRef.current);
+        intervalTimerRef.current = null;
+      }
+    }
+  }, [isTracking]);
 
   // Fetch weekly goal and challenges
   useEffect(() => {
@@ -425,36 +497,73 @@ export const RunTracker = () => {
 
       {/* Active Run Stats */}
       {isTracking && activeRun && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card>
-            <CardContent className="p-4 text-center">
-              <Clock className="h-5 w-5 mx-auto mb-2 text-muted-foreground" />
-              <p className="text-2xl font-bold font-mono">{formatDuration(activeRun.duration)}</p>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">Duration</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 text-center">
-              <Footprints className="h-5 w-5 mx-auto mb-2 text-muted-foreground" />
-              <p className="text-2xl font-bold font-mono">{formatDistance(activeRun.distance)} km</p>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">Distance</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 text-center">
-              <TrendingUp className="h-5 w-5 mx-auto mb-2 text-muted-foreground" />
-              <p className="text-2xl font-bold font-mono">{formatPace(activeRun.currentPace)}/km</p>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">Pace</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 text-center">
-              <Flame className="h-5 w-5 mx-auto mb-2 text-muted-foreground" />
-              <p className="text-2xl font-bold font-mono">{Math.round((activeRun.distance / 1000) * 60)}</p>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">Calories</p>
-            </CardContent>
-          </Card>
-        </div>
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Card>
+              <CardContent className="p-4 text-center">
+                <Clock className="h-5 w-5 mx-auto mb-2 text-muted-foreground" />
+                <p className="text-2xl font-bold font-mono">{formatDuration(activeRun.duration)}</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">Duration</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4 text-center">
+                <Footprints className="h-5 w-5 mx-auto mb-2 text-muted-foreground" />
+                <p className="text-2xl font-bold font-mono">{formatDistance(activeRun.distance)} km</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">Distance</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4 text-center">
+                <TrendingUp className="h-5 w-5 mx-auto mb-2 text-muted-foreground" />
+                <p className="text-2xl font-bold font-mono">{formatPace(activeRun.currentPace)}/km</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">Pace</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4 text-center">
+                <Flame className="h-5 w-5 mx-auto mb-2 text-muted-foreground" />
+                <p className="text-2xl font-bold font-mono">{Math.round((activeRun.distance / 1000) * 60)}</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">Calories</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Interval Training Display */}
+          {intervalSettings.enabled && (
+            <Card className={`border-2 ${intervalPhase === 'work' ? 'border-orange-500 bg-orange-500/5' : 'border-blue-500 bg-blue-500/5'}`}>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    {intervalPhase === 'work' ? (
+                      <Zap className="h-5 w-5 text-orange-500" />
+                    ) : (
+                      <Timer className="h-5 w-5 text-blue-500" />
+                    )}
+                    <span className={`font-bold uppercase tracking-wide ${intervalPhase === 'work' ? 'text-orange-500' : 'text-blue-500'}`}>
+                      {intervalPhase === 'work' ? 'Work' : 'Rest'}
+                    </span>
+                  </div>
+                  <Badge variant="outline">
+                    Interval {completedIntervals + 1}{intervalSettings.intervals > 0 ? ` / ${intervalSettings.intervals}` : ''}
+                  </Badge>
+                </div>
+                <div className="text-center">
+                  <p className={`text-5xl font-bold font-mono ${intervalPhase === 'work' ? 'text-orange-500' : 'text-blue-500'}`}>
+                    {formatDuration(intervalTimeRemaining)}
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {intervalPhase === 'work' ? 'Push your pace!' : 'Recovery time'}
+                  </p>
+                </div>
+                <Progress 
+                  value={(intervalTimeRemaining / (intervalPhase === 'work' ? intervalSettings.workSeconds : intervalSettings.restSeconds)) * 100} 
+                  className={`h-2 mt-3 ${intervalPhase === 'work' ? '[&>div]:bg-orange-500' : '[&>div]:bg-blue-500'}`}
+                />
+              </CardContent>
+            </Card>
+          )}
+        </>
       )}
 
       {/* Map */}
@@ -477,12 +586,43 @@ export const RunTracker = () => {
             </Suspense>
           </div>
 
+          {/* Interval Training Toggle (before starting) */}
+          {!isTracking && (
+            <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg mb-4">
+              <div className="flex items-center gap-3">
+                <Timer className="h-5 w-5 text-muted-foreground" />
+                <div>
+                  <p className="font-medium text-sm">Interval Training</p>
+                  <p className="text-xs text-muted-foreground">
+                    {intervalSettings.enabled 
+                      ? `${intervalSettings.workSeconds}s work / ${intervalSettings.restSeconds}s rest`
+                      : 'Customize work/rest periods'}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={() => setShowIntervalDialog(true)}
+                  className="h-8 w-8"
+                >
+                  <Settings className="h-4 w-4" />
+                </Button>
+                <Switch 
+                  checked={intervalSettings.enabled}
+                  onCheckedChange={(checked) => setIntervalSettings(prev => ({ ...prev, enabled: checked }))}
+                />
+              </div>
+            </div>
+          )}
+
           {/* Controls */}
           <div className="flex justify-center gap-4">
             {!isTracking ? (
               <Button size="lg" onClick={startRun} className="gap-2">
                 <Play className="h-5 w-5" />
-                Start Run
+                {intervalSettings.enabled ? 'Start Intervals' : 'Start Run'}
               </Button>
             ) : (
               <>
@@ -623,6 +763,123 @@ export const RunTracker = () => {
             <Button variant="outline" onClick={() => setShowGoalDialog(false)}>Cancel</Button>
             <Button onClick={saveWeeklyGoal} disabled={savingGoal}>
               {savingGoal ? 'Saving...' : 'Save Goal'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Interval Settings Dialog */}
+      <Dialog open={showIntervalDialog} onOpenChange={setShowIntervalDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Timer className="h-5 w-5" />
+              Interval Training Settings
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="work-seconds">Work Period (seconds)</Label>
+              <Input
+                id="work-seconds"
+                type="number"
+                min="10"
+                max="600"
+                value={intervalSettings.workSeconds}
+                onChange={(e) => setIntervalSettings(prev => ({ 
+                  ...prev, 
+                  workSeconds: parseInt(e.target.value) || 60 
+                }))}
+              />
+              <p className="text-xs text-muted-foreground">High intensity running phase</p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="rest-seconds">Rest Period (seconds)</Label>
+              <Input
+                id="rest-seconds"
+                type="number"
+                min="10"
+                max="300"
+                value={intervalSettings.restSeconds}
+                onChange={(e) => setIntervalSettings(prev => ({ 
+                  ...prev, 
+                  restSeconds: parseInt(e.target.value) || 30 
+                }))}
+              />
+              <p className="text-xs text-muted-foreground">Recovery / walking phase</p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="total-intervals">Total Intervals (0 = unlimited)</Label>
+              <Input
+                id="total-intervals"
+                type="number"
+                min="0"
+                max="50"
+                value={intervalSettings.intervals}
+                onChange={(e) => setIntervalSettings(prev => ({ 
+                  ...prev, 
+                  intervals: parseInt(e.target.value) || 0 
+                }))}
+              />
+              <p className="text-xs text-muted-foreground">Leave at 0 for continuous intervals</p>
+            </div>
+
+            {/* Preset buttons */}
+            <div className="space-y-2">
+              <Label>Quick Presets</Label>
+              <div className="grid grid-cols-3 gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setIntervalSettings(prev => ({ ...prev, workSeconds: 30, restSeconds: 30 }))}
+                >
+                  30/30
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setIntervalSettings(prev => ({ ...prev, workSeconds: 60, restSeconds: 30 }))}
+                >
+                  60/30
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setIntervalSettings(prev => ({ ...prev, workSeconds: 90, restSeconds: 60 }))}
+                >
+                  90/60
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setIntervalSettings(prev => ({ ...prev, workSeconds: 120, restSeconds: 60 }))}
+                >
+                  2min/1min
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setIntervalSettings(prev => ({ ...prev, workSeconds: 180, restSeconds: 90 }))}
+                >
+                  3min/90s
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setIntervalSettings(prev => ({ ...prev, workSeconds: 300, restSeconds: 120 }))}
+                >
+                  5min/2min
+                </Button>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowIntervalDialog(false)}>Cancel</Button>
+            <Button onClick={() => {
+              setIntervalSettings(prev => ({ ...prev, enabled: true }));
+              setShowIntervalDialog(false);
+            }}>
+              Enable Intervals
             </Button>
           </DialogFooter>
         </DialogContent>
