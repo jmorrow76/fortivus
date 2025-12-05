@@ -35,6 +35,7 @@ const Navbar = () => {
     { name: "Run Tracker", href: "/running", icon: MapPin },
     { name: "Calorie Tracker", href: "/calories", icon: Utensils },
     { name: "Body Analysis", href: "/body-analysis", icon: Camera },
+    { name: "Progress Photos", href: "/progress", icon: Camera },
     { name: "Hormonal Optimization", href: "/hormonal", icon: Battery },
     { name: "Joint Health Analytics", href: "/joint-health", icon: Shield },
     { name: "Sleep-Adaptive Workouts", href: "/sleep-adaptive", icon: Moon },
