@@ -23,15 +23,15 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const FORTIVUS_ELITE = {
   monthly: {
-    price_id: "price_1SalhlClAe0PX3avSpaZIuZE",
-    product_id: "prod_TXrQkWjvadiPDC",
-    price: 15,
+    price_id: "price_1Sb2xWClAe0PX3avm3Zy3tRv",
+    product_id: "prod_TY9GTiqRjM75tb",
+    price: 29.99,
     interval: "month",
   },
   yearly: {
     price_id: "price_1SalhsClAe0PX3avqmzqwqgg",
     product_id: "prod_TXrQrkzH13DuVC",
-    price: 99,
+    price: 199,
     interval: "year",
   },
   name: "Fortivus Elite",
