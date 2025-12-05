@@ -11,14 +11,14 @@ const Navbar = () => {
   const { isAdmin } = useAdmin();
 
   const navLinks = [
-    { name: "About", href: "/about", isPage: true },
     { name: "Forum", href: "/forum", isPage: true },
+    { name: "Check-in", href: "/checkin", isPage: true },
+    { name: "Community", href: "/community", isPage: true },
     { name: "Supplements", href: "/supplements", isPage: true },
     { name: "Pricing", href: "/pricing", isPage: true },
   ];
 
   const mobileNavLinks = [
-    { name: "About", href: "/about", isPage: true },
     { name: "Forum", href: "/forum", isPage: true },
     { name: "Check-in", href: "/checkin", isPage: true },
     { name: "Community", href: "/community", isPage: true },
