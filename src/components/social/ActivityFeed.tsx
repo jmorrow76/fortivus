@@ -27,10 +27,16 @@ export function ActivityFeed() {
     setFetching(false);
   };
 
-  const handleInstagramShare = async (activity: typeof activityFeed[0]) => {
+  const handleShare = async (activity: typeof activityFeed[0], platform: 'instagram' | 'general') => {
     const name = activity.profile?.display_name || 'Someone';
     const badgeName = activity.badge?.name || 'Achievement';
-    const shareText = `🏆 ${name} just earned the "${badgeName}" badge on Fortivus! #Fortivus #FitnessGoals #Achievement`;
+    const isOwnAchievement = activity.user_id === user?.id;
+    
+    const shareText = isOwnAchievement
+      ? `🏆 I just earned the "${badgeName}" badge on Fortivus! #Fortivus #FitnessGoals #Achievement`
+      : `🏆 ${name} just earned the "${badgeName}" badge on Fortivus! #Fortivus #FitnessGoals`;
+    
+    console.log('Attempting share:', { platform, shareText, hasNavigatorShare: !!navigator.share });
     
     // Try native share API first (works on mobile)
     if (navigator.share) {
@@ -46,24 +52,28 @@ export function ActivityFeed() {
         });
         return;
       } catch (err) {
-        // User cancelled or error - fall through to clipboard
-        if ((err as Error).name !== 'AbortError') {
-          console.error('Share failed:', err);
-        }
+        console.log('Share API error:', err);
+        // User cancelled - don't show error
+        if ((err as Error).name === 'AbortError') return;
       }
     }
     
-    // Fallback: copy to clipboard and prompt to share manually
+    // Fallback: copy to clipboard
     try {
       await navigator.clipboard.writeText(shareText);
       toast({
         title: "Copied to clipboard!",
-        description: "Open Instagram and paste to share your achievement.",
+        description: platform === 'instagram' 
+          ? "Open Instagram and paste to share your achievement."
+          : "Paste anywhere to share this achievement.",
       });
-    } catch {
+    } catch (err) {
+      console.log('Clipboard error:', err);
+      // Final fallback - show in toast
       toast({
-        title: "Share text",
+        title: "Share this!",
         description: shareText,
+        duration: 10000,
       });
     }
   };
@@ -160,16 +170,27 @@ export function ActivityFeed() {
                 </div>
 
                 <div className="flex items-center gap-1">
-                  {activity.activity_type === 'badge_earned' && activity.user_id === user?.id && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleInstagramShare(activity)}
-                      className="h-8 w-8 text-pink-500 hover:text-pink-600 hover:bg-pink-500/10"
-                      title="Share to Instagram"
-                    >
-                      <Instagram className="h-4 w-4" />
-                    </Button>
+                  {activity.activity_type === 'badge_earned' && (
+                    <>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleShare(activity, 'instagram')}
+                        className="h-8 w-8 text-pink-500 hover:text-pink-600 hover:bg-pink-500/10"
+                        title="Share to Instagram"
+                      >
+                        <Instagram className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleShare(activity, 'general')}
+                        className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                        title="Share"
+                      >
+                        <Share2 className="h-4 w-4" />
+                      </Button>
+                    </>
                   )}
                   {!isFollowing(activity.user_id) && activity.user_id !== user?.id && (
                     <Button
