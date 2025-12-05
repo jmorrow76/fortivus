@@ -1,4 +1,4 @@
-import { Instagram, Youtube, Twitter } from "lucide-react";
+import { Instagram, Youtube, Facebook } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const footerLinks = {
@@ -25,9 +25,9 @@ const footerLinks = {
 };
 
 const socialLinks = [
-  { icon: Instagram, href: "#", label: "Instagram" },
+  { icon: Instagram, href: "https://instagram.com/Fortivus.Fitness", label: "Instagram" },
+  { icon: Facebook, href: "https://facebook.com/Fortivus.Fitness", label: "Facebook" },
   { icon: Youtube, href: "#", label: "YouTube" },
-  { icon: Twitter, href: "#", label: "X" },
 ];
 
 const Footer = () => {
