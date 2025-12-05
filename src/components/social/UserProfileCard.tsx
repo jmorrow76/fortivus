@@ -58,13 +58,13 @@ export function UserProfileCard({ userId, onClose }: UserProfileCardProps) {
     setLoading(true);
 
     const [profileRes, streakRes, followersRes, followingRes] = await Promise.all([
-      supabase.from('profiles').select('display_name, avatar_url').eq('user_id', userId).maybeSingle(),
+      supabase.rpc('get_public_profile', { target_user_id: userId }),
       supabase.from('user_streaks').select('current_streak, total_xp, total_checkins').eq('user_id', userId).maybeSingle(),
       supabase.from('user_follows').select('id').eq('following_id', userId),
       supabase.from('user_follows').select('id').eq('follower_id', userId)
     ]);
 
-    if (profileRes.data) setProfile(profileRes.data);
+    if (profileRes.data && profileRes.data.length > 0) setProfile(profileRes.data[0]);
     if (streakRes.data) setStreak(streakRes.data);
     setFollowerCount(followersRes.data?.length || 0);
     setFollowingCount(followingRes.data?.length || 0);
