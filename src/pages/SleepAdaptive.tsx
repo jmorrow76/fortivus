@@ -18,7 +18,7 @@ const SleepAdaptive = () => {
   const { user, subscription } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const isElite = subscription?.isActive;
+  const isElite = subscription?.subscribed;
 
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
