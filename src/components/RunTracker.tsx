@@ -500,13 +500,13 @@ export const RunTracker = () => {
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
               {currentPosition && (
-                <>
-                  <Marker 
-                    position={[currentPosition.lat, currentPosition.lng]} 
-                    icon={defaultIcon}
-                  />
-                  <RecenterMap position={[currentPosition.lat, currentPosition.lng]} />
-                </>
+                <Marker 
+                  position={[currentPosition.lat, currentPosition.lng]} 
+                  icon={defaultIcon}
+                />
+              )}
+              {currentPosition && (
+                <RecenterMap position={[currentPosition.lat, currentPosition.lng]} />
               )}
               {routeCoordinates.length > 1 && (
                 <Polyline 
