@@ -21,6 +21,7 @@ import Supplements from "./pages/Supplements";
 import Gear from "./pages/Gear";
 import BodyAnalysisPage from "./pages/BodyAnalysis";
 import KnowledgeHub from "./pages/KnowledgeHub";
+import ArticleDetail from "./pages/ArticleDetail";
 import PricingPage from "./pages/PricingPage";
 import SubscriptionSuccess from "./pages/SubscriptionSuccess";
 import CalorieTracking from "./pages/CalorieTracking";
@@ -55,6 +56,7 @@ const App = () => (
             <Route path="/gear" element={<Gear />} />
             <Route path="/body-analysis" element={<BodyAnalysisPage />} />
             <Route path="/knowledge" element={<KnowledgeHub />} />
+            <Route path="/knowledge/:slug" element={<ArticleDetail />} />
             <Route path="/pricing" element={<PricingPage />} />
             <Route path="/subscription-success" element={<SubscriptionSuccess />} />
             <Route path="/calories" element={<CalorieTracking />} />
