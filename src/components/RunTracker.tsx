@@ -10,12 +10,28 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Play, Pause, Square, MapPin, Clock, Footprints, Flame, TrendingUp, Target, Settings } from 'lucide-react';
+import { Play, Pause, Square, MapPin, Clock, Footprints, Flame, TrendingUp, Target, Settings, Trophy, Plus } from 'lucide-react';
 import { useRunTracker } from '@/hooks/useRunTracker';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { format, startOfWeek, endOfWeek, isWithinInterval } from 'date-fns';
+import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
+
+interface Challenge {
+  id: string;
+  title: string;
+  description: string;
+  target_count: number;
+  xp_reward: number;
+  reset_type: string | null;
+}
+
+interface UserChallenge {
+  challenge_id: string;
+  progress: number;
+  is_completed: boolean;
+  challenge: Challenge;
+}
 
 // Fix for default marker icon
 const defaultIcon = new Icon({
@@ -96,13 +112,90 @@ export const RunTracker = () => {
   const [goalDistanceInput, setGoalDistanceInput] = useState('10');
   const [goalRunsInput, setGoalRunsInput] = useState('3');
   const [savingGoal, setSavingGoal] = useState(false);
+  
+  // Running challenges state
+  const [runningChallenges, setRunningChallenges] = useState<Challenge[]>([]);
+  const [userChallenges, setUserChallenges] = useState<UserChallenge[]>([]);
+  const [joiningChallenge, setJoiningChallenge] = useState<string | null>(null);
 
-  // Fetch weekly goal
+  // Fetch weekly goal and challenges
   useEffect(() => {
     if (user) {
       fetchWeeklyGoal();
+      fetchRunningChallenges();
     }
   }, [user]);
+
+  const fetchRunningChallenges = async () => {
+    if (!user) return;
+    
+    const [{ data: challenges }, { data: joined }] = await Promise.all([
+      supabase.from('challenges').select('*').eq('category', 'running').eq('is_active', true),
+      supabase.from('user_challenges').select('*, challenge:challenges(*)').eq('user_id', user.id),
+    ]);
+    
+    if (challenges) setRunningChallenges(challenges);
+    if (joined) {
+      setUserChallenges(joined.filter(uc => uc.challenge?.category === 'running').map(uc => ({
+        challenge_id: uc.challenge_id,
+        progress: uc.progress,
+        is_completed: uc.is_completed,
+        challenge: uc.challenge as Challenge,
+      })));
+    }
+  };
+
+  const joinChallenge = async (challengeId: string) => {
+    if (!user) return;
+    setJoiningChallenge(challengeId);
+    
+    const { error } = await supabase.from('user_challenges').insert({
+      user_id: user.id,
+      challenge_id: challengeId,
+      progress: 0,
+    });
+    
+    if (!error) {
+      toast({ title: 'Challenge joined!', description: 'Good luck!' });
+      fetchRunningChallenges();
+    }
+    setJoiningChallenge(null);
+  };
+
+  // Calculate challenge progress based on this week/month runs
+  const getChallengeProgress = (challenge: Challenge): number => {
+    const now = new Date();
+    let relevantRuns = runHistory;
+    
+    if (challenge.reset_type === 'weekly') {
+      const weekStart = startOfWeek(now, { weekStartsOn: 1 });
+      const weekEnd = endOfWeek(now, { weekStartsOn: 1 });
+      relevantRuns = runHistory.filter(run => 
+        isWithinInterval(new Date(run.started_at), { start: weekStart, end: weekEnd })
+      );
+    } else if (challenge.reset_type === 'monthly') {
+      const monthStart = startOfMonth(now);
+      const monthEnd = endOfMonth(now);
+      relevantRuns = runHistory.filter(run => 
+        isWithinInterval(new Date(run.started_at), { start: monthStart, end: monthEnd })
+      );
+    }
+    
+    // Check if it's a distance or run count challenge
+    if (challenge.title.toLowerCase().includes('km') || challenge.title.toLowerCase().includes('10k')) {
+      const totalKm = relevantRuns.reduce((sum, r) => sum + (r.distance_meters || 0), 0) / 1000;
+      // For single run challenges
+      if (challenge.title.toLowerCase().includes('complete a')) {
+        const maxSingleRun = Math.max(...relevantRuns.map(r => (r.distance_meters || 0) / 1000), 0);
+        return maxSingleRun;
+      }
+      return totalKm;
+    } else {
+      // Count unique run days
+      const uniqueDays = new Set(relevantRuns.map(r => new Date(r.started_at).toDateString()));
+      return uniqueDays.size;
+    }
+  };
 
   const fetchWeeklyGoal = async () => {
     if (!user) return;
@@ -172,8 +265,8 @@ export const RunTracker = () => {
     await stopRun(notes);
     setNotes('');
     setShowStopDialog(false);
-    // Refresh goal data to show updated streak
-    await fetchWeeklyGoal();
+    // Refresh goal data and challenges to show updated progress
+    await Promise.all([fetchWeeklyGoal(), fetchRunningChallenges()]);
   };
 
   const mapCenter: [number, number] = currentPosition 
@@ -256,6 +349,70 @@ export const RunTracker = () => {
                 Set Weekly Goal
               </Button>
             )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Running Challenges */}
+      {!isTracking && runningChallenges.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Trophy className="h-5 w-5" />
+              Running Challenges
+            </CardTitle>
+            <CardDescription>Join challenges to earn XP and badges</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {runningChallenges.map((challenge) => {
+              const joined = userChallenges.find(uc => uc.challenge_id === challenge.id);
+              const progress = getChallengeProgress(challenge);
+              const progressPercent = Math.min(100, (progress / challenge.target_count) * 100);
+              const isCompleted = progress >= challenge.target_count;
+              
+              return (
+                <div 
+                  key={challenge.id}
+                  className={`p-3 rounded-lg border ${isCompleted ? 'bg-green-500/10 border-green-500/20' : 'bg-muted/50 border-transparent'}`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-medium text-sm">{challenge.title}</span>
+                        <Badge variant="outline" className="text-xs">
+                          {challenge.reset_type === 'weekly' ? 'Weekly' : 'Monthly'}
+                        </Badge>
+                        {isCompleted && <Badge className="bg-green-600 text-xs">Done!</Badge>}
+                      </div>
+                      <p className="text-xs text-muted-foreground mb-2">{challenge.description}</p>
+                      {joined ? (
+                        <div>
+                          <div className="flex justify-between text-xs mb-1">
+                            <span>{progress.toFixed(1)} / {challenge.target_count}</span>
+                            <span className="text-primary">+{challenge.xp_reward} XP</span>
+                          </div>
+                          <Progress value={progressPercent} className="h-1.5" />
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-muted-foreground">+{challenge.xp_reward} XP reward</span>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => joinChallenge(challenge.id)}
+                            disabled={joiningChallenge === challenge.id}
+                            className="h-7 text-xs gap-1"
+                          >
+                            <Plus className="h-3 w-3" />
+                            Join
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </CardContent>
         </Card>
       )}
