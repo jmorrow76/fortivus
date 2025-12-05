@@ -189,16 +189,20 @@ serve(async (req) => {
     
     console.log("[GENERATE-ARTICLE] Generating article on topic:", topic);
 
-    const userPrompt = `Write a comprehensive, expert-level article on the following topic for men over 40:
+const userPrompt = `Write a COMPREHENSIVE, LONG-FORM, expert-level article on the following topic for men over 40:
 
 "${topic}"
 
+CRITICAL LENGTH REQUIREMENT: The article MUST be at least 2500-3500 words. This is a full-length feature article, not a blog post.
+
 Structure your article with:
-1. An engaging introduction that hooks the reader (2-3 short paragraphs)
-2. Clear sections with subheadings (use ## for headings)
-3. Specific, actionable advice and protocols
-4. Scientific backing where relevant (cite general research, not specific papers)
-5. A motivating conclusion with key takeaways
+1. An engaging introduction that hooks the reader (3-4 short paragraphs)
+2. At least 5-7 major sections with ## headings
+3. Each section should have 3-5 paragraphs of detailed content
+4. Specific, actionable advice and protocols with step-by-step guidance
+5. Scientific backing where relevant (cite general research, not specific papers)
+6. Real-world examples and scenarios men over 40 can relate to
+7. A comprehensive conclusion with key takeaways (bulleted list)
 
 CRITICAL FORMATTING REQUIREMENTS:
 - Break content into SHORT paragraphs (2-4 sentences each)
@@ -206,8 +210,15 @@ CRITICAL FORMATTING REQUIREMENTS:
 - Use bullet points or numbered lists where appropriate
 - Never write walls of text - keep paragraphs digestible
 - Each section should have multiple paragraphs, not one long block
+- Include practical tips, protocols, or action items in each section
 
-The article should be approximately 1500-2000 words. Make it genuinely valuable and shareable.
+CONTENT DEPTH:
+- Include specific numbers, timeframes, and recommendations
+- Provide "how-to" guidance, not just "what to do"
+- Address common mistakes and how to avoid them
+- Include modifications or alternatives where relevant
+
+The article should be genuinely valuable, comprehensive, and position the reader to take immediate action. This is premium content for a fitness platform.
 
 Also provide an image_prompt describing an ideal cover image for this article - it should be a professional fitness/health related scene that captures the essence of the article.
 
