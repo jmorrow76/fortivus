@@ -27,8 +27,9 @@ export function RunningLeaderboard() {
 
   const fetchLeaderboard = async () => {
     try {
+      // Use type assertion since the view isn't in auto-generated types
       const { data, error } = await supabase
-        .from('running_leaderboard_view')
+        .from('running_leaderboard_view' as any)
         .select('*')
         .order('weekly_distance_meters', { ascending: false })
         .limit(20);
@@ -38,7 +39,7 @@ export function RunningLeaderboard() {
         return;
       }
 
-      setLeaderboard((data as RunnerStats[]) || []);
+      setLeaderboard((data as unknown as RunnerStats[]) || []);
     } catch (err) {
       console.error('Error in fetchLeaderboard:', err);
     } finally {
