@@ -97,6 +97,54 @@ export type Database = {
           },
         ]
       }
+      articles: {
+        Row: {
+          author: string
+          category: string
+          content: string
+          created_at: string
+          excerpt: string
+          id: string
+          is_featured: boolean
+          is_published: boolean
+          published_at: string | null
+          read_time_minutes: number
+          slug: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author: string
+          category: string
+          content: string
+          created_at?: string
+          excerpt: string
+          id?: string
+          is_featured?: boolean
+          is_published?: boolean
+          published_at?: string | null
+          read_time_minutes?: number
+          slug: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author?: string
+          category?: string
+          content?: string
+          created_at?: string
+          excerpt?: string
+          id?: string
+          is_featured?: boolean
+          is_published?: boolean
+          published_at?: string | null
+          read_time_minutes?: number
+          slug?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       badges: {
         Row: {
           category: Database["public"]["Enums"]["badge_category"]
@@ -584,6 +632,57 @@ export type Database = {
           stress_level?: number
           user_id?: string
           workout_recommendation?: Json | null
+        }
+        Relationships: []
+      }
+      newsletter_subscribers: {
+        Row: {
+          email: string
+          id: string
+          is_active: boolean
+          subscribed_at: string
+          unsubscribed_at: string | null
+        }
+        Insert: {
+          email: string
+          id?: string
+          is_active?: boolean
+          subscribed_at?: string
+          unsubscribed_at?: string | null
+        }
+        Update: {
+          email?: string
+          id?: string
+          is_active?: boolean
+          subscribed_at?: string
+          unsubscribed_at?: string | null
+        }
+        Relationships: []
+      }
+      newsletters: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          recipients_count: number | null
+          sent_at: string | null
+          subject: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          recipients_count?: number | null
+          sent_at?: string | null
+          subject: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          recipients_count?: number | null
+          sent_at?: string | null
+          subject?: string
         }
         Relationships: []
       }
