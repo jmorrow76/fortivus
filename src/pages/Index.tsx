@@ -4,7 +4,6 @@ import StatsCounter from "@/components/StatsCounter";
 
 import Supplements from "@/components/Supplements";
 import AIAnalysis from "@/components/AIAnalysis";
-import BodyAnalysis from "@/components/BodyAnalysis";
 import SuccessStories from "@/components/SuccessStories";
 
 import Gear from "@/components/Gear";
@@ -22,7 +21,6 @@ const Index = () => {
         <Hero />
         <StatsCounter />
         <AIAnalysis />
-        <BodyAnalysis />
         <Pricing />
         <SuccessStories />
         <Articles />
