@@ -4,7 +4,7 @@ import {
   Loader2, Trophy, Flame, Target, Dumbbell, Calendar, 
   TrendingUp, Heart, Footprints, Moon, Zap, Lock, 
   Crown, Medal, ChevronRight, Activity, Users, Camera,
-  Brain, Sparkles
+  Brain, Sparkles, Apple
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useGamification } from '@/hooks/useGamification';
@@ -481,6 +481,34 @@ export default function Dashboard() {
                     <p className="text-sm text-muted-foreground mb-2">Get your body composition analysis</p>
                     <Button size="sm" asChild className="w-full">
                       <Link to="/body-analysis">Analyze Now</Link>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Calorie Tracker - Premium Feature */}
+              <Card className={!subscription.subscribed ? 'relative overflow-hidden' : ''}>
+                {!subscription.subscribed && (
+                  <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
+                    <Lock className="h-6 w-6 text-muted-foreground mb-2" />
+                    <p className="text-sm text-muted-foreground mb-2">Elite Feature</p>
+                    <Button size="sm" asChild>
+                      <a href="/#pricing">Upgrade</a>
+                    </Button>
+                  </div>
+                )}
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Apple className="h-4 w-4" />
+                    Calorie Tracker
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center">
+                    <Flame className="h-8 w-8 mx-auto mb-2 text-orange-500/50" />
+                    <p className="text-sm text-muted-foreground mb-2">Track meals & macros</p>
+                    <Button size="sm" asChild className="w-full">
+                      <Link to="/calories">Track Calories</Link>
                     </Button>
                   </div>
                 </CardContent>

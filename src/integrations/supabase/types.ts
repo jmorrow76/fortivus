@@ -183,6 +183,54 @@ export type Database = {
           },
         ]
       }
+      foods: {
+        Row: {
+          brand: string | null
+          calories: number
+          carbs: number
+          created_at: string
+          created_by: string | null
+          fat: number
+          fiber: number | null
+          id: string
+          is_verified: boolean
+          name: string
+          protein: number
+          serving_size: number
+          serving_unit: string
+        }
+        Insert: {
+          brand?: string | null
+          calories: number
+          carbs?: number
+          created_at?: string
+          created_by?: string | null
+          fat?: number
+          fiber?: number | null
+          id?: string
+          is_verified?: boolean
+          name: string
+          protein?: number
+          serving_size?: number
+          serving_unit?: string
+        }
+        Update: {
+          brand?: string | null
+          calories?: number
+          carbs?: number
+          created_at?: string
+          created_by?: string | null
+          fat?: number
+          fiber?: number | null
+          id?: string
+          is_verified?: boolean
+          name?: string
+          protein?: number
+          serving_size?: number
+          serving_unit?: string
+        }
+        Relationships: []
+      }
       forum_categories: {
         Row: {
           created_at: string
@@ -294,6 +342,59 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "forum_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meal_logs: {
+        Row: {
+          created_at: string
+          custom_calories: number | null
+          custom_carbs: number | null
+          custom_fat: number | null
+          custom_food_name: string | null
+          custom_protein: number | null
+          food_id: string | null
+          id: string
+          log_date: string
+          meal_type: string
+          servings: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          custom_calories?: number | null
+          custom_carbs?: number | null
+          custom_fat?: number | null
+          custom_food_name?: string | null
+          custom_protein?: number | null
+          food_id?: string | null
+          id?: string
+          log_date?: string
+          meal_type?: string
+          servings?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          custom_calories?: number | null
+          custom_carbs?: number | null
+          custom_fat?: number | null
+          custom_food_name?: string | null
+          custom_protein?: number | null
+          food_id?: string | null
+          id?: string
+          log_date?: string
+          meal_type?: string
+          servings?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meal_logs_food_id_fkey"
+            columns: ["food_id"]
+            isOneToOne: false
+            referencedRelation: "foods"
             referencedColumns: ["id"]
           },
         ]
