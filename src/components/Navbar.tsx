@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, LogOut, Settings, LayoutDashboard, Shield } from "lucide-react";
+import { Menu, X, LogOut, Settings, LayoutDashboard, Shield, Home } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useAdmin } from "@/hooks/useAdmin";
 
@@ -63,6 +63,11 @@ const Navbar = () => {
           <div className="hidden lg:flex items-center gap-2">
             {user ? (
               <>
+                <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                  <Link to="/">
+                    <Home className="h-4 w-4" />
+                  </Link>
+                </Button>
                 <Button variant="default" size="sm" asChild>
                   <Link to="/dashboard" className="flex items-center gap-2">
                     <LayoutDashboard className="h-4 w-4" />
@@ -123,6 +128,12 @@ const Navbar = () => {
               <div className="flex flex-col gap-3 pt-4 border-t border-border mt-2">
                 {user ? (
                   <>
+                    <Button variant="ghost" className="justify-start" asChild>
+                      <Link to="/" onClick={() => setIsOpen(false)}>
+                        <Home className="h-4 w-4 mr-2" />
+                        Home
+                      </Link>
+                    </Button>
                     <Button variant="default" className="justify-start" asChild>
                       <Link to="/dashboard" onClick={() => setIsOpen(false)}>
                         <LayoutDashboard className="h-4 w-4 mr-2" />
