@@ -267,7 +267,7 @@ export default function Dashboard() {
                     <CardDescription>Your workout activity</CardDescription>
                   </div>
                   <Button variant="ghost" size="sm" asChild>
-                    <Link to="/progress?tab=workouts" className="flex items-center gap-1">
+                    <Link to="/workouts" className="flex items-center gap-1">
                       View All <ChevronRight className="h-4 w-4" />
                     </Link>
                   </Button>
