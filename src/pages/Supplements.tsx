@@ -8,112 +8,104 @@ const supplements = [
   {
     name: "AG1 Athletic Greens",
     brand: "AG1",
-    description: "The ultimate daily nutritional foundation. 75 vitamins, minerals, and whole-food sourced nutrients in one scoop.",
+    description: "75 vitamins, minerals, and whole-food sourced nutrients in one scoop.",
     rating: 4.9,
     reviews: 12847,
-    price: "$99/month",
-    icon: Leaf,
-    tag: "Featured Partner",
+    price: "$99/mo",
+    tag: "Featured",
     affiliateUrl: "https://drinkag1.com/?utm_source=YOURAFFILIATEID",
     logo: "AG1",
-    brandColor: "bg-emerald-500",
     brandBg: "bg-emerald-50",
+    textColor: "text-emerald-600",
   },
   {
     name: "IM8 Performance Formula",
     brand: "IM8",
-    description: "Advanced performance and recovery formula designed specifically for men over 40.",
+    description: "Advanced performance and recovery formula for men over 40.",
     rating: 4.8,
     reviews: 3456,
     price: "$79.99",
-    icon: Zap,
-    tag: "Partner Brand",
+    tag: "Partner",
     affiliateUrl: "https://im8.com/?ref=YOURAFFILIATEID",
     logo: "IM8",
-    brandColor: "bg-orange-500",
     brandBg: "bg-orange-50",
+    textColor: "text-orange-600",
   },
   {
     name: "Caldera + Lab The Good",
     brand: "Caldera + Lab",
-    description: "Multi-functional serum with 27 active botanicals. Clean, clinical skincare for men.",
+    description: "Multi-functional serum with 27 active botanicals for men.",
     rating: 4.9,
     reviews: 2134,
     price: "$125",
-    icon: Shield,
-    tag: "Men's Skincare",
+    tag: "Skincare",
     affiliateUrl: "https://calderalab.com/?utm_source=YOURAFFILIATEID",
     logo: "Caldera",
-    brandColor: "bg-slate-800",
     brandBg: "bg-slate-100",
+    textColor: "text-slate-700",
   },
   {
     name: "Testosterone Support",
     brand: "Amazon's Choice",
-    description: "Clinically dosed ashwagandha, tongkat ali, and zinc for natural testosterone optimization.",
+    description: "Ashwagandha, tongkat ali, and zinc for natural T optimization.",
     rating: 4.7,
     reviews: 8923,
     price: "$39.99",
-    icon: Brain,
-    tag: "Amazon Pick",
+    tag: "Amazon",
     affiliateUrl: "https://amazon.com/dp/PRODUCTID?tag=YOURAMAZONID",
     logo: "Amazon",
-    brandColor: "bg-amber-500",
     brandBg: "bg-amber-50",
+    textColor: "text-amber-600",
   },
 ];
 
-const additionalSupplements = [
+const essentials = [
   {
     name: "Omega-3 Fish Oil",
     brand: "Nordic Naturals",
-    description: "Ultra-pure, high-potency omega-3 for heart, brain, and joint health.",
+    description: "High-potency omega-3 for heart, brain, and joint health.",
     rating: 4.8,
     reviews: 15234,
     price: "$45.99",
     icon: Heart,
-    tag: "Heart Health",
+    tag: "Heart",
     affiliateUrl: "https://amazon.com/dp/PRODUCTID?tag=YOURAMAZONID",
-    logo: "Nordic",
     brandBg: "bg-blue-50",
   },
   {
     name: "Creatine Monohydrate",
     brand: "Thorne",
-    description: "NSF certified for sport. Supports muscle strength, power output, and cognitive function.",
+    description: "NSF certified. Supports muscle strength and cognitive function.",
     rating: 4.9,
     reviews: 7892,
     price: "$32.00",
     icon: Dumbbell,
-    tag: "Muscle & Strength",
+    tag: "Strength",
     affiliateUrl: "https://amazon.com/dp/PRODUCTID?tag=YOURAMAZONID",
-    logo: "Thorne",
     brandBg: "bg-indigo-50",
   },
   {
     name: "Vitamin D3 + K2",
     brand: "Sports Research",
-    description: "Essential for bone health, immune function, and testosterone production in men.",
+    description: "Essential for bone health, immunity, and testosterone.",
     rating: 4.8,
     reviews: 11456,
     price: "$24.95",
     icon: Zap,
     tag: "Immunity",
     affiliateUrl: "https://amazon.com/dp/PRODUCTID?tag=YOURAMAZONID",
-    logo: "SR",
     brandBg: "bg-yellow-50",
   },
   {
     name: "Magnesium Glycinate",
     brand: "Pure Encapsulations",
-    description: "Highly absorbable magnesium for sleep quality, muscle recovery, and stress management.",
+    description: "For sleep quality, muscle recovery, and stress management.",
     rating: 4.9,
     reviews: 9234,
     price: "$38.60",
     icon: Brain,
     tag: "Recovery",
     affiliateUrl: "https://amazon.com/dp/PRODUCTID?tag=YOURAMAZONID",
-    logo: "Pure",
     brandBg: "bg-purple-50",
   },
 ];
@@ -127,55 +119,50 @@ const Supplements = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <main className="pt-20">
-        {/* Hero Section */}
-        <section className="section-padding bg-secondary/20">
-          <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto text-center">
-              <span className="section-label">Curated Selection</span>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight mb-6">
-                Premium <span className="text-accent">Supplements</span>
-              </h1>
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                Hand-picked supplements for men over 40. Every product is vetted for quality, 
-                efficacy, and value by our team of fitness experts.
-              </p>
-            </div>
+        {/* Hero */}
+        <section className="py-10 md:py-14 bg-secondary/20">
+          <div className="container mx-auto px-4 text-center">
+            <span className="text-xs font-medium tracking-[0.15em] uppercase text-muted-foreground">Curated Selection</span>
+            <h1 className="text-3xl md:text-4xl font-medium tracking-tight mt-2 mb-3">
+              Premium <span className="text-accent">Supplements</span>
+            </h1>
+            <p className="text-muted-foreground max-w-lg mx-auto">
+              Hand-picked supplements for men over 40. Vetted for quality, efficacy, and value.
+            </p>
           </div>
         </section>
 
         {/* Featured AG1 Banner */}
-        <section className="section-padding">
+        <section className="py-8 md:py-10">
           <div className="container mx-auto px-4">
-            <div className="p-6 lg:p-10 rounded-xl bg-emerald-50 border border-emerald-200">
-              <div className="flex flex-col lg:flex-row items-center gap-8">
+            <div className="p-5 md:p-8 rounded-xl bg-emerald-50 border border-emerald-200">
+              <div className="flex flex-col md:flex-row items-center gap-6">
                 <div className="flex-1">
-                  <span className="px-3 py-1 rounded-md bg-emerald-100 text-emerald-700 text-xs font-semibold mb-4 inline-block">
+                  <span className="px-2 py-1 rounded bg-emerald-100 text-emerald-700 text-xs font-semibold">
                     Official Partner
                   </span>
-                  <h2 className="text-2xl lg:text-4xl font-medium mb-4 text-foreground">
+                  <h2 className="text-xl md:text-2xl font-medium mt-3 mb-2 text-foreground">
                     AG1 by Athletic Greens
                   </h2>
-                  <p className="text-muted-foreground mb-6 max-w-xl leading-relaxed text-lg">
-                    One scoop. 75 high-quality vitamins, minerals, and whole-food sourced nutrients. 
-                    The comprehensive daily nutrition drink trusted by elite athletes worldwide.
+                  <p className="text-muted-foreground mb-4 text-sm md:text-base">
+                    One scoop. 75 vitamins, minerals, and whole-food sourced nutrients. 
+                    Trusted by elite athletes worldwide.
                   </p>
-                  <ul className="space-y-2 mb-6 text-muted-foreground">
-                    <li className="flex items-center gap-2">
+                  <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mb-4">
+                    <span className="flex items-center gap-1.5">
                       <Leaf className="h-4 w-4 text-emerald-600" />
-                      75 vitamins, minerals & nutrients
-                    </li>
-                    <li className="flex items-center gap-2">
+                      75 nutrients
+                    </span>
+                    <span className="flex items-center gap-1.5">
                       <Zap className="h-4 w-4 text-emerald-600" />
-                      Supports energy & focus
-                    </li>
-                    <li className="flex items-center gap-2">
+                      Energy & focus
+                    </span>
+                    <span className="flex items-center gap-1.5">
                       <Shield className="h-4 w-4 text-emerald-600" />
-                      NSF Certified for Sport
-                    </li>
-                  </ul>
+                      NSF Certified
+                    </span>
+                  </div>
                   <Button 
-                    variant="default" 
-                    size="lg"
                     onClick={() => handleShopClick("https://drinkag1.com/?utm_source=YOURAFFILIATEID")}
                     className="bg-emerald-600 hover:bg-emerald-700"
                   >
@@ -183,8 +170,8 @@ const Supplements = () => {
                     <ExternalLink className="w-4 h-4 ml-2" />
                   </Button>
                 </div>
-                <div className="w-48 h-48 rounded-xl bg-emerald-100 flex items-center justify-center">
-                  <span className="font-heading text-4xl font-bold text-emerald-700">AG1</span>
+                <div className="w-32 h-32 md:w-36 md:h-36 rounded-xl bg-emerald-100 flex items-center justify-center shrink-0">
+                  <span className="font-heading text-3xl font-bold text-emerald-700">AG1</span>
                 </div>
               </div>
             </div>
@@ -192,60 +179,52 @@ const Supplements = () => {
         </section>
 
         {/* Partner Supplements */}
-        <section className="section-padding bg-secondary/20">
+        <section className="py-8 md:py-10 bg-secondary/20">
           <div className="container mx-auto px-4">
-            <div className="section-header">
-              <span className="section-label">Partner Brands</span>
-              <h2 className="section-title">Featured Supplements</h2>
-              <p className="section-description">
-                Premium products from our trusted partner brands
-              </p>
+            <div className="text-center mb-8">
+              <span className="text-xs font-medium tracking-[0.15em] uppercase text-muted-foreground">Partner Brands</span>
+              <h2 className="text-2xl font-medium mt-2">Featured Supplements</h2>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {supplements.map((supplement) => (
-                <Card key={supplement.name} variant="interactive" className="group">
-                  <CardContent className="p-5">
-                    <div className={`h-16 rounded-lg ${supplement.brandBg} flex items-center justify-center mb-4`}>
-                      <span className={`font-heading text-lg font-bold ${supplement.brandColor === 'bg-slate-800' ? 'text-slate-800' : supplement.brandColor === 'bg-emerald-500' ? 'text-emerald-600' : supplement.brandColor === 'bg-orange-500' ? 'text-orange-600' : 'text-amber-600'}`}>
-                        {supplement.logo}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {supplements.map((item) => (
+                <Card key={item.name} variant="interactive" className="group">
+                  <CardContent className="p-4">
+                    <div className={`h-12 rounded-lg ${item.brandBg} flex items-center justify-center mb-3`}>
+                      <span className={`font-heading text-sm font-bold ${item.textColor}`}>
+                        {item.logo}
                       </span>
                     </div>
                     
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="px-2 py-1 rounded-md bg-accent/10 text-accent text-xs font-semibold">
-                        {supplement.tag}
-                      </span>
-                    </div>
+                    <span className="px-2 py-0.5 rounded bg-accent/10 text-accent text-[10px] font-semibold uppercase">
+                      {item.tag}
+                    </span>
 
-                    <div className="mb-4">
-                      <p className="text-xs text-muted-foreground mb-1">{supplement.brand}</p>
-                      <h3 className="font-heading text-base font-bold mb-2 group-hover:text-accent transition-colors">
-                        {supplement.name}
+                    <div className="mt-2 mb-3">
+                      <p className="text-[10px] text-muted-foreground">{item.brand}</p>
+                      <h3 className="font-medium text-sm leading-tight group-hover:text-accent transition-colors">
+                        {item.name}
                       </h3>
-                      <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
-                        {supplement.description}
+                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                        {item.description}
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="flex items-center gap-1">
-                        <Star className="w-4 h-4 fill-amber-500 text-amber-500" />
-                        <span className="font-semibold text-sm">{supplement.rating}</span>
-                      </div>
-                      <span className="text-xs text-muted-foreground">
-                        ({supplement.reviews.toLocaleString()})
+                    <div className="flex items-center gap-1.5 mb-3">
+                      <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
+                      <span className="font-medium text-xs">{item.rating}</span>
+                      <span className="text-[10px] text-muted-foreground">
+                        ({item.reviews.toLocaleString()})
                       </span>
                     </div>
 
-                    <div className="flex items-center justify-between pt-4 border-t border-border">
-                      <span className="text-lg font-medium text-foreground">
-                        {supplement.price}
-                      </span>
+                    <div className="flex items-center justify-between pt-3 border-t border-border">
+                      <span className="font-medium text-sm">{item.price}</span>
                       <Button 
                         variant="default" 
                         size="sm"
-                        onClick={() => handleShopClick(supplement.affiliateUrl)}
+                        className="h-7 text-xs px-3"
+                        onClick={() => handleShopClick(item.affiliateUrl)}
                       >
                         Shop
                       </Button>
@@ -258,58 +237,50 @@ const Supplements = () => {
         </section>
 
         {/* Essential Supplements */}
-        <section className="section-padding">
+        <section className="py-8 md:py-10">
           <div className="container mx-auto px-4">
-            <div className="section-header">
-              <span className="section-label">Essentials</span>
-              <h2 className="section-title">Core Supplements for Men 40+</h2>
-              <p className="section-description">
-                Science-backed essentials that every man over 40 should consider
-              </p>
+            <div className="text-center mb-8">
+              <span className="text-xs font-medium tracking-[0.15em] uppercase text-muted-foreground">Essentials</span>
+              <h2 className="text-2xl font-medium mt-2">Core Supplements for Men 40+</h2>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {additionalSupplements.map((supplement) => (
-                <Card key={supplement.name} variant="interactive" className="group">
-                  <CardContent className="p-5">
-                    <div className={`h-16 rounded-lg ${supplement.brandBg} flex items-center justify-center mb-4`}>
-                      <supplement.icon className="h-8 w-8 text-muted-foreground" />
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {essentials.map((item) => (
+                <Card key={item.name} variant="interactive" className="group">
+                  <CardContent className="p-4">
+                    <div className={`h-12 rounded-lg ${item.brandBg} flex items-center justify-center mb-3`}>
+                      <item.icon className="h-5 w-5 text-muted-foreground" />
                     </div>
                     
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="px-2 py-1 rounded-md bg-accent/10 text-accent text-xs font-semibold">
-                        {supplement.tag}
-                      </span>
-                    </div>
+                    <span className="px-2 py-0.5 rounded bg-accent/10 text-accent text-[10px] font-semibold uppercase">
+                      {item.tag}
+                    </span>
 
-                    <div className="mb-4">
-                      <p className="text-xs text-muted-foreground mb-1">{supplement.brand}</p>
-                      <h3 className="font-heading text-base font-bold mb-2 group-hover:text-accent transition-colors">
-                        {supplement.name}
+                    <div className="mt-2 mb-3">
+                      <p className="text-[10px] text-muted-foreground">{item.brand}</p>
+                      <h3 className="font-medium text-sm leading-tight group-hover:text-accent transition-colors">
+                        {item.name}
                       </h3>
-                      <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
-                        {supplement.description}
+                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                        {item.description}
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="flex items-center gap-1">
-                        <Star className="w-4 h-4 fill-amber-500 text-amber-500" />
-                        <span className="font-semibold text-sm">{supplement.rating}</span>
-                      </div>
-                      <span className="text-xs text-muted-foreground">
-                        ({supplement.reviews.toLocaleString()})
+                    <div className="flex items-center gap-1.5 mb-3">
+                      <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
+                      <span className="font-medium text-xs">{item.rating}</span>
+                      <span className="text-[10px] text-muted-foreground">
+                        ({item.reviews.toLocaleString()})
                       </span>
                     </div>
 
-                    <div className="flex items-center justify-between pt-4 border-t border-border">
-                      <span className="text-lg font-medium text-foreground">
-                        {supplement.price}
-                      </span>
+                    <div className="flex items-center justify-between pt-3 border-t border-border">
+                      <span className="font-medium text-sm">{item.price}</span>
                       <Button 
                         variant="default" 
                         size="sm"
-                        onClick={() => handleShopClick(supplement.affiliateUrl)}
+                        className="h-7 text-xs px-3"
+                        onClick={() => handleShopClick(item.affiliateUrl)}
                       >
                         Shop
                       </Button>
@@ -322,13 +293,11 @@ const Supplements = () => {
         </section>
 
         {/* Trust Badge */}
-        <section className="section-padding bg-secondary/20">
+        <section className="py-8 bg-secondary/20">
           <div className="container mx-auto px-4 text-center">
-            <Shield className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="text-xl font-medium mb-2">Trusted Partnerships</h3>
-            <p className="text-muted-foreground max-w-xl mx-auto">
-              We only recommend products we've personally tested and trust. As an affiliate partner, 
-              we earn commissions on purchases at no extra cost to you.
+            <p className="text-sm text-muted-foreground flex items-center justify-center gap-2">
+              <Shield className="h-4 w-4" />
+              Affiliate partner. We earn commissions at no extra cost to you.
             </p>
           </div>
         </section>
