@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Award, Flame, Target, Zap, User, MessageCircle } from 'lucide-react';
+import { Award, Flame, Target, Zap, User, MessageCircle, Instagram, Share2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -7,11 +7,15 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Loader2 } from 'lucide-react';
 import { useSocial } from '@/hooks/useSocial';
 import { formatDistanceToNow } from 'date-fns';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 
 export function ActivityFeed() {
   const { activityFeed, fetchActivityFeed, loading, isFollowing, followUser } = useSocial();
   const [filter, setFilter] = useState<'following' | 'all'>('following');
   const [fetching, setFetching] = useState(false);
+  const { toast } = useToast();
+  const { user } = useAuth();
 
   useEffect(() => {
     loadFeed();
@@ -21,6 +25,47 @@ export function ActivityFeed() {
     setFetching(true);
     await fetchActivityFeed(filter === 'following');
     setFetching(false);
+  };
+
+  const handleInstagramShare = async (activity: typeof activityFeed[0]) => {
+    const name = activity.profile?.display_name || 'Someone';
+    const badgeName = activity.badge?.name || 'Achievement';
+    const shareText = `🏆 ${name} just earned the "${badgeName}" badge on Fortivus! #Fortivus #FitnessGoals #Achievement`;
+    
+    // Try native share API first (works on mobile)
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `${badgeName} Badge Earned!`,
+          text: shareText,
+          url: window.location.origin,
+        });
+        toast({
+          title: "Shared successfully!",
+          description: "Your achievement has been shared.",
+        });
+        return;
+      } catch (err) {
+        // User cancelled or error - fall through to clipboard
+        if ((err as Error).name !== 'AbortError') {
+          console.error('Share failed:', err);
+        }
+      }
+    }
+    
+    // Fallback: copy to clipboard and prompt to share manually
+    try {
+      await navigator.clipboard.writeText(shareText);
+      toast({
+        title: "Copied to clipboard!",
+        description: "Open Instagram and paste to share your achievement.",
+      });
+    } catch {
+      toast({
+        title: "Share text",
+        description: shareText,
+      });
+    }
   };
 
   const getActivityIcon = (type: string) => {
@@ -114,16 +159,29 @@ export function ActivityFeed() {
                   </div>
                 </div>
 
-                {!isFollowing(activity.user_id) && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => followUser(activity.user_id)}
-                    className="text-xs"
-                  >
-                    Follow
-                  </Button>
-                )}
+                <div className="flex items-center gap-1">
+                  {activity.activity_type === 'badge_earned' && activity.user_id === user?.id && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleInstagramShare(activity)}
+                      className="h-8 w-8 text-pink-500 hover:text-pink-600 hover:bg-pink-500/10"
+                      title="Share to Instagram"
+                    >
+                      <Instagram className="h-4 w-4" />
+                    </Button>
+                  )}
+                  {!isFollowing(activity.user_id) && activity.user_id !== user?.id && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => followUser(activity.user_id)}
+                      className="text-xs"
+                    >
+                      Follow
+                    </Button>
+                  )}
+                </div>
               </div>
             ))}
           </div>
