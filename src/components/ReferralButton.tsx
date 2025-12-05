@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Users, X, Send, Loader2, Copy, Check, Mail, Twitter, Facebook, MessageCircle } from "lucide-react";
+import { Users, X, Send, Loader2, Copy, Check, Mail, Twitter, Facebook, MessageCircle, Instagram } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -104,6 +104,23 @@ const ReferralButton = () => {
   const shareOnWhatsApp = () => {
     const text = encodeURIComponent(`Check out Fortivus - AI-powered fitness for men over 40! 💪 ${referralLink}`);
     window.open(`https://wa.me/?text=${text}`, "_blank");
+  };
+
+  const shareOnInstagram = async () => {
+    // Instagram doesn't have a direct share URL, so we copy and prompt user
+    try {
+      await navigator.clipboard.writeText(`Check out Fortivus - AI-powered fitness for men over 40! 💪 ${referralLink}`);
+      toast({
+        title: "Copied to clipboard!",
+        description: "Open Instagram and paste in your story or DM.",
+      });
+    } catch (error) {
+      toast({
+        title: "Failed to copy",
+        description: "Please copy the referral link manually.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -222,6 +239,14 @@ const ReferralButton = () => {
               >
                 <MessageCircle className="h-4 w-4 mr-3" />
                 Share on WhatsApp
+              </Button>
+              <Button
+                onClick={shareOnInstagram}
+                variant="outline"
+                className="w-full justify-start"
+              >
+                <Instagram className="h-4 w-4 mr-3" />
+                Share on Instagram
               </Button>
             </div>
           </TabsContent>
