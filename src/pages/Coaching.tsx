@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useCoaching } from '@/hooks/useCoaching';
@@ -8,12 +8,14 @@ import CoachingChat from '@/components/coaching/CoachingChat';
 import ConversationSidebar from '@/components/coaching/ConversationSidebar';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Lock, Crown } from 'lucide-react';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Loader2, Lock, Crown, Menu, MessageSquare } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Coaching = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading, subscription } = useAuth();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const {
     conversations,
     currentConversation,
@@ -89,21 +91,61 @@ const Coaching = () => {
   const handleNewConversation = () => {
     setCurrentConversation(null);
     setMessages([]);
+    setMobileMenuOpen(false);
+  };
+
+  const handleSelectConversation = (conversation: typeof currentConversation) => {
+    if (conversation) {
+      selectConversation(conversation);
+      setMobileMenuOpen(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
       <main className="flex-1 container mx-auto px-4 py-6">
-        <div className="mb-6">
+        {/* Desktop header */}
+        <div className="mb-6 hidden md:block">
           <h1 className="text-2xl font-bold tracking-tight">AI Coaching</h1>
           <p className="text-muted-foreground">
             Your personal coach for training, nutrition, and mindset
           </p>
         </div>
+
+        {/* Mobile header with menu */}
+        <div className="mb-4 md:hidden">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-xl font-bold tracking-tight">AI Coaching</h1>
+              <p className="text-sm text-muted-foreground">
+                {currentConversation?.title || 'New conversation'}
+              </p>
+            </div>
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-80 p-0">
+                <div className="h-full">
+                  <ConversationSidebar
+                    conversations={conversations}
+                    currentConversation={currentConversation}
+                    onSelectConversation={handleSelectConversation}
+                    onNewConversation={handleNewConversation}
+                    onDeleteConversation={deleteConversation}
+                  />
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
+        </div>
         
-        <Card className="h-[calc(100vh-220px)] overflow-hidden">
+        <Card className="h-[calc(100vh-200px)] md:h-[calc(100vh-220px)] overflow-hidden">
           <div className="flex h-full">
+            {/* Desktop sidebar */}
             <div className="w-64 shrink-0 hidden md:block">
               <ConversationSidebar
                 conversations={conversations}
