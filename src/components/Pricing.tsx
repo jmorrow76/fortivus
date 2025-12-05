@@ -356,12 +356,6 @@ const Pricing = () => {
           </Card>
         </div>
 
-        {/* Guarantee */}
-        <div className="text-center mt-12">
-          <p className="text-sm text-muted-foreground">
-            30-day money-back guarantee. No questions asked.
-          </p>
-        </div>
       </div>
     </section>
   );
