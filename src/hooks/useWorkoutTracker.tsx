@@ -417,7 +417,7 @@ export const useWorkoutTracker = () => {
   const addExerciseToTemplate = async (
     templateId: string, 
     exerciseId: string, 
-    options?: { targetSets?: number; targetReps?: number; targetWeight?: number }
+    options?: { targetSets?: number; targetReps?: number; targetWeight?: number; restSeconds?: number }
   ) => {
     if (!user) return;
     
@@ -434,10 +434,35 @@ export const useWorkoutTracker = () => {
         target_sets: options?.targetSets || 3,
         target_reps: options?.targetReps || 10,
         target_weight: options?.targetWeight || null,
+        rest_seconds: options?.restSeconds || 90,
       });
     
     if (error) {
       toast({ title: 'Error', description: 'Failed to add exercise', variant: 'destructive' });
+      return;
+    }
+    
+    await fetchTemplates();
+  };
+
+  // Update template exercise settings
+  const updateTemplateExercise = async (
+    templateExerciseId: string,
+    updates: { targetSets?: number; targetReps?: number; targetWeight?: number; restSeconds?: number }
+  ) => {
+    const updateData: any = {};
+    if (updates.targetSets !== undefined) updateData.target_sets = updates.targetSets;
+    if (updates.targetReps !== undefined) updateData.target_reps = updates.targetReps;
+    if (updates.targetWeight !== undefined) updateData.target_weight = updates.targetWeight;
+    if (updates.restSeconds !== undefined) updateData.rest_seconds = updates.restSeconds;
+
+    const { error } = await supabase
+      .from('template_exercises')
+      .update(updateData)
+      .eq('id', templateExerciseId);
+    
+    if (error) {
+      toast({ title: 'Error', description: 'Failed to update exercise', variant: 'destructive' });
       return;
     }
     
@@ -632,6 +657,7 @@ export const useWorkoutTracker = () => {
     cancelWorkout,
     createTemplate,
     addExerciseToTemplate,
+    updateTemplateExercise,
     removeExerciseFromTemplate,
     deleteTemplate,
     startWorkoutFromTemplate,

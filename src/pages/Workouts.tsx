@@ -42,6 +42,7 @@ const Workouts = () => {
     cancelWorkout,
     createTemplate,
     addExerciseToTemplate,
+    updateTemplateExercise,
     removeExerciseFromTemplate,
     deleteTemplate,
     startWorkoutFromTemplate,
@@ -533,20 +534,57 @@ const Workouts = () => {
                         <div className="space-y-2">
                           <p className="text-sm font-medium">Exercises in template:</p>
                           {editingTemplate.exercises.map((te) => (
-                            <div key={te.id} className="flex items-center justify-between p-2 bg-muted rounded-lg">
-                              <div>
-                                <p className="font-medium text-sm">{te.exercise.name}</p>
-                                <p className="text-xs text-muted-foreground">
-                                  {te.target_sets} sets × {te.target_reps} reps
-                                </p>
+                            <div key={te.id} className="p-3 bg-muted rounded-lg space-y-2">
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <p className="font-medium text-sm">{te.exercise.name}</p>
+                                </div>
+                                <Button 
+                                  size="icon" 
+                                  variant="ghost"
+                                  onClick={() => removeExerciseFromTemplate(te.id)}
+                                >
+                                  <Trash2 className="w-4 h-4 text-destructive" />
+                                </Button>
                               </div>
-                              <Button 
-                                size="icon" 
-                                variant="ghost"
-                                onClick={() => removeExerciseFromTemplate(te.id)}
-                              >
-                                <Trash2 className="w-4 h-4 text-destructive" />
-                              </Button>
+                              <div className="grid grid-cols-3 gap-2">
+                                <div>
+                                  <label className="text-xs text-muted-foreground">Sets</label>
+                                  <Input
+                                    type="number"
+                                    className="h-8"
+                                    value={te.target_sets || 3}
+                                    onChange={(e) => updateTemplateExercise(te.id, { targetSets: parseInt(e.target.value) || 3 })}
+                                    min={1}
+                                    max={20}
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-xs text-muted-foreground">Reps</label>
+                                  <Input
+                                    type="number"
+                                    className="h-8"
+                                    value={te.target_reps || 10}
+                                    onChange={(e) => updateTemplateExercise(te.id, { targetReps: parseInt(e.target.value) || 10 })}
+                                    min={1}
+                                    max={100}
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-xs text-muted-foreground flex items-center gap-1">
+                                    <Timer className="w-3 h-3" /> Rest (sec)
+                                  </label>
+                                  <Input
+                                    type="number"
+                                    className="h-8"
+                                    value={te.rest_seconds || 90}
+                                    onChange={(e) => updateTemplateExercise(te.id, { restSeconds: parseInt(e.target.value) || 90 })}
+                                    min={0}
+                                    max={600}
+                                    step={15}
+                                  />
+                                </div>
+                              </div>
                             </div>
                           ))}
                         </div>
@@ -647,8 +685,12 @@ const Workouts = () => {
                               {template.exercises.map((te) => (
                                 <div key={te.id} className="flex items-center justify-between text-sm">
                                   <span>{te.exercise.name}</span>
-                                  <span className="text-muted-foreground">
+                                  <span className="text-muted-foreground flex items-center gap-2">
                                     {te.target_sets} × {te.target_reps}
+                                    <span className="flex items-center gap-1 text-xs">
+                                      <Timer className="w-3 h-3" />
+                                      {te.rest_seconds || 90}s
+                                    </span>
                                   </span>
                                 </div>
                               ))}
