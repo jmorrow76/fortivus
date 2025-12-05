@@ -23,6 +23,7 @@ const BodyAnalysis = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,6 +56,7 @@ const BodyAnalysis = () => {
 
     setIsAnalyzing(true);
     setResult(null);
+    setErrorMessage(null);
 
     try {
       const response = await fetch(
@@ -79,7 +81,9 @@ const BodyAnalysis = () => {
       toast.success('Analysis complete!');
     } catch (error) {
       console.error('Analysis error:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to analyze image');
+      const message = error instanceof Error ? error.message : 'Failed to analyze image';
+      setErrorMessage(message);
+      toast.error(message);
     } finally {
       setIsAnalyzing(false);
     }
@@ -88,6 +92,7 @@ const BodyAnalysis = () => {
   const resetAnalysis = () => {
     setSelectedImage(null);
     setResult(null);
+    setErrorMessage(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -197,13 +202,32 @@ const BodyAnalysis = () => {
 
           {/* Results Section */}
           <div className="space-y-6">
-            {!result && !isAnalyzing && (
+            {!result && !isAnalyzing && !errorMessage && (
               <Card variant="default" className="h-full flex items-center justify-center min-h-[400px]">
                 <CardContent className="text-center py-12">
                   <Target className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
                   <p className="text-muted-foreground">
                     Upload a photo to receive your personalized analysis
                   </p>
+                </CardContent>
+              </Card>
+            )}
+
+            {errorMessage && !isAnalyzing && (
+              <Card variant="default" className="h-full flex items-center justify-center min-h-[400px] border-destructive/50">
+                <CardContent className="text-center py-12">
+                  <AlertCircle className="w-16 h-16 mx-auto mb-4 text-destructive/70" />
+                  <p className="text-destructive font-medium mb-2">Analysis Failed</p>
+                  <p className="text-muted-foreground text-sm max-w-sm mx-auto">
+                    {errorMessage}
+                  </p>
+                  <Button 
+                    variant="outline" 
+                    className="mt-4"
+                    onClick={resetAnalysis}
+                  >
+                    Try a Different Photo
+                  </Button>
                 </CardContent>
               </Card>
             )}
