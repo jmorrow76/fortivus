@@ -13,8 +13,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Textarea } from '@/components/ui/textarea';
 import { 
   Dumbbell, Play, History, Trophy, Plus, Search, 
-  Timer, Check, X, ChevronRight, Minus, Clock, FileText, Trash2, Save
+  Timer, Check, X, ChevronRight, Minus, Clock, FileText, Trash2, Save, TrendingUp
 } from 'lucide-react';
+import ExerciseProgressChart from '@/components/ExerciseProgressChart';
 import { Navigate } from 'react-router-dom';
 import { format, formatDistanceToNow } from 'date-fns';
 
@@ -413,7 +414,7 @@ const Workouts = () => {
           </Card>
 
           <Tabs defaultValue="history" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="history" className="flex items-center gap-2">
                 <History className="w-4 h-4" />
                 <span className="hidden sm:inline">History</span>
@@ -425,6 +426,10 @@ const Workouts = () => {
               <TabsTrigger value="exercises" className="flex items-center gap-2">
                 <Dumbbell className="w-4 h-4" />
                 <span className="hidden sm:inline">Exercises</span>
+              </TabsTrigger>
+              <TabsTrigger value="progress" className="flex items-center gap-2">
+                <TrendingUp className="w-4 h-4" />
+                <span className="hidden sm:inline">Progress</span>
               </TabsTrigger>
               <TabsTrigger value="records" className="flex items-center gap-2">
                 <Trophy className="w-4 h-4" />
@@ -713,6 +718,11 @@ const Workouts = () => {
                   ))}
                 </div>
               </div>
+            </TabsContent>
+
+            {/* Progress Tab */}
+            <TabsContent value="progress">
+              <ExerciseProgressChart />
             </TabsContent>
 
             {/* Records Tab */}
