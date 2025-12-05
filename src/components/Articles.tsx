@@ -1,10 +1,23 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Clock, ArrowRight, User, Loader2, Search, X } from "lucide-react";
+import { Clock, ArrowRight, User, Loader2, Search, X, History, TrendingUp } from "lucide-react";
+
+const RECENT_SEARCHES_KEY = "fortivus_recent_searches";
+const MAX_RECENT_SEARCHES = 5;
+
+const SUGGESTED_TERMS = [
+  "strength training",
+  "nutrition",
+  "recovery",
+  "sleep",
+  "testosterone",
+  "mobility",
+  "protein",
+];
 
 interface Article {
   id: string;
@@ -24,8 +37,60 @@ const Articles = () => {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const searchRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const isKnowledgeHubPage = location.pathname === "/knowledge";
+
+  // Load recent searches from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem(RECENT_SEARCHES_KEY);
+    if (saved) {
+      try {
+        setRecentSearches(JSON.parse(saved));
+      } catch {
+        setRecentSearches([]);
+      }
+    }
+  }, []);
+
+  // Handle click outside to close suggestions
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setIsSearchFocused(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const saveRecentSearch = (term: string) => {
+    if (!term.trim()) return;
+    const updated = [term, ...recentSearches.filter(s => s !== term)].slice(0, MAX_RECENT_SEARCHES);
+    setRecentSearches(updated);
+    localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(updated));
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      saveRecentSearch(searchQuery.trim());
+      setIsSearchFocused(false);
+    }
+  };
+
+  const handleSuggestionClick = (term: string) => {
+    setSearchQuery(term);
+    saveRecentSearch(term);
+    setIsSearchFocused(false);
+  };
+
+  const clearRecentSearches = () => {
+    setRecentSearches([]);
+    localStorage.removeItem(RECENT_SEARCHES_KEY);
+  };
 
   useEffect(() => {
     const fetchArticles = async () => {
@@ -147,23 +212,76 @@ const Articles = () => {
         {/* Search and Category Filter - Only on Knowledge Hub */}
         {isKnowledgeHubPage && (
           <div className="space-y-4 mb-10">
-            {/* Search Bar */}
-            <div className="relative max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Search articles..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 pr-10"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
-                  <X className="h-4 w-4" />
-                </button>
+            {/* Search Bar with Suggestions */}
+            <div ref={searchRef} className="relative max-w-md">
+              <form onSubmit={handleSearchSubmit}>
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
+                <Input
+                  type="text"
+                  placeholder="Search articles..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => setIsSearchFocused(true)}
+                  className="pl-10 pr-10"
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground z-10"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </form>
+              
+              {/* Suggestions Dropdown */}
+              {isSearchFocused && !searchQuery && (recentSearches.length > 0 || SUGGESTED_TERMS.length > 0) && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-lg z-50 overflow-hidden">
+                  {/* Recent Searches */}
+                  {recentSearches.length > 0 && (
+                    <div className="p-2">
+                      <div className="flex items-center justify-between px-2 py-1">
+                        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Recent</span>
+                        <button
+                          onClick={clearRecentSearches}
+                          className="text-xs text-muted-foreground hover:text-foreground"
+                        >
+                          Clear
+                        </button>
+                      </div>
+                      {recentSearches.map((term, index) => (
+                        <button
+                          key={`recent-${index}`}
+                          onClick={() => handleSuggestionClick(term)}
+                          className="w-full flex items-center gap-2 px-2 py-2 text-sm text-left hover:bg-secondary rounded-md transition-colors"
+                        >
+                          <History className="h-3.5 w-3.5 text-muted-foreground" />
+                          {term}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {/* Suggested Terms */}
+                  <div className="p-2 border-t border-border">
+                    <div className="px-2 py-1">
+                      <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Suggested</span>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5 px-2 py-1">
+                      {SUGGESTED_TERMS.map((term) => (
+                        <button
+                          key={term}
+                          onClick={() => handleSuggestionClick(term)}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 text-xs bg-secondary hover:bg-secondary/80 rounded-full transition-colors"
+                        >
+                          <TrendingUp className="h-3 w-3 text-muted-foreground" />
+                          {term}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
             
