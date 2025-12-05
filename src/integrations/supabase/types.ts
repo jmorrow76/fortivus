@@ -720,7 +720,11 @@ export type Database = {
       running_goals: {
         Row: {
           created_at: string
+          current_streak: number
           id: string
+          last_run_date: string | null
+          longest_streak: number
+          streak_type: string
           updated_at: string
           user_id: string
           weekly_distance_km: number
@@ -728,7 +732,11 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          current_streak?: number
           id?: string
+          last_run_date?: string | null
+          longest_streak?: number
+          streak_type?: string
           updated_at?: string
           user_id: string
           weekly_distance_km?: number
@@ -736,7 +744,11 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          current_streak?: number
           id?: string
+          last_run_date?: string | null
+          longest_streak?: number
+          streak_type?: string
           updated_at?: string
           user_id?: string
           weekly_distance_km?: number
