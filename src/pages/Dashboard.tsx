@@ -197,6 +197,22 @@ export default function Dashboard() {
             </div>
           </div>
 
+          {/* Quick Actions */}
+          <div className="flex flex-wrap gap-3 mb-8">
+            <Button asChild size="lg" className="flex-1 sm:flex-none">
+              <Link to="/workouts">
+                <Dumbbell className="h-5 w-5 mr-2" />
+                Log Workout
+              </Link>
+            </Button>
+            <Button variant="outline" asChild size="lg" className="flex-1 sm:flex-none">
+              <Link to="/progress">
+                <Camera className="h-5 w-5 mr-2" />
+                Upload Progress Photo
+              </Link>
+            </Button>
+          </div>
+
           {/* Quick Stats Row */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <Card className="bg-gradient-to-br from-primary/10 to-primary/5">
