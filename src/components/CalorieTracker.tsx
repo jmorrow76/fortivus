@@ -12,7 +12,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { 
   Plus, Search, Trash2, CalendarIcon, Apple, Beef, 
-  Cookie, Droplets, ChevronLeft, ChevronRight, Flame, CheckCircle
+  Cookie, Droplets, ChevronLeft, ChevronRight, Flame, CheckCircle, Zap
 } from 'lucide-react';
 import { useCalorieTracker, Food, MealType, MEAL_TYPES } from '@/hooks/useCalorieTracker';
 import { format } from 'date-fns';
@@ -27,6 +27,7 @@ export function CalorieTracker() {
   const {
     foods,
     mealLogs,
+    frequentFoods,
     loading,
     selectedDate,
     setSelectedDate,
@@ -99,6 +100,10 @@ export function CalorieTracker() {
       setIsAddingFood(false);
       setSelectedFood(food);
     }
+  };
+
+  const handleQuickAdd = async (food: Food) => {
+    await logMeal(food.id, 1, 'snack');
   };
 
   const changeDate = (days: number) => {
@@ -214,6 +219,35 @@ export function CalorieTracker() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Quick Add - Frequent Foods */}
+      {frequentFoods.length > 0 && (
+        <Card>
+          <CardHeader className="py-3 px-4">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <Zap className="w-4 h-4 text-amber-500" />
+              Quick Add
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0 px-4 pb-3">
+            <div className="flex flex-wrap gap-2">
+              {frequentFoods.map((food) => (
+                <Button
+                  key={food.id}
+                  variant="outline"
+                  size="sm"
+                  className="text-xs h-auto py-1.5 px-2.5"
+                  onClick={() => handleQuickAdd(food)}
+                >
+                  <Plus className="w-3 h-3 mr-1" />
+                  {food.name}
+                  <span className="text-muted-foreground ml-1">({food.calories})</span>
+                </Button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Log Food Dialog */}
       <Dialog open={isLogDialogOpen} onOpenChange={setIsLogDialogOpen}>
