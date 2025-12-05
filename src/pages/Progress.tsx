@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -30,6 +30,8 @@ const Progress = () => {
   const { user, loading: authLoading, subscription } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
+  const defaultTab = searchParams.get('tab') || 'workouts';
 
   const [photos, setPhotos] = useState<ProgressPhoto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -226,7 +228,7 @@ const Progress = () => {
             <div className="flex items-center gap-4">
               <Button
                 variant="ghost"
-                onClick={() => navigate("/")}
+                onClick={() => navigate("/dashboard")}
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back
@@ -312,37 +314,41 @@ const Progress = () => {
             </Dialog>
           </div>
 
-          {photos.length === 0 ? (
-            <Card className="shadow-card">
-              <CardContent className="py-16 text-center">
-                <div className="text-muted-foreground">
-                  <p className="text-lg mb-2">No progress photos yet</p>
-                  <p className="text-sm">Start documenting your fitness journey by adding your first photo.</p>
-                </div>
-              </CardContent>
-            </Card>
-          ) : (
-            <Tabs defaultValue="grid" className="w-full">
-              <TabsList className="mb-6">
-                <TabsTrigger value="grid" className="gap-2">
-                  <LayoutGrid className="h-4 w-4" />
-                  Gallery
-                </TabsTrigger>
-                <TabsTrigger value="compare" className="gap-2">
-                  <Columns className="h-4 w-4" />
-                  Compare
-                </TabsTrigger>
-                <TabsTrigger value="chart" className="gap-2">
-                  <LineChart className="h-4 w-4" />
-                  Chart
-                </TabsTrigger>
-                <TabsTrigger value="workouts" className="gap-2">
-                  <Dumbbell className="h-4 w-4" />
-                  Workouts
-                </TabsTrigger>
-              </TabsList>
+          <Tabs defaultValue={defaultTab} className="w-full">
+            <TabsList className="mb-6">
+              <TabsTrigger value="workouts" className="gap-2">
+                <Dumbbell className="h-4 w-4" />
+                Workouts
+              </TabsTrigger>
+              <TabsTrigger value="grid" className="gap-2">
+                <LayoutGrid className="h-4 w-4" />
+                Gallery
+              </TabsTrigger>
+              <TabsTrigger value="compare" className="gap-2">
+                <Columns className="h-4 w-4" />
+                Compare
+              </TabsTrigger>
+              <TabsTrigger value="chart" className="gap-2">
+                <LineChart className="h-4 w-4" />
+                Weight
+              </TabsTrigger>
+            </TabsList>
 
-              <TabsContent value="grid">
+            <TabsContent value="workouts">
+              <WorkoutLog />
+            </TabsContent>
+
+            <TabsContent value="grid">
+              {photos.length === 0 ? (
+                <Card className="shadow-card">
+                  <CardContent className="py-16 text-center">
+                    <div className="text-muted-foreground">
+                      <p className="text-lg mb-2">No progress photos yet</p>
+                      <p className="text-sm">Start documenting your fitness journey by adding your first photo.</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {photos.map((photo) => (
                     <Card key={photo.id} className="shadow-card overflow-hidden group">
@@ -386,21 +392,17 @@ const Progress = () => {
                     </Card>
                   ))}
                 </div>
-              </TabsContent>
+              )}
+            </TabsContent>
 
-              <TabsContent value="compare">
-                <PhotoComparison photos={photos} />
-              </TabsContent>
+            <TabsContent value="compare">
+              <PhotoComparison photos={photos} />
+            </TabsContent>
 
-              <TabsContent value="chart">
-                <WeightChart photos={photos} />
-              </TabsContent>
-
-              <TabsContent value="workouts">
-                <WorkoutLog />
-              </TabsContent>
-            </Tabs>
-          )}
+            <TabsContent value="chart">
+              <WeightChart photos={photos} />
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
     </div>
