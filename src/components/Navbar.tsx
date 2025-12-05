@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, LogOut, Settings, LayoutDashboard, Shield, Home, MessageCircle } from "lucide-react";
+import { Menu, X, LogOut, Settings, LayoutDashboard, Shield, Home, Crown } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useAdmin } from "@/hooks/useAdmin";
 
@@ -52,9 +52,12 @@ const Navbar = () => {
               <Link
                 key={link.name}
                 to={link.href}
-                className="text-xs font-medium tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-200"
+                className="text-xs font-medium tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-200 flex items-center gap-1"
               >
                 {link.name}
+                {link.name === "AI Coach" && (
+                  <Crown className="h-3 w-3 text-amber-500" />
+                )}
               </Link>
             ))}
           </div>
@@ -119,10 +122,13 @@ const Navbar = () => {
                 <Link
                   key={link.name}
                   to={link.href}
-                  className="text-xs font-medium tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors py-2"
+                  className="text-xs font-medium tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors py-2 flex items-center gap-1"
                   onClick={() => setIsOpen(false)}
                 >
                   {link.name}
+                  {link.name === "AI Coach" && (
+                    <Crown className="h-3 w-3 text-amber-500" />
+                  )}
                 </Link>
               ))}
               <div className="flex flex-col gap-3 pt-4 border-t border-border mt-2">
