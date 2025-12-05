@@ -73,6 +73,12 @@ export interface ActiveWorkoutExercise {
   sets: ExerciseSet[];
 }
 
+export interface PRCelebrationData {
+  exerciseName: string;
+  weight: number;
+  reps: number;
+}
+
 export const useWorkoutTracker = () => {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -84,6 +90,7 @@ export const useWorkoutTracker = () => {
   const [activeSession, setActiveSession] = useState<WorkoutSession | null>(null);
   const [activeExercises, setActiveExercises] = useState<ActiveWorkoutExercise[]>([]);
   const [loading, setLoading] = useState(false);
+  const [prCelebration, setPrCelebration] = useState<PRCelebrationData | null>(null);
 
   // Fetch all exercises
   const fetchExercises = useCallback(async () => {
@@ -304,6 +311,11 @@ export const useWorkoutTracker = () => {
     );
     
     if (!existingPR || weight > existingPR.value) {
+      // Find exercise name
+      const exerciseName = exercises.find(e => e.id === exerciseId)?.name || 
+        activeExercises.find(ae => ae.exercise.id === exerciseId)?.exercise.name || 
+        'Exercise';
+      
       const { data, error } = await supabase
         .from('personal_records')
         .upsert({
@@ -319,13 +331,20 @@ export const useWorkoutTracker = () => {
         .single();
       
       if (!error && data) {
-        toast({ title: '🏆 New PR!', description: `${weight} lbs for ${reps} reps!` });
+        // Trigger celebration animation
+        setPrCelebration({ exerciseName, weight, reps });
+        
         setPersonalRecords(prev => {
           const filtered = prev.filter(pr => !(pr.exercise_id === exerciseId && pr.record_type === 'weight'));
           return [...filtered, data];
         });
       }
     }
+  };
+  
+  // Clear PR celebration
+  const clearPrCelebration = () => {
+    setPrCelebration(null);
   };
 
   // Delete a set
@@ -667,5 +686,7 @@ export const useWorkoutTracker = () => {
     fetchExercises,
     fetchTemplates,
     fetchWorkoutHistory,
+    prCelebration,
+    clearPrCelebration,
   };
 };
