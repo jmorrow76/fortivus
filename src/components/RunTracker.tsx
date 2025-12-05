@@ -2,14 +2,20 @@ import { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Polyline, Marker, useMap } from 'react-leaflet';
 import { Icon } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Play, Pause, Square, MapPin, Clock, Footprints, Flame, TrendingUp } from 'lucide-react';
+import { Play, Pause, Square, MapPin, Clock, Footprints, Flame, TrendingUp, Target, Settings } from 'lucide-react';
 import { useRunTracker } from '@/hooks/useRunTracker';
-import { format } from 'date-fns';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { format, startOfWeek, endOfWeek, isWithinInterval } from 'date-fns';
 
 // Fix for default marker icon
 const defaultIcon = new Icon({
@@ -59,6 +65,8 @@ const formatDistance = (meters: number): string => {
 };
 
 export const RunTracker = () => {
+  const { user } = useAuth();
+  const { toast } = useToast();
   const {
     isTracking,
     activeRun,
@@ -74,8 +82,81 @@ export const RunTracker = () => {
   } = useRunTracker();
 
   const [showStopDialog, setShowStopDialog] = useState(false);
+  const [showGoalDialog, setShowGoalDialog] = useState(false);
   const [notes, setNotes] = useState('');
   const [showHistory, setShowHistory] = useState(false);
+  
+  // Weekly goal state
+  const [weeklyGoal, setWeeklyGoal] = useState<{ weekly_distance_km: number; weekly_runs: number } | null>(null);
+  const [goalDistanceInput, setGoalDistanceInput] = useState('10');
+  const [goalRunsInput, setGoalRunsInput] = useState('3');
+  const [savingGoal, setSavingGoal] = useState(false);
+
+  // Fetch weekly goal
+  useEffect(() => {
+    if (user) {
+      fetchWeeklyGoal();
+    }
+  }, [user]);
+
+  const fetchWeeklyGoal = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from('running_goals')
+      .select('weekly_distance_km, weekly_runs')
+      .eq('user_id', user.id)
+      .maybeSingle();
+    
+    if (data) {
+      setWeeklyGoal(data);
+      setGoalDistanceInput(data.weekly_distance_km.toString());
+      setGoalRunsInput(data.weekly_runs.toString());
+    }
+  };
+
+  const saveWeeklyGoal = async () => {
+    if (!user) return;
+    setSavingGoal(true);
+    
+    const goalData = {
+      user_id: user.id,
+      weekly_distance_km: parseFloat(goalDistanceInput) || 10,
+      weekly_runs: parseInt(goalRunsInput) || 3,
+      updated_at: new Date().toISOString(),
+    };
+
+    const { error } = await supabase
+      .from('running_goals')
+      .upsert(goalData, { onConflict: 'user_id' });
+
+    if (error) {
+      toast({ title: 'Error', description: 'Failed to save goal', variant: 'destructive' });
+    } else {
+      setWeeklyGoal({ weekly_distance_km: goalData.weekly_distance_km, weekly_runs: goalData.weekly_runs });
+      setShowGoalDialog(false);
+      toast({ title: 'Goal saved!', description: 'Your weekly running goal has been updated.' });
+    }
+    setSavingGoal(false);
+  };
+
+  // Calculate weekly progress
+  const getWeeklyProgress = () => {
+    const now = new Date();
+    const weekStart = startOfWeek(now, { weekStartsOn: 1 });
+    const weekEnd = endOfWeek(now, { weekStartsOn: 1 });
+
+    const thisWeekRuns = runHistory.filter(run => {
+      const runDate = new Date(run.started_at);
+      return isWithinInterval(runDate, { start: weekStart, end: weekEnd });
+    });
+
+    const totalDistanceKm = thisWeekRuns.reduce((sum, r) => sum + (r.distance_meters || 0), 0) / 1000;
+    const totalRuns = thisWeekRuns.length;
+
+    return { totalDistanceKm, totalRuns };
+  };
+
+  const weeklyProgress = getWeeklyProgress();
 
   const handleStop = async () => {
     await stopRun(notes);
@@ -95,6 +176,57 @@ export const RunTracker = () => {
         <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive">
           {error}
         </div>
+      )}
+
+      {/* Weekly Goal Progress */}
+      {!isTracking && (
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Target className="h-5 w-5" />
+                Weekly Goal
+              </CardTitle>
+              <CardDescription>
+                {weeklyGoal 
+                  ? `${weeklyGoal.weekly_runs} runs • ${weeklyGoal.weekly_distance_km} km this week`
+                  : 'Set a weekly running goal to stay motivated'}
+              </CardDescription>
+            </div>
+            <Button variant="ghost" size="icon" onClick={() => setShowGoalDialog(true)}>
+              <Settings className="h-4 w-4" />
+            </Button>
+          </CardHeader>
+          <CardContent>
+            {weeklyGoal ? (
+              <div className="space-y-4">
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span>Distance: {weeklyProgress.totalDistanceKm.toFixed(1)} / {weeklyGoal.weekly_distance_km} km</span>
+                    <span>{Math.min(100, Math.round((weeklyProgress.totalDistanceKm / weeklyGoal.weekly_distance_km) * 100))}%</span>
+                  </div>
+                  <Progress value={Math.min(100, (weeklyProgress.totalDistanceKm / weeklyGoal.weekly_distance_km) * 100)} className="h-2" />
+                </div>
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span>Runs: {weeklyProgress.totalRuns} / {weeklyGoal.weekly_runs}</span>
+                    <span>{Math.min(100, Math.round((weeklyProgress.totalRuns / weeklyGoal.weekly_runs) * 100))}%</span>
+                  </div>
+                  <Progress value={Math.min(100, (weeklyProgress.totalRuns / weeklyGoal.weekly_runs) * 100)} className="h-2" />
+                </div>
+                {weeklyProgress.totalDistanceKm >= weeklyGoal.weekly_distance_km && weeklyProgress.totalRuns >= weeklyGoal.weekly_runs && (
+                  <div className="p-3 bg-green-500/10 border border-green-500/20 rounded-lg text-green-600 text-center text-sm">
+                    🎉 Weekly goal achieved! Great work!
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Button variant="outline" className="w-full" onClick={() => setShowGoalDialog(true)}>
+                Set Weekly Goal
+              </Button>
+            )}
+          </CardContent>
+        </Card>
       )}
 
       {/* Active Run Stats */}
@@ -276,6 +408,47 @@ export const RunTracker = () => {
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowStopDialog(false)}>Cancel</Button>
             <Button onClick={handleStop}>Save Run</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Goal Settings Dialog */}
+      <Dialog open={showGoalDialog} onOpenChange={setShowGoalDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Set Weekly Running Goal</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="goal-distance">Weekly Distance Goal (km)</Label>
+              <Input
+                id="goal-distance"
+                type="number"
+                min="1"
+                max="200"
+                value={goalDistanceInput}
+                onChange={(e) => setGoalDistanceInput(e.target.value)}
+                placeholder="10"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="goal-runs">Weekly Runs Goal</Label>
+              <Input
+                id="goal-runs"
+                type="number"
+                min="1"
+                max="14"
+                value={goalRunsInput}
+                onChange={(e) => setGoalRunsInput(e.target.value)}
+                placeholder="3"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowGoalDialog(false)}>Cancel</Button>
+            <Button onClick={saveWeeklyGoal} disabled={savingGoal}>
+              {savingGoal ? 'Saving...' : 'Save Goal'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

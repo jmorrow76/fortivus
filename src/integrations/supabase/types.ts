@@ -717,6 +717,33 @@ export type Database = {
         }
         Relationships: []
       }
+      running_goals: {
+        Row: {
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+          weekly_distance_km: number
+          weekly_runs: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+          weekly_distance_km?: number
+          weekly_runs?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+          weekly_distance_km?: number
+          weekly_runs?: number
+        }
+        Relationships: []
+      }
       running_sessions: {
         Row: {
           avg_pace_seconds_per_km: number | null
