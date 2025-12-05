@@ -4,6 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Menu, X, LogOut, Settings, LayoutDashboard, Shield, Home, Crown } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useAdmin } from "@/hooks/useAdmin";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -48,18 +54,27 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-6">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                to={link.href}
-                className="text-xs font-medium tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-200 flex items-center gap-1"
-              >
-                {link.name}
-                {["AI Coach", "Workouts", "Run Tracker"].includes(link.name) && (
-                  <Crown className="h-3 w-3 text-amber-500" />
-                )}
-              </Link>
-            ))}
+            <TooltipProvider>
+              {navLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  to={link.href}
+                  className="text-xs font-medium tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-200 flex items-center gap-1"
+                >
+                  {link.name}
+                  {["AI Coach", "Workouts", "Run Tracker"].includes(link.name) && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Crown className="h-3 w-3 text-amber-500" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Elite Feature</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                </Link>
+              ))}
+            </TooltipProvider>
           </div>
 
           {/* Desktop CTA */}
@@ -118,6 +133,7 @@ const Navbar = () => {
         {isOpen && (
           <div className="lg:hidden py-6 border-t border-border animate-fade-in">
             <div className="flex flex-col gap-4">
+            <TooltipProvider>
               {mobileNavLinks.map((link) => (
                 <Link
                   key={link.name}
@@ -127,10 +143,18 @@ const Navbar = () => {
                 >
                   {link.name}
                   {["AI Coach", "Workouts", "Run Tracker"].includes(link.name) && (
-                    <Crown className="h-3 w-3 text-amber-500" />
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Crown className="h-3 w-3 text-amber-500" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Elite Feature</p>
+                      </TooltipContent>
+                    </Tooltip>
                   )}
                 </Link>
               ))}
+            </TooltipProvider>
               <div className="flex flex-col gap-3 pt-4 border-t border-border mt-2">
                 {user ? (
                   <>
