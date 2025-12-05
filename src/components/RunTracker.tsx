@@ -24,6 +24,7 @@ interface Challenge {
   target_count: number;
   xp_reward: number;
   reset_type: string | null;
+  category: string;
 }
 
 interface UserChallenge {
@@ -129,19 +130,40 @@ export const RunTracker = () => {
   const fetchRunningChallenges = async () => {
     if (!user) return;
     
-    const [{ data: challenges }, { data: joined }] = await Promise.all([
-      supabase.from('challenges').select('*').eq('category', 'running').eq('is_active', true),
-      supabase.from('user_challenges').select('*, challenge:challenges(*)').eq('user_id', user.id),
-    ]);
-    
-    if (challenges) setRunningChallenges(challenges);
-    if (joined) {
-      setUserChallenges(joined.filter(uc => uc.challenge?.category === 'running').map(uc => ({
-        challenge_id: uc.challenge_id,
-        progress: uc.progress,
-        is_completed: uc.is_completed,
-        challenge: uc.challenge as Challenge,
-      })));
+    try {
+      const [{ data: challenges, error: challengesError }, { data: joined, error: joinedError }] = await Promise.all([
+        supabase.from('challenges').select('*').eq('category', 'running').eq('is_active', true),
+        supabase.from('user_challenges').select('*, challenge:challenges(*)').eq('user_id', user.id),
+      ]);
+      
+      if (challengesError) {
+        console.error('Error fetching challenges:', challengesError);
+        return;
+      }
+      
+      if (challenges) setRunningChallenges(challenges);
+      
+      if (joinedError) {
+        console.error('Error fetching user challenges:', joinedError);
+        return;
+      }
+      
+      if (joined) {
+        const runningUserChallenges = joined
+          .filter(uc => {
+            const challenge = uc.challenge as Challenge | null;
+            return challenge?.category === 'running';
+          })
+          .map(uc => ({
+            challenge_id: uc.challenge_id,
+            progress: uc.progress,
+            is_completed: uc.is_completed,
+            challenge: uc.challenge as Challenge,
+          }));
+        setUserChallenges(runningUserChallenges);
+      }
+    } catch (err) {
+      console.error('Error in fetchRunningChallenges:', err);
     }
   };
 
