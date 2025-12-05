@@ -4,7 +4,7 @@ import {
   Loader2, Trophy, Flame, Target, Dumbbell, Calendar, 
   TrendingUp, Lock, Zap, Settings,
   Crown, Medal, ChevronRight, Users, Camera,
-  Brain, Sparkles, MapPin, Utensils
+  Brain, Sparkles, MapPin, Utensils, MessageCircle
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useGamification } from '@/hooks/useGamification';
@@ -504,6 +504,34 @@ export default function Dashboard() {
                       </Button>
                     </div>
                   )}
+                </CardContent>
+              </Card>
+
+              {/* AI Coaching - Premium Feature */}
+              <Card className={!subscription.subscribed ? 'relative overflow-hidden' : ''}>
+                {!subscription.subscribed && (
+                  <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
+                    <Lock className="h-6 w-6 text-muted-foreground mb-2" />
+                    <p className="text-sm text-muted-foreground mb-2">Elite Feature</p>
+                    <Button size="sm" asChild>
+                      <a href="/#pricing">Upgrade</a>
+                    </Button>
+                  </div>
+                )}
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <MessageCircle className="h-4 w-4" />
+                    1-on-1 AI Coach
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center">
+                    <MessageCircle className="h-8 w-8 mx-auto mb-2 text-primary/50" />
+                    <p className="text-sm text-muted-foreground mb-2">Get personalized coaching advice</p>
+                    <Button size="sm" asChild className="w-full">
+                      <Link to="/coaching">Chat Now</Link>
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
 

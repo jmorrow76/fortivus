@@ -29,3 +29,6 @@ verify_jwt = false
 
 [functions.simulate-community-activity]
 verify_jwt = false
+
+[functions.ai-coaching]
+verify_jwt = false
