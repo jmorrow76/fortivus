@@ -4,7 +4,7 @@ import {
   Loader2, Trophy, Flame, Target, Dumbbell, Calendar, 
   TrendingUp, Heart, Footprints, Moon, Zap, Lock, 
   Crown, Medal, ChevronRight, Activity, Users, Camera,
-  Brain, Sparkles, Apple
+  Brain, Sparkles, Apple, MapPin
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useGamification } from '@/hooks/useGamification';
@@ -42,6 +42,13 @@ interface MoodCheckin {
   check_in_date: string;
 }
 
+interface RunningStats {
+  totalRuns: number;
+  totalDistanceKm: number;
+  totalDurationMinutes: number;
+  runningBadges: number;
+}
+
 export default function Dashboard() {
   const navigate = useNavigate();
   const { user, loading: authLoading, subscription } = useAuth();
@@ -54,6 +61,7 @@ export default function Dashboard() {
   const [personalPlan, setPersonalPlan] = useState<PersonalPlan | null>(null);
   const [latestCheckin, setLatestCheckin] = useState<MoodCheckin | null>(null);
   const [progressPhotos, setProgressPhotos] = useState<number>(0);
+  const [runningStats, setRunningStats] = useState<RunningStats>({ totalRuns: 0, totalDistanceKm: 0, totalDurationMinutes: 0, runningBadges: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -72,18 +80,35 @@ export default function Dashboard() {
     if (!user) return;
 
     try {
-      const [profileRes, leaderboardRes, planRes, checkinRes, photosRes] = await Promise.all([
+      const [profileRes, leaderboardRes, planRes, checkinRes, photosRes, runsRes, runningBadgesRes] = await Promise.all([
         supabase.from('profiles').select('display_name, avatar_url').eq('user_id', user.id).maybeSingle(),
         supabase.from('leaderboard_view').select('*').order('total_xp', { ascending: false }),
         supabase.from('personal_plans').select('id, goals, created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(1).maybeSingle(),
         supabase.from('mood_checkins').select('id, mood_level, energy_level, check_in_date').eq('user_id', user.id).order('check_in_date', { ascending: false }).limit(1).maybeSingle(),
         supabase.from('progress_photos').select('id', { count: 'exact' }).eq('user_id', user.id),
+        supabase.from('running_sessions').select('distance_meters, duration_seconds').eq('user_id', user.id),
+        supabase.from('user_badges').select('badge:badges(requirement_type)').eq('user_id', user.id),
       ]);
 
       if (profileRes.data) setProfile(profileRes.data);
       if (planRes.data) setPersonalPlan(planRes.data);
       if (checkinRes.data) setLatestCheckin(checkinRes.data);
       if (photosRes.count !== null) setProgressPhotos(photosRes.count);
+
+      // Calculate running stats
+      if (runsRes.data) {
+        const totalRuns = runsRes.data.length;
+        const totalDistanceKm = runsRes.data.reduce((sum, r) => sum + (r.distance_meters || 0), 0) / 1000;
+        const totalDurationMinutes = runsRes.data.reduce((sum, r) => sum + (r.duration_seconds || 0), 0) / 60;
+        
+        // Count running-related badges
+        const runningBadgeTypes = ['runs_completed', 'total_distance_km', 'pace_under_6', 'run_duration_30', 'single_run_5km'];
+        const runningBadges = (runningBadgesRes.data || []).filter((ub: any) => 
+          runningBadgeTypes.includes(ub.badge?.requirement_type)
+        ).length;
+
+        setRunningStats({ totalRuns, totalDistanceKm, totalDurationMinutes, runningBadges });
+      }
 
       // Calculate leaderboard position
       if (leaderboardRes.data) {
@@ -262,6 +287,49 @@ export default function Dashboard() {
                           </span>
                         </div>
                       ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Running Stats */}
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <MapPin className="h-5 w-5" />
+                      Running Stats
+                    </CardTitle>
+                    <CardDescription>Your running achievements</CardDescription>
+                  </div>
+                  <Button variant="ghost" size="sm" asChild>
+                    <Link to="/running" className="flex items-center gap-1">
+                      Track Run <ChevronRight className="h-4 w-4" />
+                    </Link>
+                  </Button>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-4 gap-4">
+                    <div className="text-center p-4 bg-muted rounded-lg">
+                      <p className="text-3xl font-bold text-primary">{runningStats.totalRuns}</p>
+                      <p className="text-sm text-muted-foreground">Total Runs</p>
+                    </div>
+                    <div className="text-center p-4 bg-muted rounded-lg">
+                      <p className="text-3xl font-bold text-primary">{runningStats.totalDistanceKm.toFixed(1)}</p>
+                      <p className="text-sm text-muted-foreground">Kilometers</p>
+                    </div>
+                    <div className="text-center p-4 bg-muted rounded-lg">
+                      <p className="text-3xl font-bold text-primary">{Math.round(runningStats.totalDurationMinutes)}</p>
+                      <p className="text-sm text-muted-foreground">Minutes</p>
+                    </div>
+                    <div className="text-center p-4 bg-muted rounded-lg">
+                      <p className="text-3xl font-bold text-primary">{runningStats.runningBadges}</p>
+                      <p className="text-sm text-muted-foreground">Badges</p>
+                    </div>
+                  </div>
+                  {runningStats.totalRuns === 0 && (
+                    <div className="mt-4 text-center text-muted-foreground">
+                      <p className="text-sm">No runs yet. Start tracking to earn running badges!</p>
                     </div>
                   )}
                 </CardContent>
