@@ -11,6 +11,7 @@ const Navbar = () => {
   const { isAdmin } = useAdmin();
 
   const navLinks = [
+    { name: "Knowledge Hub", href: "/knowledge", isPage: true },
     { name: "Forum", href: "/forum", isPage: true },
     { name: "Check-in", href: "/checkin", isPage: true },
     { name: "Community", href: "/community", isPage: true },
@@ -20,6 +21,7 @@ const Navbar = () => {
   ];
 
   const mobileNavLinks = [
+    { name: "Knowledge Hub", href: "/knowledge", isPage: true },
     { name: "Forum", href: "/forum", isPage: true },
     { name: "Check-in", href: "/checkin", isPage: true },
     { name: "Community", href: "/community", isPage: true },
