@@ -15,6 +15,7 @@ const Navbar = () => {
     { name: "Check-in", href: "/checkin", isPage: true },
     { name: "Community", href: "/community", isPage: true },
     { name: "Supplements", href: "/supplements", isPage: true },
+    { name: "Gear", href: "/gear", isPage: true },
     { name: "Pricing", href: "/pricing", isPage: true },
   ];
 
@@ -23,6 +24,7 @@ const Navbar = () => {
     { name: "Check-in", href: "/checkin", isPage: true },
     { name: "Community", href: "/community", isPage: true },
     { name: "Supplements", href: "/supplements", isPage: true },
+    { name: "Gear", href: "/gear", isPage: true },
     { name: "Pricing", href: "/pricing", isPage: true },
   ];
 
