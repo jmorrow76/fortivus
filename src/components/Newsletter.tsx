@@ -9,13 +9,40 @@ const Newsletter = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) {
+    if (!email) return;
+
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      
+      const { error } = await supabase
+        .from("newsletter_subscribers")
+        .insert({ email });
+
+      if (error) {
+        if (error.code === "23505") {
+          toast({
+            title: "Already subscribed!",
+            description: "You're already on our list. Stay tuned!",
+          });
+        } else {
+          throw error;
+        }
+      } else {
+        toast({
+          title: "Welcome to Fortivus!",
+          description: "Check your inbox for your first newsletter.",
+        });
+      }
+      
       setIsSubmitted(true);
+    } catch (error) {
+      console.error("Newsletter signup error:", error);
       toast({
-        title: "Welcome to Fortivus!",
-        description: "Check your inbox for your first newsletter.",
+        title: "Something went wrong",
+        description: "Please try again later.",
+        variant: "destructive",
       });
     }
   };

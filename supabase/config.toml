@@ -32,3 +32,18 @@ verify_jwt = false
 
 [functions.ai-coaching]
 verify_jwt = false
+
+[functions.generate-article]
+verify_jwt = false
+
+[functions.send-weekly-newsletter]
+verify_jwt = false
+
+[functions.generate-personal-plan]
+verify_jwt = false
+
+[functions.generate-workout-recommendation]
+verify_jwt = false
+
+[functions.moderate-content]
+verify_jwt = false
