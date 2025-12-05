@@ -1202,6 +1202,19 @@ export type Database = {
         }
         Relationships: []
       }
+      running_leaderboard_view: {
+        Row: {
+          avatar_url: string | null
+          display_name: string | null
+          total_distance_meters: number | null
+          total_runs: number | null
+          user_id: string | null
+          weekly_distance_meters: number | null
+          weekly_duration_seconds: number | null
+          weekly_runs: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {

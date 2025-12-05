@@ -12,6 +12,7 @@ import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Play, Pause, Square, MapPin, Clock, Footprints, Flame, TrendingUp, Target, Settings, Trophy, Plus } from 'lucide-react';
 import { useRunTracker } from '@/hooks/useRunTracker';
+import { RunningLeaderboard } from '@/components/RunningLeaderboard';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -438,6 +439,9 @@ export const RunTracker = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Running Leaderboard */}
+      {!isTracking && <RunningLeaderboard />}
 
       {/* Active Run Stats */}
       {isTracking && activeRun && (
