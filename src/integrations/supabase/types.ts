@@ -478,6 +478,45 @@ export type Database = {
         }
         Relationships: []
       }
+      social_connections: {
+        Row: {
+          access_token: string | null
+          auto_post_badges: boolean
+          auto_post_progress: boolean
+          auto_post_workouts: boolean
+          connected_at: string
+          id: string
+          platform: string
+          platform_username: string | null
+          refresh_token: string | null
+          user_id: string
+        }
+        Insert: {
+          access_token?: string | null
+          auto_post_badges?: boolean
+          auto_post_progress?: boolean
+          auto_post_workouts?: boolean
+          connected_at?: string
+          id?: string
+          platform: string
+          platform_username?: string | null
+          refresh_token?: string | null
+          user_id: string
+        }
+        Update: {
+          access_token?: string | null
+          auto_post_badges?: boolean
+          auto_post_progress?: boolean
+          auto_post_workouts?: boolean
+          connected_at?: string
+          id?: string
+          platform?: string
+          platform_username?: string | null
+          refresh_token?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       subscription_grants: {
         Row: {
           expires_at: string | null
