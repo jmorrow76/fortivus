@@ -12,6 +12,7 @@ import { useWorkoutLog } from '@/hooks/useWorkoutLog';
 import { useHealthData } from '@/hooks/useHealthData';
 import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
+import { SocialConnections } from '@/components/SocialConnections';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -542,6 +543,9 @@ export default function Dashboard() {
                   </Button>
                 </CardContent>
               </Card>
+
+              {/* Social Connections */}
+              <SocialConnections />
 
               {/* Recent Badges */}
               <Card>
