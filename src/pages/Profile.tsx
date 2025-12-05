@@ -198,49 +198,6 @@ const Profile = () => {
             Back to Home
           </Button>
 
-          {/* Health Data Section */}
-          <div className="mb-6">
-            {isElite ? (
-              <HealthDashboard />
-            ) : (
-              <Card className="border-dashed relative overflow-hidden">
-                <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
-                  <Crown className="h-8 w-8 text-accent mb-2" />
-                  <p className="font-heading font-semibold text-foreground mb-1">Elite Feature</p>
-                  <p className="text-sm text-muted-foreground mb-3">Sync your wearable health data</p>
-                  <Button size="sm" onClick={() => navigate("/#pricing")}>
-                    Upgrade to Elite
-                  </Button>
-                </div>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-muted-foreground">
-                    <Settings className="h-5 w-5" />
-                    Wearable Health Data
-                  </CardTitle>
-                  <CardDescription>
-                    Connect Apple Health or Google Fit
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-3 gap-4 opacity-50">
-                    <div className="p-3 rounded-lg bg-secondary/30 text-center">
-                      <div className="font-bold">--</div>
-                      <div className="text-xs text-muted-foreground">Steps</div>
-                    </div>
-                    <div className="p-3 rounded-lg bg-secondary/30 text-center">
-                      <div className="font-bold">--</div>
-                      <div className="text-xs text-muted-foreground">Heart Rate</div>
-                    </div>
-                    <div className="p-3 rounded-lg bg-secondary/30 text-center">
-                      <div className="font-bold">--</div>
-                      <div className="text-xs text-muted-foreground">Sleep</div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-
           <Card className="shadow-card">
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -458,6 +415,49 @@ const Profile = () => {
           {/* Social Connections */}
           <div className="mt-6">
             <SocialConnections />
+          </div>
+
+          {/* Health Data Section */}
+          <div className="mt-6">
+            {isElite ? (
+              <HealthDashboard />
+            ) : (
+              <Card className="border-dashed relative overflow-hidden">
+                <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
+                  <Crown className="h-8 w-8 text-accent mb-2" />
+                  <p className="font-heading font-semibold text-foreground mb-1">Elite Feature</p>
+                  <p className="text-sm text-muted-foreground mb-3">Sync your wearable health data</p>
+                  <Button size="sm" onClick={() => navigate("/#pricing")}>
+                    Upgrade to Elite
+                  </Button>
+                </div>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-muted-foreground">
+                    <Settings className="h-5 w-5" />
+                    Wearable Health Data
+                  </CardTitle>
+                  <CardDescription>
+                    Connect Apple Health or Google Fit
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-3 gap-4 opacity-50">
+                    <div className="p-3 rounded-lg bg-secondary/30 text-center">
+                      <div className="font-bold">--</div>
+                      <div className="text-xs text-muted-foreground">Steps</div>
+                    </div>
+                    <div className="p-3 rounded-lg bg-secondary/30 text-center">
+                      <div className="font-bold">--</div>
+                      <div className="text-xs text-muted-foreground">Heart Rate</div>
+                    </div>
+                    <div className="p-3 rounded-lg bg-secondary/30 text-center">
+                      <div className="font-bold">--</div>
+                      <div className="text-xs text-muted-foreground">Sleep</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </div>
       </main>
