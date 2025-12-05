@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { 
   Loader2, Trophy, Flame, Target, Dumbbell, Calendar, 
-  TrendingUp, Lock, Zap,
+  TrendingUp, Lock, Zap, Settings,
   Crown, Medal, ChevronRight, Users, Camera,
   Brain, Sparkles, MapPin, Utensils
 } from 'lucide-react';
@@ -151,12 +151,17 @@ export default function Dashboard() {
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div className="flex items-center gap-4">
-              <Avatar className="h-16 w-16 border-2 border-primary">
-                <AvatarImage src={profile?.avatar_url || undefined} />
-                <AvatarFallback className="bg-primary/10 text-primary text-xl">
-                  {profile?.display_name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
+              <Link to="/profile" className="relative group">
+                <Avatar className="h-16 w-16 border-2 border-primary group-hover:border-accent transition-colors">
+                  <AvatarImage src={profile?.avatar_url || undefined} />
+                  <AvatarFallback className="bg-primary/10 text-primary text-xl">
+                    {profile?.display_name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="absolute inset-0 flex items-center justify-center bg-background/60 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Settings className="h-5 w-5 text-foreground" />
+                </div>
+              </Link>
               <div>
                 <h1 className="text-2xl font-bold">
                   Member Portal
@@ -174,14 +179,22 @@ export default function Dashboard() {
                 </p>
               </div>
             </div>
-            {!hasCheckedInToday && (
-              <Button asChild>
-                <Link to="/checkin">
-                  <Calendar className="h-4 w-4 mr-2" />
-                  Daily Check-in
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" asChild>
+                <Link to="/profile">
+                  <Settings className="h-4 w-4 mr-2" />
+                  Settings
                 </Link>
               </Button>
-            )}
+              {!hasCheckedInToday && (
+                <Button asChild>
+                  <Link to="/checkin">
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Daily Check-in
+                  </Link>
+                </Button>
+              )}
+            </div>
           </div>
 
           {/* Quick Stats Row */}
