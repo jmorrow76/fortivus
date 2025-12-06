@@ -1301,6 +1301,47 @@ export type Database = {
           },
         ]
       }
+      prayer_journal_entries: {
+        Row: {
+          answered_at: string | null
+          answered_notes: string | null
+          created_at: string
+          id: string
+          is_answered: boolean
+          partnership_id: string
+          request_text: string
+          user_id: string
+        }
+        Insert: {
+          answered_at?: string | null
+          answered_notes?: string | null
+          created_at?: string
+          id?: string
+          is_answered?: boolean
+          partnership_id: string
+          request_text: string
+          user_id: string
+        }
+        Update: {
+          answered_at?: string | null
+          answered_notes?: string | null
+          created_at?: string
+          id?: string
+          is_answered?: boolean
+          partnership_id?: string
+          request_text?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prayer_journal_entries_partnership_id_fkey"
+            columns: ["partnership_id"]
+            isOneToOne: false
+            referencedRelation: "accountability_partnerships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null

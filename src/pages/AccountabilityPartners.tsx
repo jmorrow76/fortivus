@@ -13,6 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { PrayerJournal } from "@/components/accountability/PrayerJournal";
 import { 
   Users, 
   Heart, 
@@ -24,7 +25,8 @@ import {
   Loader2,
   ArrowLeft,
   ClipboardCheck,
-  Calendar
+  Calendar,
+  BookOpen
 } from "lucide-react";
 
 const PRAYER_FOCUS_OPTIONS = [
@@ -187,8 +189,9 @@ const AccountabilityPartners = () => {
           )}
 
           <Tabs defaultValue="partners" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="partners">My Partners</TabsTrigger>
+              <TabsTrigger value="journal">Prayer Journal</TabsTrigger>
               <TabsTrigger value="find">Find Partners</TabsTrigger>
               <TabsTrigger value="profile">My Profile</TabsTrigger>
             </TabsList>
@@ -343,6 +346,52 @@ const AccountabilityPartners = () => {
                       ))}
                     </>
                   )}
+                </div>
+              )}
+            </TabsContent>
+
+            {/* Prayer Journal Tab */}
+            <TabsContent value="journal">
+              {activePartnerships.length === 0 ? (
+                <Card>
+                  <CardContent className="py-12 text-center">
+                    <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="font-heading text-lg font-semibold mb-2">No Prayer Journal Yet</h3>
+                    <p className="text-muted-foreground mb-4">
+                      Connect with an accountability partner to start a shared prayer journal
+                    </p>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-8">
+                  {activePartnerships.map((partnership) => (
+                    <Card key={partnership.id}>
+                      <CardHeader>
+                        <div className="flex items-center gap-3">
+                          <Avatar>
+                            <AvatarImage src={partnership.partner?.avatar_url || ''} />
+                            <AvatarFallback>
+                              {partnership.partner?.display_name?.[0] || 'U'}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <CardTitle className="text-base">
+                              Partnership with {partnership.partner?.display_name || 'Anonymous'}
+                            </CardTitle>
+                            <CardDescription>
+                              Praying together since {new Date(partnership.created_at).toLocaleDateString()}
+                            </CardDescription>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <PrayerJournal 
+                          partnershipId={partnership.id} 
+                          partnerName={partnership.partner?.display_name || 'your partner'}
+                        />
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
               )}
             </TabsContent>
