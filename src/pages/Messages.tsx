@@ -10,18 +10,22 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { MessageCircle, Send, Plus, User, ArrowLeft } from 'lucide-react';
+import { MessageCircle, Send, Plus, User, ArrowLeft, Image, X, Loader2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 
 export default function Messages() {
   const { user, loading: authLoading } = useAuth();
-  const { conversations, loading, startConversation, sendMessage, markAsRead, totalUnread } = useMessages();
+  const { conversations, loading, startConversation, sendMessage, uploadImage, markAsRead, totalUnread } = useMessages();
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [messageInput, setMessageInput] = useState('');
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [sending, setSending] = useState(false);
   const [searchParams] = useSearchParams();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { messages, loading: messagesLoading } = useConversationMessages(selectedConversation);
 
@@ -50,9 +54,46 @@ export default function Messages() {
   }, [messages]);
 
   const handleSend = async () => {
-    if (!selectedConversation || !messageInput.trim()) return;
-    await sendMessage(selectedConversation, messageInput);
-    setMessageInput('');
+    if (!selectedConversation || (!messageInput.trim() && !selectedImage)) return;
+    
+    setSending(true);
+    try {
+      let imageUrl: string | undefined;
+      
+      if (selectedImage) {
+        imageUrl = await uploadImage(selectedImage) || undefined;
+      }
+      
+      await sendMessage(selectedConversation, messageInput, imageUrl);
+      setMessageInput('');
+      setSelectedImage(null);
+      setImagePreview(null);
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        return; // Max 5MB
+      }
+      setSelectedImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeSelectedImage = () => {
+    setSelectedImage(null);
+    setImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -222,7 +263,25 @@ export default function Messages() {
                                   : "bg-muted"
                               )}
                             >
-                              <p className="break-words">{msg.content}</p>
+                              {msg.image_url && (
+                                <Dialog>
+                                  <DialogTrigger asChild>
+                                    <img
+                                      src={msg.image_url}
+                                      alt="Shared image"
+                                      className="rounded-lg max-w-full max-h-48 object-cover cursor-pointer hover:opacity-90 transition-opacity mb-2"
+                                    />
+                                  </DialogTrigger>
+                                  <DialogContent className="max-w-3xl p-0">
+                                    <img
+                                      src={msg.image_url}
+                                      alt="Shared image"
+                                      className="w-full h-auto rounded-lg"
+                                    />
+                                  </DialogContent>
+                                </Dialog>
+                              )}
+                              {msg.content && <p className="break-words">{msg.content}</p>}
                               <p className={cn(
                                 "text-xs mt-1",
                                 isOwn ? "text-primary-foreground/70" : "text-muted-foreground"
@@ -238,17 +297,51 @@ export default function Messages() {
                   )}
                 </ScrollArea>
 
-                <div className="p-4 border-t">
+                <div className="p-4 border-t space-y-3">
+                  {imagePreview && (
+                    <div className="relative inline-block">
+                      <img
+                        src={imagePreview}
+                        alt="Selected"
+                        className="h-20 w-20 object-cover rounded-lg"
+                      />
+                      <button
+                        onClick={removeSelectedImage}
+                        className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  )}
                   <div className="flex gap-2">
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleImageSelect}
+                      accept="image/*"
+                      className="hidden"
+                    />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={sending}
+                    >
+                      <Image className="h-5 w-5" />
+                    </Button>
                     <Input
                       value={messageInput}
                       onChange={(e) => setMessageInput(e.target.value)}
                       onKeyDown={handleKeyPress}
                       placeholder="Type a message..."
                       className="flex-1"
+                      disabled={sending}
                     />
-                    <Button onClick={handleSend} disabled={!messageInput.trim()}>
-                      <Send className="h-4 w-4" />
+                    <Button 
+                      onClick={handleSend} 
+                      disabled={(!messageInput.trim() && !selectedImage) || sending}
+                    >
+                      {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                     </Button>
                   </div>
                 </div>

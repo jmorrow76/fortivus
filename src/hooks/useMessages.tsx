@@ -14,6 +14,7 @@ interface Message {
   conversation_id: string;
   sender_id: string;
   content: string;
+  image_url: string | null;
   created_at: string;
   is_read: boolean;
 }
@@ -204,8 +205,8 @@ export function useMessages() {
     }
   };
 
-  const sendMessage = async (conversationId: string, content: string) => {
-    if (!user || !content.trim()) return;
+  const sendMessage = async (conversationId: string, content: string, imageUrl?: string) => {
+    if (!user || (!content.trim() && !imageUrl)) return;
 
     try {
       const { error } = await supabase
@@ -213,13 +214,39 @@ export function useMessages() {
         .insert({
           conversation_id: conversationId,
           sender_id: user.id,
-          content: content.trim(),
+          content: content.trim() || '',
+          image_url: imageUrl || null,
         });
 
       if (error) throw error;
     } catch (error) {
       console.error('Error sending message:', error);
       toast.error('Failed to send message');
+    }
+  };
+
+  const uploadImage = async (file: File): Promise<string | null> => {
+    if (!user) return null;
+
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+
+    try {
+      const { error: uploadError } = await supabase.storage
+        .from('dm-images')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('dm-images')
+        .getPublicUrl(fileName);
+
+      return publicUrl;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast.error('Failed to upload image');
+      return null;
     }
   };
 
@@ -253,6 +280,7 @@ export function useMessages() {
     loading,
     startConversation,
     sendMessage,
+    uploadImage,
     markAsRead,
     refetch: fetchConversations,
     totalUnread,
