@@ -74,6 +74,7 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
   const [selectedDayForTemplate, setSelectedDayForTemplate] = useState<number | null>(null);
   const [templateName, setTemplateName] = useState('');
   const [isCreatingTemplate, setIsCreatingTemplate] = useState(false);
+  const [isCreatingAllTemplates, setIsCreatingAllTemplates] = useState(false);
 
   // Load existing AI plan on mount for Elite users
   useEffect(() => {
@@ -381,6 +382,128 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
       });
     } finally {
       setIsCreatingTemplate(false);
+    }
+  };
+
+  const handleCreateAllTemplates = async () => {
+    if (!user || !aiPlan) return;
+    
+    const workoutDays = aiPlan.workout.weeklySchedule.filter(
+      day => day.exercises && day.exercises.length > 0
+    );
+    
+    if (workoutDays.length === 0) {
+      toast({
+        title: "No Workouts",
+        description: "No workout days with exercises found to create templates from",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsCreatingAllTemplates(true);
+    const workoutLocation = getWorkoutLocation();
+    let createdCount = 0;
+
+    try {
+      for (const day of workoutDays) {
+        // Create the workout template
+        const { data: template, error: templateError } = await supabase
+          .from("workout_templates")
+          .insert({
+            user_id: user.id,
+            name: `${day.day} - ${day.focus}`,
+            description: `Generated from AI Personal Plan`,
+          })
+          .select()
+          .single();
+
+        if (templateError) {
+          console.error("Error creating template:", templateError);
+          continue;
+        }
+
+        // Add exercises to the template
+        for (let i = 0; i < day.exercises.length; i++) {
+          const exercise = day.exercises[i];
+          
+          const { data: existingExercises } = await supabase
+            .from("exercises")
+            .select("id")
+            .ilike("name", `%${exercise.name}%`)
+            .limit(1);
+
+          let exerciseId: string;
+
+          if (existingExercises && existingExercises.length > 0) {
+            exerciseId = existingExercises[0].id;
+          } else {
+            const { data: newExercise, error: exerciseError } = await supabase
+              .from("exercises")
+              .insert({
+                name: exercise.name,
+                muscle_group: day.focus.toLowerCase().includes("leg") ? "quadriceps" :
+                             day.focus.toLowerCase().includes("chest") ? "chest" :
+                             day.focus.toLowerCase().includes("back") ? "back" :
+                             day.focus.toLowerCase().includes("shoulder") ? "shoulders" :
+                             day.focus.toLowerCase().includes("arm") ? "biceps" :
+                             "core",
+                equipment: workoutLocation === "bodyweight" ? "bodyweight" : 
+                          workoutLocation === "minimal" ? "dumbbells" : "barbell",
+                is_custom: true,
+                created_by: user.id,
+              })
+              .select()
+              .single();
+
+            if (exerciseError) {
+              console.error("Error creating exercise:", exerciseError);
+              continue;
+            }
+            exerciseId = newExercise.id;
+          }
+
+          const repsMatch = exercise.reps.match(/\d+/);
+          const targetReps = repsMatch ? parseInt(repsMatch[0]) : 10;
+
+          await supabase
+            .from("template_exercises")
+            .insert({
+              template_id: template.id,
+              exercise_id: exerciseId,
+              sort_order: i,
+              target_sets: exercise.sets,
+              target_reps: targetReps,
+              rest_seconds: 90,
+              notes: exercise.notes || null,
+            });
+        }
+        createdCount++;
+      }
+
+      toast({
+        title: "Templates Created!",
+        description: `${createdCount} workout templates have been added`,
+        action: (
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => navigate("/workouts")}
+            className="ml-2"
+          >
+            Go to Workouts
+          </Button>
+        ),
+      });
+    } catch (error: any) {
+      console.error("Error creating templates:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create workout templates",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCreatingAllTemplates(false);
     }
   };
 
@@ -699,6 +822,29 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
                   </button>
                   {expandedSections.workout && (
                     <div className="p-4 space-y-4">
+                      {/* Bulk save button */}
+                      {aiPlan.workout.weeklySchedule?.some(day => day.exercises && day.exercises.length > 0) && (
+                        <div className="flex justify-end">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleCreateAllTemplates}
+                            disabled={isCreatingAllTemplates}
+                          >
+                            {isCreatingAllTemplates ? (
+                              <>
+                                <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                                Saving All...
+                              </>
+                            ) : (
+                              <>
+                                <Save className="h-3 w-3 mr-1" />
+                                Save All as Templates
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      )}
                       {aiPlan.workout.weeklySchedule?.map((day, idx) => (
                         <div key={idx} className="p-3 bg-background rounded-lg border">
                           <div className="flex justify-between items-center mb-3">
