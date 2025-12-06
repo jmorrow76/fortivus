@@ -1,43 +1,58 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, ArrowLeft, Mail, CheckCircle2, RefreshCw } from 'lucide-react';
+import { Loader2, ArrowLeft, Mail, CheckCircle2, RefreshCw, KeyRound } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { z } from 'zod';
+import { supabase } from '@/integrations/supabase/client';
 
 const emailSchema = z.string().email('Please enter a valid email address');
 const passwordSchema = z.string().min(6, 'Password must be at least 6 characters');
 
-type AuthMode = 'login' | 'signup' | 'forgot-password' | 'verification-pending';
+type AuthMode = 'login' | 'signup' | 'forgot-password' | 'verification-pending' | 'update-password';
 
 const Auth = () => {
   const [mode, setMode] = useState<AuthMode>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [errors, setErrors] = useState<{ email?: string; password?: string; confirmPassword?: string }>({});
   const [resetEmailSent, setResetEmailSent] = useState(false);
   const [signupEmail, setSignupEmail] = useState('');
   const [resendCooldown, setResendCooldown] = useState(0);
   const [isResending, setIsResending] = useState(false);
+  const [passwordUpdated, setPasswordUpdated] = useState(false);
   
   const [socialLoading, setSocialLoading] = useState<'google' | 'apple' | 'facebook' | null>(null);
   
-  const { user, loading, signIn, signUp, signInWithSocial, resendVerificationEmail, resetPassword } = useAuth();
+  const { user, loading, signIn, signUp, signInWithSocial, resendVerificationEmail, resetPassword, updatePassword } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
+
+  // Check for password recovery event
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setMode('update-password');
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   useEffect(() => {
-    if (user && !loading) {
+    if (user && !loading && mode !== 'update-password') {
       navigate('/dashboard');
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate, mode]);
 
   // Cooldown timer effect
   useEffect(() => {
@@ -75,17 +90,25 @@ const Auth = () => {
   }, [resendCooldown, signupEmail, resendVerificationEmail, toast]);
 
   const validateForm = () => {
-    const newErrors: { email?: string; password?: string } = {};
+    const newErrors: { email?: string; password?: string; confirmPassword?: string } = {};
     
-    const emailResult = emailSchema.safeParse(email);
-    if (!emailResult.success) {
-      newErrors.email = emailResult.error.errors[0].message;
+    if (mode !== 'update-password') {
+      const emailResult = emailSchema.safeParse(email);
+      if (!emailResult.success) {
+        newErrors.email = emailResult.error.errors[0].message;
+      }
     }
     
     if (mode !== 'forgot-password') {
       const passwordResult = passwordSchema.safeParse(password);
       if (!passwordResult.success) {
         newErrors.password = passwordResult.error.errors[0].message;
+      }
+    }
+
+    if (mode === 'update-password') {
+      if (password !== confirmPassword) {
+        newErrors.confirmPassword = 'Passwords do not match';
       }
     }
     
@@ -101,7 +124,15 @@ const Auth = () => {
     setIsSubmitting(true);
     
     try {
-      if (mode === 'forgot-password') {
+      if (mode === 'update-password') {
+        const { error } = await updatePassword(password);
+        if (error) {
+          toast({ title: 'Update Failed', description: error.message, variant: 'destructive' });
+        } else {
+          setPasswordUpdated(true);
+          toast({ title: 'Password Updated', description: 'Your password has been changed successfully.' });
+        }
+      } else if (mode === 'forgot-password') {
         const { error } = await resetPassword(email);
         if (error) {
           toast({ title: 'Reset Failed', description: error.message, variant: 'destructive' });
@@ -120,7 +151,7 @@ const Auth = () => {
         } else {
           toast({ title: 'Welcome back!', description: 'You have successfully signed in.' });
         }
-      } else {
+      } else if (mode === 'signup') {
         const { error } = await signUp(email, password, displayName);
         if (error) {
           if (error.message.includes('User already registered')) {
@@ -178,6 +209,7 @@ const Auth = () => {
       case 'signup': return 'Create Account';
       case 'forgot-password': return 'Reset Password';
       case 'verification-pending': return 'Verify Your Email';
+      case 'update-password': return passwordUpdated ? 'Password Updated' : 'Set New Password';
     }
   };
 
@@ -187,6 +219,7 @@ const Auth = () => {
       case 'signup': return 'Join Fortivus to start your fitness journey';
       case 'forgot-password': return 'Enter your email to receive reset instructions';
       case 'verification-pending': return 'One more step to complete your registration';
+      case 'update-password': return passwordUpdated ? 'You can now sign in with your new password' : 'Enter your new password below';
     }
   };
 
@@ -211,7 +244,78 @@ const Auth = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {mode === 'verification-pending' ? (
+          {mode === 'update-password' ? (
+            passwordUpdated ? (
+              <div className="text-center space-y-6">
+                <div className="mx-auto w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center">
+                  <CheckCircle2 className="h-8 w-8 text-accent" />
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Your password has been successfully updated.
+                </p>
+                <Button 
+                  className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
+                  onClick={() => {
+                    setPasswordUpdated(false);
+                    setMode('login');
+                    navigate('/auth');
+                  }}
+                >
+                  Sign In Now
+                </Button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="mx-auto w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mb-4">
+                  <KeyRound className="h-8 w-8 text-accent" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password">New Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setErrors(prev => ({ ...prev, password: undefined }));
+                    }}
+                    className={errors.password ? 'border-destructive' : ''}
+                  />
+                  {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Confirm Password</Label>
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    placeholder="••••••••"
+                    value={confirmPassword}
+                    onChange={(e) => {
+                      setConfirmPassword(e.target.value);
+                      setErrors(prev => ({ ...prev, confirmPassword: undefined }));
+                    }}
+                    className={errors.confirmPassword ? 'border-destructive' : ''}
+                  />
+                  {errors.confirmPassword && <p className="text-sm text-destructive">{errors.confirmPassword}</p>}
+                </div>
+                <Button 
+                  type="submit" 
+                  className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Updating...
+                    </>
+                  ) : (
+                    'Update Password'
+                  )}
+                </Button>
+              </form>
+            )
+          ) : mode === 'verification-pending' ? (
             <div className="text-center space-y-6">
               <div className="mx-auto w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center">
                 <Mail className="h-8 w-8 text-accent" />
