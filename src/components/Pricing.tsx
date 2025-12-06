@@ -181,6 +181,12 @@ const Pricing = () => {
           <p className="section-description">
             Choose the plan that matches your commitment to honoring God with your body. Cancel anytime.
           </p>
+          <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-accent/10 rounded-full">
+            <span className="text-accent font-semibold">✝</span>
+            <span className="text-sm text-muted-foreground">
+              10% of all proceeds support local churches and Christian ministries
+            </span>
+          </div>
         </div>
 
         {/* Billing Toggle */}
