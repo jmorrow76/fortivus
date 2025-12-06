@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, Check, CheckCheck, Trash2, X, MessageCircle, Award, Flame, Target, Zap, Users } from 'lucide-react';
+import { Bell, Check, CheckCheck, Trash2, X, MessageCircle, Award, Flame, Target, Zap, Users, HandHeart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Popover,
@@ -37,6 +37,8 @@ export function NotificationBell() {
         return <Target className="h-4 w-4 text-green-500" />;
       case 'accountability_checkin':
         return <Users className="h-4 w-4 text-purple-500" />;
+      case 'prayer_request':
+        return <HandHeart className="h-4 w-4 text-rose-500" />;
       default:
         return <Zap className="h-4 w-4 text-primary" />;
     }
