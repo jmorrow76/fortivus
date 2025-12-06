@@ -10,6 +10,7 @@ import { Loader2, ArrowLeft, Mail, CheckCircle2, RefreshCw, KeyRound } from 'luc
 import { Separator } from '@/components/ui/separator';
 import { z } from 'zod';
 import { supabase } from '@/integrations/supabase/client';
+import PasswordStrengthIndicator from '@/components/PasswordStrengthIndicator';
 
 const emailSchema = z.string().email('Please enter a valid email address');
 const passwordSchema = z.string().min(6, 'Password must be at least 6 characters');
@@ -283,6 +284,7 @@ const Auth = () => {
                     className={errors.password ? 'border-destructive' : ''}
                   />
                   {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
+                  <PasswordStrengthIndicator password={password} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="confirmPassword">Confirm Password</Label>
@@ -433,6 +435,7 @@ const Auth = () => {
                     className={errors.password ? 'border-destructive' : ''}
                   />
                   {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
+                  {mode === 'signup' && <PasswordStrengthIndicator password={password} />}
                 </div>
               )}
 
