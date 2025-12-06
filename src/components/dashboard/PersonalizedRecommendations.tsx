@@ -75,13 +75,32 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
   const [templateName, setTemplateName] = useState('');
   const [isCreatingTemplate, setIsCreatingTemplate] = useState(false);
   const [isCreatingAllTemplates, setIsCreatingAllTemplates] = useState(false);
+  const [savedTemplateDays, setSavedTemplateDays] = useState<Set<string>>(new Set());
 
-  // Load existing AI plan on mount for Elite users
+  // Load existing AI plan and saved templates on mount for Elite users
   useEffect(() => {
     if (subscription.subscribed && user) {
       loadExistingPlan();
+      loadSavedTemplateDays();
     }
   }, [subscription.subscribed, user]);
+
+  const loadSavedTemplateDays = async () => {
+    if (!user) return;
+    try {
+      const { data } = await supabase
+        .from('workout_templates')
+        .select('name')
+        .eq('user_id', user.id)
+        .eq('description', 'Generated from AI Personal Plan');
+      
+      if (data) {
+        setSavedTemplateDays(new Set(data.map(t => t.name)));
+      }
+    } catch (error) {
+      console.error('Error loading saved templates:', error);
+    }
+  };
 
   const loadExistingPlan = async () => {
     if (!user) return;
@@ -370,6 +389,9 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
         ),
       });
       
+      // Update saved template days
+      setSavedTemplateDays(prev => new Set([...prev, templateName.trim() || `${aiPlan.workout.weeklySchedule[selectedDayForTemplate].day} - ${aiPlan.workout.weeklySchedule[selectedDayForTemplate].focus}`]));
+      
       setShowTemplateDialog(false);
       setSelectedDayForTemplate(null);
       setTemplateName("");
@@ -480,6 +502,11 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
         }
         createdCount++;
       }
+
+      // Update saved template days state
+      const newSavedDays = new Set(savedTemplateDays);
+      workoutDays.forEach(day => newSavedDays.add(`${day.day} - ${day.focus}`));
+      setSavedTemplateDays(newSavedDays);
 
       toast({
         title: "Templates Created!",
@@ -845,37 +872,49 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
                           </Button>
                         </div>
                       )}
-                      {aiPlan.workout.weeklySchedule?.map((day, idx) => (
-                        <div key={idx} className="p-3 bg-background rounded-lg border">
-                          <div className="flex justify-between items-center mb-3">
-                            <span className="font-medium">{day.day}</span>
-                            <div className="flex items-center gap-2">
-                              <Badge variant="outline">{day.focus}</Badge>
-                              {day.exercises && day.exercises.length > 0 && (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleOpenTemplateDialog(idx)}
-                                  className="h-7 px-2 text-xs"
-                                >
-                                  <Plus className="h-3 w-3 mr-1" />
-                                  Save Template
-                                </Button>
-                              )}
+                      {aiPlan.workout.weeklySchedule?.map((day, idx) => {
+                        const templateKey = `${day.day} - ${day.focus}`;
+                        const isSaved = savedTemplateDays.has(templateKey);
+                        return (
+                          <div key={idx} className="p-3 bg-background rounded-lg border">
+                            <div className="flex justify-between items-center mb-3">
+                              <span className="font-medium flex items-center gap-2">
+                                {day.day}
+                                {isSaved && (
+                                  <span className="inline-flex items-center gap-1 text-xs text-green-600 bg-green-100 dark:bg-green-900/30 dark:text-green-400 px-2 py-0.5 rounded-full">
+                                    <Check className="h-3 w-3" />
+                                    Saved
+                                  </span>
+                                )}
+                              </span>
+                              <div className="flex items-center gap-2">
+                                <Badge variant="outline">{day.focus}</Badge>
+                                {day.exercises && day.exercises.length > 0 && !isSaved && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleOpenTemplateDialog(idx)}
+                                    className="h-7 px-2 text-xs"
+                                  >
+                                    <Plus className="h-3 w-3 mr-1" />
+                                    Save Template
+                                  </Button>
+                                )}
+                              </div>
                             </div>
+                            {day.exercises && day.exercises.length > 0 && (
+                              <div className="space-y-2">
+                                {day.exercises.map((ex, exIdx) => (
+                                  <div key={exIdx} className="flex justify-between items-center text-sm p-2 bg-muted/50 rounded">
+                                    <span>{ex.name}</span>
+                                    <span className="text-muted-foreground">{ex.sets} × {ex.reps}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
                           </div>
-                          {day.exercises && day.exercises.length > 0 && (
-                            <div className="space-y-2">
-                              {day.exercises.map((ex, exIdx) => (
-                                <div key={exIdx} className="flex justify-between items-center text-sm p-2 bg-muted/50 rounded">
-                                  <span>{ex.name}</span>
-                                  <span className="text-muted-foreground">{ex.sets} × {ex.reps}</span>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      ))}
+                        );
+                      })}
                       {aiPlan.workout.cardioRecommendation && (
                         <p className="text-sm text-muted-foreground italic">
                           Cardio: {aiPlan.workout.cardioRecommendation}
