@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 
@@ -193,6 +193,25 @@ export const useOnboarding = () => {
     return recommendations;
   };
 
+  const resetOnboarding = useCallback(async () => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('user_onboarding')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setOnboardingData(null);
+      setHasCompletedOnboarding(false);
+    } catch (error) {
+      console.error('Error resetting onboarding:', error);
+      throw error;
+    }
+  }, [user]);
+
   return {
     onboardingData,
     hasCompletedOnboarding,
@@ -200,6 +219,7 @@ export const useOnboarding = () => {
     saveOnboarding,
     getPersonalizedRecommendations,
     refreshOnboarding: checkOnboardingStatus,
+    resetOnboarding,
   };
 };
 

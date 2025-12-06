@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth, FORTIVUS_ELITE } from "@/hooks/useAuth";
+import { useOnboarding } from "@/hooks/useOnboarding";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Camera, Loader2, User, Crown, Settings, Calendar, Sparkles, Flame } from "lucide-react";
+import { ArrowLeft, Camera, Loader2, User, Crown, Settings, Calendar, Sparkles, Flame, RefreshCw } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import HealthDashboard from "@/components/HealthDashboard";
 import { NotificationSettings } from "@/components/NotificationSettings";
@@ -18,6 +19,7 @@ import { format } from "date-fns";
 
 const Profile = () => {
   const { user, loading: authLoading, subscription, session } = useAuth();
+  const { hasCompletedOnboarding, resetOnboarding } = useOnboarding();
   const isElite = subscription.subscribed && (
     subscription.productId === FORTIVUS_ELITE.monthly.product_id ||
     subscription.productId === FORTIVUS_ELITE.yearly.product_id ||
@@ -36,6 +38,27 @@ const Profile = () => {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [managingSubscription, setManagingSubscription] = useState(false);
+  const [resettingAssessment, setResettingAssessment] = useState(false);
+
+  const handleRetakeAssessment = async () => {
+    setResettingAssessment(true);
+    try {
+      await resetOnboarding();
+      toast({
+        title: "Assessment reset",
+        description: "Redirecting to the fitness assessment...",
+      });
+      navigate("/onboarding");
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to reset assessment",
+        variant: "destructive",
+      });
+    } finally {
+      setResettingAssessment(false);
+    }
+  };
 
   const handleManageSubscription = async () => {
     if (!session) return;
@@ -305,6 +328,37 @@ const Profile = () => {
                 <p className="text-xs text-muted-foreground">
                   Email cannot be changed
                 </p>
+              </div>
+
+              {/* Fitness Assessment Section */}
+              <div className="space-y-3 pt-4 border-t">
+                <div className="flex items-center gap-2">
+                  <RefreshCw className="h-5 w-5 text-accent" />
+                  <h3 className="font-semibold">Fitness Assessment</h3>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {hasCompletedOnboarding
+                    ? "Update your fitness goals, experience level, and preferences to get refreshed personalized recommendations."
+                    : "Complete your fitness assessment to get personalized workout and nutrition recommendations."}
+                </p>
+                <Button
+                  variant="outline"
+                  onClick={handleRetakeAssessment}
+                  disabled={resettingAssessment}
+                  className="w-full sm:w-auto"
+                >
+                  {resettingAssessment ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Loading...
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      {hasCompletedOnboarding ? "Retake Assessment" : "Take Assessment"}
+                    </>
+                  )}
+                </Button>
               </div>
 
               {/* Macro Goals Section */}
