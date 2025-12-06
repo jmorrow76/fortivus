@@ -28,7 +28,8 @@ import {
   BookOpen,
   Trash2,
   Star,
-  StarOff
+  StarOff,
+  Award
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useLikes } from '@/hooks/useLikes';
@@ -40,6 +41,7 @@ interface Testimony {
   content: string;
   created_at: string;
   is_featured: boolean;
+  is_weekly_spotlight: boolean;
   author_name?: string;
   author_avatar?: string;
 }
@@ -64,6 +66,7 @@ export default function Testimonies() {
       const { data, error } = await supabase
         .from('testimonies')
         .select('*')
+        .order('is_weekly_spotlight', { ascending: false })
         .order('is_featured', { ascending: false })
         .order('created_at', { ascending: false });
 
@@ -192,6 +195,30 @@ export default function Testimonies() {
     }
   };
 
+  const handleSetWeeklySpotlight = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('testimonies')
+        .update({ is_weekly_spotlight: true })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Testimony of the Week set!',
+        description: 'This testimony will now be featured on the homepage.'
+      });
+
+      fetchTestimonies();
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to set weekly spotlight',
+        variant: 'destructive'
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
@@ -310,22 +337,40 @@ export default function Testimonies() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      {testimony.is_featured && (
+                      {(testimony as any).is_weekly_spotlight && (
+                        <Badge className="gap-1 bg-primary">
+                          <Award className="h-3 w-3" />
+                          Testimony of the Week
+                        </Badge>
+                      )}
+                      {testimony.is_featured && !(testimony as any).is_weekly_spotlight && (
                         <Badge variant="secondary" className="gap-1">
                           <Star className="h-3 w-3" />
                           Featured
                         </Badge>
                       )}
                       {isAdmin && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className={`h-8 w-8 ${testimony.is_featured ? 'text-yellow-500' : 'text-muted-foreground'}`}
-                          onClick={() => handleToggleFeatured(testimony.id, testimony.title, testimony.is_featured)}
-                          title={testimony.is_featured ? 'Remove from featured' : 'Feature this testimony'}
-                        >
-                          {testimony.is_featured ? <StarOff className="h-4 w-4" /> : <Star className="h-4 w-4" />}
-                        </Button>
+                        <>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className={`h-8 w-8 ${(testimony as any).is_weekly_spotlight ? 'text-primary' : 'text-muted-foreground'}`}
+                            onClick={() => handleSetWeeklySpotlight(testimony.id)}
+                            title="Set as Testimony of the Week"
+                            disabled={(testimony as any).is_weekly_spotlight}
+                          >
+                            <Award className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className={`h-8 w-8 ${testimony.is_featured ? 'text-yellow-500' : 'text-muted-foreground'}`}
+                            onClick={() => handleToggleFeatured(testimony.id, testimony.title, testimony.is_featured)}
+                            title={testimony.is_featured ? 'Remove from featured' : 'Feature this testimony'}
+                          >
+                            {testimony.is_featured ? <StarOff className="h-4 w-4" /> : <Star className="h-4 w-4" />}
+                          </Button>
+                        </>
                       )}
                       {testimony.user_id === user?.id && (
                         <Button
