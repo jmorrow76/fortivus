@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 
-type TargetType = 'forum_topic' | 'forum_post' | 'activity_feed';
+type TargetType = 'forum_topic' | 'forum_post' | 'activity_feed' | 'prayer_request';
 
 interface LikeCount {
   [key: string]: number;

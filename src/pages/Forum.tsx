@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { LikeButton } from "@/components/LikeButton";
+import { PrayerButton } from "@/components/PrayerButton";
 import {
   Dialog,
   DialogContent,
@@ -38,6 +39,8 @@ import {
   Lock,
   Image as ImageIcon,
   X,
+  HeartHandshake,
+  HandHeart,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
@@ -80,6 +83,8 @@ const iconMap: Record<string, React.ElementType> = {
   Apple,
   Heart,
   Trophy,
+  HeartHandshake,
+  HandHeart,
 };
 
 const Forum = () => {
@@ -126,6 +131,19 @@ const Forum = () => {
     userLikes: postUserLikes, 
     toggleLike: togglePostLike 
   } = useLikes('forum_post', postIds);
+
+  // Prayer hooks for prayer request category topics
+  const { 
+    likeCounts: topicPrayerCounts, 
+    userLikes: topicUserPrayers, 
+    toggleLike: toggleTopicPrayer 
+  } = useLikes('prayer_request', topicIds);
+
+  // Check if current category is Prayer Requests
+  const isPrayerCategory = useMemo(() => {
+    const category = categories.find(c => c.id === selectedCategory);
+    return category?.name === 'Prayer Requests';
+  }, [categories, selectedCategory]);
 
   useEffect(() => {
     fetchCategories();
@@ -534,25 +552,29 @@ const Forum = () => {
             <DialogTrigger asChild>
               <Button disabled={!user}>
                 <Plus className="h-4 w-4 mr-2" />
-                New Topic
+                {isPrayerCategory ? 'Share Prayer Request' : 'New Topic'}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Create New Topic</DialogTitle>
+                <DialogTitle>
+                  {isPrayerCategory ? 'Share a Prayer Request' : 'Create New Topic'}
+                </DialogTitle>
                 <DialogDescription>
-                  Start a new discussion in {category?.name}
+                  {isPrayerCategory 
+                    ? 'Share your prayer needs with your brothers in Christ. We\'ll lift you up in prayer.'
+                    : `Start a new discussion in ${category?.name}`}
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4 pt-4">
                 <Input
-                  placeholder="Topic title"
+                  placeholder={isPrayerCategory ? "Prayer request title" : "Topic title"}
                   value={newTopicTitle}
                   onChange={(e) => setNewTopicTitle(e.target.value)}
                   maxLength={200}
                 />
                 <Textarea
-                  placeholder="What's on your mind?"
+                  placeholder={isPrayerCategory ? "Share your prayer request..." : "What's on your mind?"}
                   value={newTopicContent}
                   onChange={(e) => setNewTopicContent(e.target.value)}
                   rows={5}
@@ -671,12 +693,21 @@ const Forum = () => {
                     </div>
                     <div className="flex flex-col items-end gap-1 shrink-0">
                       <div className="flex items-center gap-2">
-                        <LikeButton
-                          liked={topicUserLikes[topic.id] || false}
-                          count={topicLikeCounts[topic.id] || 0}
-                          onClick={() => toggleTopicLike(topic.id)}
-                          size="sm"
-                        />
+                        {isPrayerCategory ? (
+                          <PrayerButton
+                            praying={topicUserPrayers[topic.id] || false}
+                            count={topicPrayerCounts[topic.id] || 0}
+                            onClick={() => toggleTopicPrayer(topic.id)}
+                            size="sm"
+                          />
+                        ) : (
+                          <LikeButton
+                            liked={topicUserLikes[topic.id] || false}
+                            count={topicLikeCounts[topic.id] || 0}
+                            onClick={() => toggleTopicLike(topic.id)}
+                            size="sm"
+                          />
+                        )}
                         <Badge variant="secondary" className="text-xs">
                           <MessageCircle className="h-3 w-3 mr-1" />
                           {topic.post_count}
