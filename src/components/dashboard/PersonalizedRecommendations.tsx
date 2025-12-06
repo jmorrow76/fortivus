@@ -77,6 +77,7 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
   const [isCreatingAllTemplates, setIsCreatingAllTemplates] = useState(false);
   const [savedTemplateDays, setSavedTemplateDays] = useState<Map<string, string>>(new Map());
   const [isResaving, setIsResaving] = useState(false);
+  const [resaveConfirmed, setResaveConfirmed] = useState(false);
 
   // Load existing AI plan and saved templates on mount for Elite users
   useEffect(() => {
@@ -1089,7 +1090,10 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
       {/* Template Creation Dialog */}
       <Dialog open={showTemplateDialog} onOpenChange={(open) => {
         setShowTemplateDialog(open);
-        if (!open) setIsResaving(false);
+        if (!open) {
+          setIsResaving(false);
+          setResaveConfirmed(false);
+        }
       }}>
         <DialogContent>
           <DialogHeader>
@@ -1103,6 +1107,15 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
           </DialogHeader>
           
           <div className="space-y-4 py-4">
+            {isResaving && !resaveConfirmed && (
+              <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+                <p className="text-sm font-medium text-destructive mb-2">Warning: This will replace all existing exercises</p>
+                <p className="text-xs text-muted-foreground">
+                  The current exercises in this template will be permanently replaced with the exercises from your AI plan. This action cannot be undone.
+                </p>
+              </div>
+            )}
+
             <div className="space-y-2">
               <Label htmlFor="template-name">Template Name</Label>
               <Input
@@ -1119,7 +1132,7 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
 
             {selectedDayForTemplate !== null && aiPlan && (
               <div className="space-y-2">
-                <Label>Exercises to {isResaving ? 'Update' : 'Include'}</Label>
+                <Label>Exercises to {isResaving ? 'Replace With' : 'Include'}</Label>
                 <div className="max-h-48 overflow-y-auto space-y-1 p-3 bg-muted/50 rounded-lg">
                   {aiPlan.workout.weeklySchedule[selectedDayForTemplate].exercises?.map((ex, idx) => (
                     <div key={idx} className="flex justify-between items-center text-sm py-1">
@@ -1136,19 +1149,28 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
             <Button variant="outline" onClick={() => setShowTemplateDialog(false)}>
               Cancel
             </Button>
-            <Button onClick={handleCreateWorkoutTemplate} disabled={isCreatingTemplate}>
-              {isCreatingTemplate ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  {isResaving ? 'Updating...' : 'Creating...'}
-                </>
-              ) : (
-                <>
-                  <Save className="h-4 w-4 mr-2" />
-                  {isResaving ? 'Update Template' : 'Create Template'}
-                </>
-              )}
-            </Button>
+            {isResaving && !resaveConfirmed ? (
+              <Button 
+                variant="destructive" 
+                onClick={() => setResaveConfirmed(true)}
+              >
+                I Understand, Continue
+              </Button>
+            ) : (
+              <Button onClick={handleCreateWorkoutTemplate} disabled={isCreatingTemplate}>
+                {isCreatingTemplate ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    {isResaving ? 'Updating...' : 'Creating...'}
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4 mr-2" />
+                    {isResaving ? 'Update Template' : 'Create Template'}
+                  </>
+                )}
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>
