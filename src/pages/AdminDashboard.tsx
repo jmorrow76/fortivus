@@ -13,7 +13,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { Shield, Users, Crown, TrendingUp, Calendar, Trash2, Plus, Loader2, Bot, Play, UserPlus, FileText, Mail, Send, Eye, Ban, UserX } from 'lucide-react';
+import { Shield, Users, Crown, TrendingUp, Calendar, Trash2, Plus, Loader2, Bot, Play, UserPlus, FileText, Mail, Send, Eye, Ban, UserX, CheckSquare, Square } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -96,6 +97,8 @@ const AdminDashboard = () => {
   const [userSearch, setUserSearch] = useState('');
   const [updatingRole, setUpdatingRole] = useState<string | null>(null);
   const [managingUser, setManagingUser] = useState<string | null>(null);
+  const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
+  const [bulkActionLoading, setBulkActionLoading] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -190,6 +193,71 @@ const AdminDashboard = () => {
       toast.error(error.message || `Failed to ${action} user`);
     } finally {
       setManagingUser(null);
+    }
+  };
+
+  // Bulk action handlers
+  const handleSelectAll = () => {
+    const filteredUsers = getFilteredUsers();
+    const selectableUsers = filteredUsers.filter(u => u.id !== user?.id);
+    if (selectedUsers.size === selectableUsers.length) {
+      setSelectedUsers(new Set());
+    } else {
+      setSelectedUsers(new Set(selectableUsers.map(u => u.id)));
+    }
+  };
+
+  const handleSelectUser = (userId: string) => {
+    const newSelected = new Set(selectedUsers);
+    if (newSelected.has(userId)) {
+      newSelected.delete(userId);
+    } else {
+      newSelected.add(userId);
+    }
+    setSelectedUsers(newSelected);
+  };
+
+  const handleBulkBan = async () => {
+    if (selectedUsers.size === 0) return;
+    setBulkActionLoading(true);
+    try {
+      const promises = Array.from(selectedUsers).map(userId =>
+        supabase.functions.invoke('manage-user', {
+          body: { targetUserId: userId, action: 'ban' },
+          headers: { Authorization: `Bearer ${session?.access_token}` },
+        })
+      );
+      await Promise.all(promises);
+      toast.success(`${selectedUsers.size} user(s) banned`);
+      setSelectedUsers(new Set());
+      fetchAllUsers();
+    } catch (error: any) {
+      console.error('Bulk ban error:', error);
+      toast.error('Failed to ban some users');
+    } finally {
+      setBulkActionLoading(false);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedUsers.size === 0) return;
+    setBulkActionLoading(true);
+    try {
+      const promises = Array.from(selectedUsers).map(userId =>
+        supabase.functions.invoke('manage-user', {
+          body: { targetUserId: userId, action: 'delete' },
+          headers: { Authorization: `Bearer ${session?.access_token}` },
+        })
+      );
+      await Promise.all(promises);
+      toast.success(`${selectedUsers.size} user(s) deleted`);
+      setSelectedUsers(new Set());
+      fetchAllUsers();
+    } catch (error: any) {
+      console.error('Bulk delete error:', error);
+      toast.error('Failed to delete some users');
+    } finally {
+      setBulkActionLoading(false);
     }
   };
 
@@ -577,13 +645,80 @@ const AdminDashboard = () => {
                     </Button>
                   </div>
                 </div>
-                <div className="mt-4">
+                <div className="mt-4 flex items-center gap-4">
                   <Input
                     placeholder="Search by name or email..."
                     value={userSearch}
                     onChange={(e) => setUserSearch(e.target.value)}
                     className="max-w-sm"
                   />
+                  {selectedUsers.size > 0 && (
+                    <div className="flex items-center gap-2 ml-auto">
+                      <span className="text-sm text-muted-foreground">
+                        {selectedUsers.size} selected
+                      </span>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="text-amber-600 border-amber-600"
+                            disabled={bulkActionLoading}
+                          >
+                            {bulkActionLoading ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Ban className="h-3 w-3 mr-1" />}
+                            Ban Selected
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Ban {selectedUsers.size} Users</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to ban {selectedUsers.size} user(s)? They will no longer be able to access the platform.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleBulkBan} className="bg-amber-600 hover:bg-amber-700">
+                              Ban Users
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            disabled={bulkActionLoading}
+                          >
+                            {bulkActionLoading ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <UserX className="h-3 w-3 mr-1" />}
+                            Delete Selected
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete {selectedUsers.size} Users</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to permanently delete {selectedUsers.size} user(s)? This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleBulkDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                              Delete Users
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setSelectedUsers(new Set())}
+                      >
+                        Clear
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </CardHeader>
               <CardContent>
@@ -600,6 +735,12 @@ const AdminDashboard = () => {
                     <Table>
                       <TableHeader>
                         <TableRow>
+                          <TableHead className="w-10">
+                            <Checkbox
+                              checked={selectedUsers.size > 0 && selectedUsers.size === getFilteredUsers().filter(u => u.id !== user?.id).length}
+                              onCheckedChange={handleSelectAll}
+                            />
+                          </TableHead>
                           <TableHead>User</TableHead>
                           <TableHead>Email</TableHead>
                           <TableHead>Roles</TableHead>
@@ -612,7 +753,15 @@ const AdminDashboard = () => {
                       </TableHeader>
                       <TableBody>
                         {getFilteredUsers().map((userData) => (
-                          <TableRow key={userData.id}>
+                          <TableRow key={userData.id} className={selectedUsers.has(userData.id) ? 'bg-muted/50' : ''}>
+                            <TableCell>
+                              {userData.id !== user?.id && (
+                                <Checkbox
+                                  checked={selectedUsers.has(userData.id)}
+                                  onCheckedChange={() => handleSelectUser(userData.id)}
+                                />
+                              )}
+                            </TableCell>
                             <TableCell>
                               <div className="flex items-center gap-2">
                                 {userData.avatar_url ? (
