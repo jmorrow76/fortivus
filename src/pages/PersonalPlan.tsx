@@ -292,6 +292,16 @@ const PersonalPlan = () => {
       toast({
         title: "Template Created!",
         description: `"${templateName}" has been added to your workout templates`,
+        action: (
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => navigate("/workouts")}
+            className="ml-2"
+          >
+            Go to Workouts
+          </Button>
+        ),
       });
       
       setShowTemplateDialog(false);
