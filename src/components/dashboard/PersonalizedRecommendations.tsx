@@ -7,10 +7,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Lightbulb, Target, Dumbbell, Utensils, Battery, 
   Calendar, ChevronRight, Pill, Clock, Flame,
-  Check
+  Check, Sparkles, ArrowRight
 } from 'lucide-react';
 import { OnboardingData, PersonalizedRecommendations as Recommendations } from '@/hooks/useOnboarding';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/hooks/useAuth';
 
 interface PersonalizedRecommendationsProps {
   recommendations: Recommendations;
@@ -19,6 +20,7 @@ interface PersonalizedRecommendationsProps {
 
 const PersonalizedRecommendations = ({ recommendations, onboardingData }: PersonalizedRecommendationsProps) => {
   const [activeTab, setActiveTab] = useState('overview');
+  const { subscription } = useAuth();
 
   const getIntensityColor = (intensity: string) => {
     switch (intensity.toLowerCase()) {
@@ -255,6 +257,40 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
             </p>
           </TabsContent>
         </Tabs>
+
+        {/* Upsell to AI Personal Plan for non-Elite users */}
+        {!subscription.subscribed && (
+          <div className="mt-6 p-4 rounded-lg bg-gradient-to-r from-accent/10 via-accent/5 to-transparent border border-accent/20">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="flex items-start gap-3">
+                <div className="p-2 rounded-lg bg-accent/10 shrink-0">
+                  <Sparkles className="h-5 w-5 text-accent" />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-sm mb-1">Want a deeper, AI-powered plan?</h4>
+                  <p className="text-xs text-muted-foreground">
+                    Elite members get custom AI Personal Plans with full meal plans, detailed macros, 
+                    saveable workout templates, supplement protocols with dosages, and more.
+                  </p>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {['Full meal plans', 'Custom macros', 'Saveable plans', 'Workout templates'].map((feature) => (
+                      <Badge key={feature} variant="secondary" className="text-xs">
+                        <Check className="h-3 w-3 mr-1" />
+                        {feature}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <Button asChild className="shrink-0">
+                <Link to="/#pricing">
+                  Upgrade to Elite
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
