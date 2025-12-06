@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -7,20 +7,87 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Lightbulb, Target, Dumbbell, Utensils, Battery, 
   Calendar, ChevronRight, Pill, Clock, Flame,
-  Check, Sparkles, ArrowRight
+  Check, Sparkles, ArrowRight, Loader2, Crown,
+  Save, ChevronDown, ChevronUp, FileText
 } from 'lucide-react';
 import { OnboardingData, PersonalizedRecommendations as Recommendations } from '@/hooks/useOnboarding';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface PersonalizedRecommendationsProps {
   recommendations: Recommendations;
   onboardingData: OnboardingData;
 }
 
+interface AIPlan {
+  diet: {
+    dailyCalories: number;
+    macros: { protein: number; carbs: number; fats: number };
+    mealPlan: { meal: string; foods: string[]; calories: number }[];
+    tips: string[];
+  };
+  workout: {
+    daysPerWeek: number;
+    focusAreas: string[];
+    weeklySchedule: {
+      day: string;
+      focus: string;
+      exercises: { name: string; sets: number; reps: string; notes?: string }[];
+    }[];
+    cardioRecommendation: string;
+  };
+  supplements: { name: string; dosage: string; timing: string; benefit: string }[];
+  timeline: string;
+  keyPriorities: string[];
+}
+
 const PersonalizedRecommendations = ({ recommendations, onboardingData }: PersonalizedRecommendationsProps) => {
   const [activeTab, setActiveTab] = useState('overview');
-  const { subscription } = useAuth();
+  const { subscription, session, user } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  // AI Plan state
+  const [aiPlan, setAiPlan] = useState<AIPlan | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [expandedSections, setExpandedSections] = useState({
+    diet: true,
+    workout: true,
+    supplements: true,
+  });
+
+  // Load existing AI plan on mount for Elite users
+  useEffect(() => {
+    if (subscription.subscribed && user) {
+      loadExistingPlan();
+    }
+  }, [subscription.subscribed, user]);
+
+  const loadExistingPlan = async () => {
+    if (!user) return;
+    try {
+      const { data } = await supabase
+        .from('personal_plans')
+        .select('plan_data')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      
+      if (data?.plan_data) {
+        setAiPlan(data.plan_data as unknown as AIPlan);
+      }
+    } catch (error) {
+      console.error('Error loading plan:', error);
+    }
+  };
+
+  const toggleSection = (section: keyof typeof expandedSections) => {
+    setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
+  };
 
   const getIntensityColor = (intensity: string) => {
     switch (intensity.toLowerCase()) {
@@ -37,17 +104,142 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
     }
   };
 
+  const handleGenerateAIPlan = async () => {
+    if (!subscription.subscribed) {
+      navigate('/#pricing');
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      // Map onboarding data to goals string
+      const goalMap: Record<string, string> = {
+        'build_muscle': 'Build lean muscle mass and increase strength',
+        'lose_fat': 'Lose body fat while maintaining muscle',
+        'improve_health': 'Improve overall health and longevity',
+        'increase_energy': 'Boost energy levels and daily performance',
+      };
+
+      const experienceMap: Record<string, string> = {
+        'beginner': 'beginner',
+        'returning': 'intermediate',
+        'consistent': 'intermediate',
+        'advanced': 'advanced',
+      };
+
+      const equipmentToLocation: Record<string, string> = {
+        'full_gym': 'gym',
+        'home_weights': 'home',
+        'resistance_bands': 'minimal',
+        'bodyweight_only': 'bodyweight',
+      };
+
+      const frequencyToTime: Record<string, string> = {
+        '1-2': '30',
+        '3-4': '45',
+        '5-6': '60',
+        '7+': '60',
+      };
+
+      const goals = goalMap[onboardingData.fitness_goal] || onboardingData.fitness_goal;
+      const experienceLevel = experienceMap[onboardingData.experience_level] || 'intermediate';
+      const workoutLocation = onboardingData.available_equipment?.length > 0 
+        ? equipmentToLocation[onboardingData.available_equipment[0]] || 'gym'
+        : 'gym';
+      const timeAvailable = frequencyToTime[onboardingData.workout_frequency] || '45';
+
+      const { data, error } = await supabase.functions.invoke("generate-personal-plan", {
+        headers: { Authorization: `Bearer ${session?.access_token}` },
+        body: {
+          goals,
+          currentStats: { 
+            age: onboardingData.age_range,
+            experienceLevel 
+          },
+          preferences: { 
+            diet: onboardingData.dietary_preference,
+            workoutLocation,
+            timeAvailable,
+          },
+        },
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      setAiPlan(data.plan);
+      setActiveTab('ai-plan');
+      toast({
+        title: "AI Plan Generated!",
+        description: "Your personalized fitness plan is ready",
+      });
+    } catch (error: any) {
+      console.error("Error generating plan:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to generate plan. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleSavePlan = async () => {
+    if (!aiPlan || !user) return;
+
+    setIsSaving(true);
+    try {
+      const goalMap: Record<string, string> = {
+        'build_muscle': 'Build lean muscle mass and increase strength',
+        'lose_fat': 'Lose body fat while maintaining muscle',
+        'improve_health': 'Improve overall health and longevity',
+        'increase_energy': 'Boost energy levels and daily performance',
+      };
+
+      const planData = JSON.parse(JSON.stringify(aiPlan));
+      const { error } = await supabase.from("personal_plans").insert([{
+        user_id: user.id,
+        goals: goalMap[onboardingData.fitness_goal] || onboardingData.fitness_goal,
+        current_stats: { 
+          age: onboardingData.age_range,
+          experienceLevel: onboardingData.experience_level
+        },
+        preferences: { 
+          diet: onboardingData.dietary_preference,
+        },
+        plan_data: planData,
+      }]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Plan Saved!",
+        description: "Your plan has been saved and can be accessed anytime.",
+      });
+    } catch (error: any) {
+      console.error("Error saving plan:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save plan",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
             <CardTitle className="flex items-center gap-2">
               <Lightbulb className="h-5 w-5 text-primary" />
               Quick Start Guide
             </CardTitle>
             <CardDescription className="mt-1">
-              Based on your assessment • For detailed AI-powered plans, try Elite
+              Based on your assessment • Personalized recommendations for you
             </CardDescription>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -63,11 +255,17 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
 
       <CardContent>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4 mb-6">
+          <TabsList className={cn("grid w-full mb-6", aiPlan ? "grid-cols-5" : "grid-cols-4")}>
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="workouts">Workouts</TabsTrigger>
             <TabsTrigger value="nutrition">Nutrition</TabsTrigger>
             <TabsTrigger value="schedule">Schedule</TabsTrigger>
+            {aiPlan && (
+              <TabsTrigger value="ai-plan" className="flex items-center gap-1">
+                <Sparkles className="h-3 w-3" />
+                AI Plan
+              </TabsTrigger>
+            )}
           </TabsList>
 
           {/* Overview Tab */}
@@ -118,7 +316,7 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
               </div>
             )}
 
-            <div className="flex gap-3 pt-2">
+            <div className="flex flex-wrap gap-3 pt-2">
               <Button asChild>
                 <Link to="/workouts">
                   <Dumbbell className="h-4 w-4 mr-2" />
@@ -256,41 +454,247 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
               Based on your {onboardingData.workout_frequency} days/week availability
             </p>
           </TabsContent>
+
+          {/* AI Plan Tab - Only shown when plan exists */}
+          {aiPlan && (
+            <TabsContent value="ai-plan" className="space-y-6">
+              {/* Key Priorities */}
+              {aiPlan.keyPriorities && aiPlan.keyPriorities.length > 0 && (
+                <div className="p-4 bg-accent/5 rounded-lg border border-accent/20">
+                  <h4 className="font-semibold text-sm mb-3 flex items-center gap-2">
+                    <Target className="h-4 w-4 text-accent" />
+                    Key Priorities
+                  </h4>
+                  <ul className="space-y-2">
+                    {aiPlan.keyPriorities.map((priority, idx) => (
+                      <li key={idx} className="flex items-start gap-2 text-sm">
+                        <Check className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
+                        {priority}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Diet Section */}
+              <div className="border rounded-lg overflow-hidden">
+                <button
+                  onClick={() => toggleSection('diet')}
+                  className="w-full p-4 flex items-center justify-between bg-muted/50 hover:bg-muted/70 transition-colors"
+                >
+                  <span className="font-semibold flex items-center gap-2">
+                    <Utensils className="h-4 w-4" />
+                    Diet Plan
+                  </span>
+                  {expandedSections.diet ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                </button>
+                {expandedSections.diet && (
+                  <div className="p-4 space-y-4">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                      <div className="p-3 bg-muted/50 rounded-lg text-center">
+                        <p className="text-2xl font-bold text-primary">{aiPlan.diet.dailyCalories}</p>
+                        <p className="text-xs text-muted-foreground">Daily Calories</p>
+                      </div>
+                      <div className="p-3 bg-muted/50 rounded-lg text-center">
+                        <p className="text-2xl font-bold text-blue-500">{aiPlan.diet.macros.protein}g</p>
+                        <p className="text-xs text-muted-foreground">Protein</p>
+                      </div>
+                      <div className="p-3 bg-muted/50 rounded-lg text-center">
+                        <p className="text-2xl font-bold text-amber-500">{aiPlan.diet.macros.carbs}g</p>
+                        <p className="text-xs text-muted-foreground">Carbs</p>
+                      </div>
+                      <div className="p-3 bg-muted/50 rounded-lg text-center">
+                        <p className="text-2xl font-bold text-green-500">{aiPlan.diet.macros.fats}g</p>
+                        <p className="text-xs text-muted-foreground">Fats</p>
+                      </div>
+                    </div>
+                    {aiPlan.diet.mealPlan && (
+                      <div className="space-y-2">
+                        {aiPlan.diet.mealPlan.map((meal, idx) => (
+                          <div key={idx} className="p-3 bg-background rounded-lg border">
+                            <div className="flex justify-between items-center mb-2">
+                              <Badge variant="secondary">{meal.meal}</Badge>
+                              <span className="text-sm text-primary font-medium">{meal.calories} cal</span>
+                            </div>
+                            <ul className="text-sm text-muted-foreground space-y-1">
+                              {meal.foods.map((food, fIdx) => (
+                                <li key={fIdx}>• {food}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Workout Section */}
+              <div className="border rounded-lg overflow-hidden">
+                <button
+                  onClick={() => toggleSection('workout')}
+                  className="w-full p-4 flex items-center justify-between bg-muted/50 hover:bg-muted/70 transition-colors"
+                >
+                  <span className="font-semibold flex items-center gap-2">
+                    <Dumbbell className="h-4 w-4" />
+                    Workout Plan ({aiPlan.workout.daysPerWeek} days/week)
+                  </span>
+                  {expandedSections.workout ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                </button>
+                {expandedSections.workout && (
+                  <div className="p-4 space-y-4">
+                    {aiPlan.workout.weeklySchedule?.map((day, idx) => (
+                      <div key={idx} className="p-3 bg-background rounded-lg border">
+                        <div className="flex justify-between items-center mb-3">
+                          <span className="font-medium">{day.day}</span>
+                          <Badge variant="outline">{day.focus}</Badge>
+                        </div>
+                        {day.exercises && day.exercises.length > 0 && (
+                          <div className="space-y-2">
+                            {day.exercises.map((ex, exIdx) => (
+                              <div key={exIdx} className="flex justify-between items-center text-sm p-2 bg-muted/50 rounded">
+                                <span>{ex.name}</span>
+                                <span className="text-muted-foreground">{ex.sets} × {ex.reps}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                    {aiPlan.workout.cardioRecommendation && (
+                      <p className="text-sm text-muted-foreground italic">
+                        Cardio: {aiPlan.workout.cardioRecommendation}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Supplements Section */}
+              {aiPlan.supplements && aiPlan.supplements.length > 0 && (
+                <div className="border rounded-lg overflow-hidden">
+                  <button
+                    onClick={() => toggleSection('supplements')}
+                    className="w-full p-4 flex items-center justify-between bg-muted/50 hover:bg-muted/70 transition-colors"
+                  >
+                    <span className="font-semibold flex items-center gap-2">
+                      <Pill className="h-4 w-4" />
+                      Supplement Protocol
+                    </span>
+                    {expandedSections.supplements ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                  </button>
+                  {expandedSections.supplements && (
+                    <div className="p-4 space-y-2">
+                      {aiPlan.supplements.map((supp, idx) => (
+                        <div key={idx} className="p-3 bg-background rounded-lg border">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <p className="font-medium">{supp.name}</p>
+                              <p className="text-xs text-muted-foreground">{supp.benefit}</p>
+                            </div>
+                            <div className="text-right text-sm">
+                              <p className="text-primary font-medium">{supp.dosage}</p>
+                              <p className="text-xs text-muted-foreground">{supp.timing}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="flex flex-wrap gap-3">
+                <Button onClick={handleSavePlan} disabled={isSaving}>
+                  {isSaving ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Save className="h-4 w-4 mr-2" />
+                  )}
+                  Save Plan
+                </Button>
+                <Button variant="outline" onClick={handleGenerateAIPlan} disabled={isGenerating}>
+                  {isGenerating ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Sparkles className="h-4 w-4 mr-2" />
+                  )}
+                  Regenerate
+                </Button>
+                <Button variant="outline" asChild>
+                  <Link to="/personal-plan">
+                    <FileText className="h-4 w-4 mr-2" />
+                    View All Plans
+                  </Link>
+                </Button>
+              </div>
+            </TabsContent>
+          )}
         </Tabs>
 
-        {/* Upsell to AI Personal Plan for non-Elite users */}
-        {!subscription.subscribed && (
-          <div className="mt-6 p-4 rounded-lg bg-gradient-to-r from-accent/10 via-accent/5 to-transparent border border-accent/20">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div className="flex items-start gap-3">
-                <div className="p-2 rounded-lg bg-accent/10 shrink-0">
-                  <Sparkles className="h-5 w-5 text-accent" />
-                </div>
-                <div>
-                  <h4 className="font-semibold text-sm mb-1">Want a deeper, AI-powered plan?</h4>
-                  <p className="text-xs text-muted-foreground">
-                    Elite members get custom AI Personal Plans with full meal plans, detailed macros, 
-                    saveable workout templates, supplement protocols with dosages, and more.
-                  </p>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {['Full meal plans', 'Custom macros', 'Saveable plans', 'Workout templates'].map((feature) => (
-                      <Badge key={feature} variant="secondary" className="text-xs">
-                        <Check className="h-3 w-3 mr-1" />
-                        {feature}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
+        {/* Generate AI Plan Button / Upsell */}
+        <div className="mt-6 p-4 rounded-lg bg-gradient-to-r from-accent/10 via-accent/5 to-transparent border border-accent/20">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <div className="p-2 rounded-lg bg-accent/10 shrink-0">
+                <Sparkles className="h-5 w-5 text-accent" />
               </div>
-              <Button asChild className="shrink-0">
-                <Link to="/#pricing">
+              <div>
+                {subscription.subscribed ? (
+                  <>
+                    <h4 className="font-semibold text-sm mb-1 flex items-center gap-2">
+                      <Crown className="h-4 w-4 text-amber-500" />
+                      Generate Full AI Personal Plan
+                    </h4>
+                    <p className="text-xs text-muted-foreground">
+                      Create a comprehensive AI-powered plan with detailed meal plans, custom macros, 
+                      workout programming with exercises, and supplement protocols with dosages.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <h4 className="font-semibold text-sm mb-1">Want a deeper, AI-powered plan?</h4>
+                    <p className="text-xs text-muted-foreground">
+                      Elite members get custom AI Personal Plans with full meal plans, detailed macros, 
+                      saveable workout templates, supplement protocols with dosages, and more.
+                    </p>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {['Full meal plans', 'Custom macros', 'Saveable plans', 'Workout templates'].map((feature) => (
+                        <Badge key={feature} variant="secondary" className="text-xs">
+                          <Check className="h-3 w-3 mr-1" />
+                          {feature}
+                        </Badge>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+            <Button 
+              onClick={handleGenerateAIPlan} 
+              disabled={isGenerating}
+              className="shrink-0"
+            >
+              {isGenerating ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Generating...
+                </>
+              ) : subscription.subscribed ? (
+                <>
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  {aiPlan ? 'Regenerate AI Plan' : 'Generate AI Plan'}
+                </>
+              ) : (
+                <>
                   Upgrade to Elite
                   <ArrowRight className="h-4 w-4 ml-2" />
-                </Link>
-              </Button>
-            </div>
+                </>
+              )}
+            </Button>
           </div>
-        )}
+        </div>
       </CardContent>
     </Card>
   );

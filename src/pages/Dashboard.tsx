@@ -4,7 +4,7 @@ import {
   Loader2, Trophy, Flame, Target, Dumbbell, Calendar, 
   TrendingUp, Lock, Zap, Settings,
   Crown, Medal, ChevronRight, Users, Camera,
-  Brain, Sparkles, MapPin, Utensils, MessageCircle,
+  MapPin, Utensils, MessageCircle,
   Battery, Shield, Moon, RotateCcw, Briefcase, Lightbulb
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
@@ -32,11 +32,6 @@ interface LeaderboardPosition {
   total: number;
 }
 
-interface PersonalPlan {
-  id: string;
-  goals: string;
-  created_at: string;
-}
 
 interface MoodCheckin {
   id: string;
@@ -75,7 +70,7 @@ export default function Dashboard() {
   
   const [profile, setProfile] = useState<Profile | null>(null);
   const [leaderboardPos, setLeaderboardPos] = useState<LeaderboardPosition | null>(null);
-  const [personalPlan, setPersonalPlan] = useState<PersonalPlan | null>(null);
+  
   const [latestCheckin, setLatestCheckin] = useState<MoodCheckin | null>(null);
   const [progressPhotos, setProgressPhotos] = useState<number>(0);
   const [runningStats, setRunningStats] = useState<RunningStats>({ totalRuns: 0, totalDistanceKm: 0, totalDurationMinutes: 0, runningBadges: 0 });
@@ -106,10 +101,9 @@ export default function Dashboard() {
     if (!user) return;
 
     try {
-      const [profileRes, leaderboardRes, planRes, checkinRes, photosRes, runsRes, runningBadgesRes, prsRes] = await Promise.all([
+      const [profileRes, leaderboardRes, checkinRes, photosRes, runsRes, runningBadgesRes, prsRes] = await Promise.all([
         supabase.from('profiles').select('display_name, avatar_url').eq('user_id', user.id).maybeSingle(),
         supabase.from('leaderboard_view').select('*').order('total_xp', { ascending: false }),
-        supabase.from('personal_plans').select('id, goals, created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(1).maybeSingle(),
         supabase.from('mood_checkins').select('id, mood_level, energy_level, check_in_date').eq('user_id', user.id).order('check_in_date', { ascending: false }).limit(1).maybeSingle(),
         supabase.from('progress_photos').select('id', { count: 'exact' }).eq('user_id', user.id),
         supabase.from('running_sessions').select('distance_meters, duration_seconds').eq('user_id', user.id),
@@ -118,7 +112,6 @@ export default function Dashboard() {
       ]);
 
       if (profileRes.data) setProfile(profileRes.data);
-      if (planRes.data) setPersonalPlan(planRes.data);
       if (checkinRes.data) setLatestCheckin(checkinRes.data);
       if (photosRes.count !== null) setProgressPhotos(photosRes.count);
       
@@ -711,49 +704,6 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
 
-              {/* AI Personal Plan - Premium Feature */}
-              <Card className={!subscription.subscribed ? 'relative overflow-hidden' : ''}>
-                {!subscription.subscribed && (
-                  <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
-                    <Lock className="h-6 w-6 text-muted-foreground mb-2" />
-                    <p className="text-sm text-muted-foreground mb-2">Elite Feature</p>
-                    <Button size="sm" asChild>
-                      <a href="/#pricing">Upgrade</a>
-                    </Button>
-                  </div>
-                )}
-                <CardHeader>
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <Brain className="h-4 w-4" />
-                    AI Personal Plan
-                  </CardTitle>
-                  <CardDescription>
-                    Detailed AI-generated diet, workout & supplements
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {personalPlan ? (
-                    <div className="space-y-2">
-                      <p className="text-sm text-muted-foreground">Latest Goal:</p>
-                      <p className="font-medium line-clamp-2">{personalPlan.goals}</p>
-                      <p className="text-xs text-muted-foreground">
-                        Created {format(new Date(personalPlan.created_at), 'MMM d, yyyy')}
-                      </p>
-                      <Button variant="outline" size="sm" asChild className="w-full mt-2">
-                        <Link to="/personal-plan">View & Manage Plans</Link>
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="text-center">
-                      <Sparkles className="h-8 w-8 mx-auto mb-2 text-primary/50" />
-                      <p className="text-sm text-muted-foreground mb-2">Generate a comprehensive plan</p>
-                      <Button size="sm" asChild className="w-full">
-                        <Link to="/personal-plan">Create AI Plan</Link>
-                      </Button>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
 
               {/* AI Coaching - Premium Feature */}
               <Card className={!subscription.subscribed ? 'relative overflow-hidden' : ''}>
