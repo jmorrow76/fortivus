@@ -74,3 +74,6 @@ verify_jwt = false
 
 [functions.send-accountability-reminders]
 verify_jwt = false
+
+[functions.notify-featured-testimony]
+verify_jwt = false
