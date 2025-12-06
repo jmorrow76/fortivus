@@ -41,6 +41,7 @@ import {
   X,
   HeartHandshake,
   HandHeart,
+  Sparkles,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
@@ -950,14 +951,22 @@ const Forum = () => {
                   Connect with fellow members, share experiences, and get advice.
                 </p>
               </div>
-              <Button 
-                variant="outline" 
-                onClick={() => navigate("/accountability")}
-                className="self-start"
-              >
-                <HandHeart className="h-4 w-4 mr-2" />
-                Find Accountability Partner
-              </Button>
+              <div className="flex flex-wrap gap-2 self-start">
+                <Button 
+                  variant="outline" 
+                  onClick={() => navigate("/testimonies")}
+                >
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Testimonies
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => navigate("/accountability")}
+                >
+                  <HandHeart className="h-4 w-4 mr-2" />
+                  Accountability Partner
+                </Button>
+              </div>
             </div>
           </div>
 
