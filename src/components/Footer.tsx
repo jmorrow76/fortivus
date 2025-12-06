@@ -42,13 +42,16 @@ const Footer = () => {
           {/* Brand */}
           <div className="col-span-2">
             <Link to="/" className="inline-block mb-8">
-              <span className="text-lg font-medium tracking-[0.25em] uppercase">
+              <span className="text-lg font-heading font-semibold tracking-wide">
                 Fortivus
               </span>
             </Link>
-            <p className="text-background/60 text-sm mb-8 max-w-xs leading-relaxed">
-              The premier fitness platform for men over 40. Transform your body,
-              optimize your health, and live your best years.
+            <p className="text-background/60 text-sm mb-4 max-w-xs leading-relaxed">
+              Faith-driven fitness for Christian men over 40. Steward your body as a temple,
+              optimize your health, and serve God with strength.
+            </p>
+            <p className="text-background/40 text-xs italic mb-8 max-w-xs">
+              "Do you not know that your bodies are temples of the Holy Spirit?" — 1 Cor 6:19
             </p>
             <div className="flex gap-4">
               {socialLinks.map((social) => (

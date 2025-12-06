@@ -2,7 +2,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Target, Heart, Users, Award } from "lucide-react";
+import { Target, Heart, Users, Award, Cross, BookOpen } from "lucide-react";
 
 const About = () => {
   return (
@@ -13,14 +13,14 @@ const About = () => {
         <section className="section-padding bg-secondary/20">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto text-center">
-              <span className="section-label">Our Story</span>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight mb-6">
-                Built for Men Who <span className="text-accent">Refuse to Settle</span>
+              <span className="section-label">Our Mission</span>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-6">
+                Steward Your Body for <span className="text-accent">God's Glory</span>
               </h1>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                Fortivus was born from a simple belief: age is not a barrier to peak performance. 
-                We exist to help men over 40 unlock their full potential through science-backed 
-                training, precision nutrition, and cutting-edge technology.
+                Fortivus exists to help Christian men over 40 honor God by treating their bodies 
+                as temples of the Holy Spirit—through science-backed training, biblical wisdom, 
+                and a brotherhood of accountability.
               </p>
             </div>
           </div>
@@ -30,73 +30,113 @@ const About = () => {
         <section className="section-padding">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto">
-              <h2 className="text-2xl md:text-3xl font-medium tracking-tight mb-8 text-center">
+              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight mb-8 text-center">
                 The Origin
               </h2>
               <div className="prose prose-lg max-w-none text-muted-foreground space-y-6">
                 <p>
                   In 2020, our founder hit a wall. At 45, despite years of fitness experience, 
-                  he found that the programs designed for 20-somethings no longer worked. 
+                  he found that the programs designed for younger men no longer worked. 
                   Recovery took longer. Energy fluctuated. The generic advice felt hollow.
                 </p>
                 <p>
-                  He searched for a solution tailored to men navigating the unique challenges 
-                  of midlife fitness—hormonal changes, busy schedules, accumulated wear on 
-                  joints—and found nothing comprehensive.
+                  But more than that, he realized something deeper was missing: purpose. 
+                  Why was he training? For vanity? For ego? He began studying Scripture's 
+                  perspective on the body—and everything changed.
                 </p>
                 <p>
-                  So he built it. Working with endocrinologists, strength coaches, and 
-                  nutritionists who specialize in male health after 40, Fortivus emerged 
-                  as the definitive platform for men who understand that strength has no 
-                  expiration date.
+                  "Your body is a temple of the Holy Spirit" (1 Corinthians 6:19) became 
+                  his foundation. He realized that physical stewardship wasn't optional for 
+                  the Christian man—it was a calling. To serve his family. To have energy 
+                  for ministry. To be strong enough to help others.
+                </p>
+                <p>
+                  Working with Christian fitness experts, nutritionists, and coaches who 
+                  specialize in men's health after 40, Fortivus emerged as the platform 
+                  for men who understand that honoring God includes honoring the body He gave us.
                 </p>
               </div>
             </div>
           </div>
         </section>
 
+        {/* Scripture Foundation */}
+        <section className="section-padding bg-accent/5">
+          <div className="container mx-auto px-4">
+            <div className="max-w-3xl mx-auto text-center">
+              <BookOpen className="h-12 w-12 text-accent mx-auto mb-6" />
+              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight mb-8">
+                Rooted in Scripture
+              </h2>
+              <div className="space-y-8">
+                <blockquote className="text-lg italic text-muted-foreground border-l-4 border-accent pl-6 text-left">
+                  "Do you not know that your bodies are temples of the Holy Spirit, who is in you, 
+                  whom you have received from God? You are not your own; you were bought at a price. 
+                  Therefore honor God with your bodies."
+                  <footer className="mt-2 text-sm font-medium text-foreground not-italic">
+                    — 1 Corinthians 6:19-20
+                  </footer>
+                </blockquote>
+                <blockquote className="text-lg italic text-muted-foreground border-l-4 border-accent pl-6 text-left">
+                  "For physical training is of some value, but godliness has value for all things, 
+                  holding promise for both the present life and the life to come."
+                  <footer className="mt-2 text-sm font-medium text-foreground not-italic">
+                    — 1 Timothy 4:8
+                  </footer>
+                </blockquote>
+                <blockquote className="text-lg italic text-muted-foreground border-l-4 border-accent pl-6 text-left">
+                  "I discipline my body and keep it under control, lest after preaching to others 
+                  I myself should be disqualified."
+                  <footer className="mt-2 text-sm font-medium text-foreground not-italic">
+                    — 1 Corinthians 9:27
+                  </footer>
+                </blockquote>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Mission & Values */}
-        <section className="section-padding bg-secondary/20">
+        <section className="section-padding">
           <div className="container mx-auto px-4">
             <div className="section-header">
-              <span className="section-label">Our Mission</span>
+              <span className="section-label">Our Values</span>
               <h2 className="section-title">
-                Redefining What's Possible
+                Guiding Principles
               </h2>
               <p className="section-description">
-                We're on a mission to prove that your 40s, 50s, and beyond can be your 
-                strongest, most vital decades.
+                These values shape everything we do at Fortivus.
               </p>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
               {[
                 {
-                  icon: Target,
-                  title: "Precision",
-                  description: "Every recommendation is backed by science and tailored to your unique physiology."
+                  icon: Cross,
+                  title: "Faith First",
+                  description: "Everything we do is grounded in biblical truth. We train for God's glory, not our own."
                 },
                 {
                   icon: Heart,
-                  title: "Longevity",
-                  description: "We optimize for sustainable health, not quick fixes that damage long-term potential."
+                  title: "Stewardship",
+                  description: "Your body is a gift. We help you care for it wisely—for longevity, not vanity."
                 },
                 {
                   icon: Users,
-                  title: "Community",
-                  description: "Join thousands of like-minded men supporting each other on this journey."
+                  title: "Brotherhood",
+                  description: "Iron sharpens iron. Join thousands of Christian men pursuing strength together."
                 },
                 {
                   icon: Award,
                   title: "Excellence",
-                  description: "We hold ourselves to the highest standards in everything we create."
+                  description: "Whatever you do, work at it with all your heart, as working for the Lord."
                 }
               ].map((value, index) => (
                 <div key={index} className="text-center p-6">
                   <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-accent/10 text-accent mb-4">
                     <value.icon className="h-6 w-6" />
                   </div>
-                  <h3 className="text-lg font-medium mb-2">{value.title}</h3>
+                  <h3 className="text-lg font-semibold mb-2">{value.title}</h3>
                   <p className="text-sm text-muted-foreground">{value.description}</p>
                 </div>
               ))}
@@ -105,34 +145,35 @@ const About = () => {
         </section>
 
         {/* Philosophy */}
-        <section className="section-padding">
+        <section className="section-padding bg-secondary/20">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto">
-              <h2 className="text-2xl md:text-3xl font-medium tracking-tight mb-8 text-center">
+              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight mb-8 text-center">
                 Our Philosophy
               </h2>
               <div className="space-y-8">
                 <div className="border-l-2 border-accent pl-6">
-                  <h3 className="text-lg font-medium mb-2">Train Smarter, Not Just Harder</h3>
+                  <h3 className="text-lg font-semibold mb-2">Train Wisely, Not Just Harder</h3>
                   <p className="text-muted-foreground">
-                    Intensity matters, but so does intelligence. Our programs account for 
+                    Intensity matters, but so does wisdom. Our programs account for 
                     recovery needs, joint health, and hormonal optimization unique to men 
-                    over 40.
+                    over 40. We train smart to serve long.
                   </p>
                 </div>
                 <div className="border-l-2 border-accent pl-6">
-                  <h3 className="text-lg font-medium mb-2">Nutrition as Medicine</h3>
+                  <h3 className="text-lg font-semibold mb-2">Purpose Over Performance</h3>
                   <p className="text-muted-foreground">
-                    What you eat directly impacts testosterone, energy, and body composition. 
-                    We provide evidence-based nutrition protocols that work with your biology, 
-                    not against it.
+                    We're not training to impress others. We're training to have energy 
+                    for our families, strength for ministry, and vitality to serve God's 
+                    purposes for our lives.
                   </p>
                 </div>
                 <div className="border-l-2 border-accent pl-6">
-                  <h3 className="text-lg font-medium mb-2">Technology as a Tool</h3>
+                  <h3 className="text-lg font-semibold mb-2">Technology as a Tool</h3>
                   <p className="text-muted-foreground">
                     Our AI-powered analysis and tracking tools give you insights that were 
-                    previously available only to elite athletes with personal teams.
+                    previously available only to elite athletes—all in service of your 
+                    stewardship calling.
                   </p>
                 </div>
               </div>
@@ -143,14 +184,14 @@ const About = () => {
         {/* CTA */}
         <section className="section-padding bg-foreground text-background">
           <div className="container mx-auto px-4 text-center">
-            <h2 className="text-2xl md:text-3xl font-medium tracking-tight mb-4">
-              Ready to Transform?
+            <h2 className="text-2xl md:text-3xl font-semibold tracking-tight mb-4">
+              Ready to Begin?
             </h2>
             <p className="text-background/70 mb-8 max-w-xl mx-auto">
-              Join the Fortivus community and discover what you're truly capable of.
+              Join a brotherhood of Christian men stewarding their strength for God's glory.
             </p>
             <Button variant="secondary" size="lg" asChild>
-              <Link to="/auth">Get Started Today</Link>
+              <Link to="/auth">Start Your Journey</Link>
             </Button>
           </div>
         </section>

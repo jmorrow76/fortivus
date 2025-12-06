@@ -149,11 +149,10 @@ const FeaturesShowcase = () => {
         <div className="section-header">
           <span className="section-label">Platform Features</span>
           <h2 className="section-title">
-            Everything You Need to <span className="text-accent">Transform</span>
+            Everything You Need to <span className="text-accent">Steward Well</span>
           </h2>
           <p className="section-description">
-            Fortivus combines AI-powered personalization with proven training science. 
-            Elite members unlock the full toolkit for accelerated results.
+            Fortivus combines AI-powered personalization with proven training science—all grounded in the calling to honor God with your body.
           </p>
         </div>
 
@@ -280,7 +279,7 @@ const FeaturesShowcase = () => {
             </Link>
           </div>
           <p className="text-sm text-muted-foreground mt-4">
-            Join 50,000+ men transforming their fitness after 40
+            Join 50,000+ Christian men stewarding their strength for God's glory
           </p>
         </div>
       </div>

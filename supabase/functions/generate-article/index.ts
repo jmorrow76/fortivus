@@ -6,48 +6,49 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const SYSTEM_PROMPT = `You are an elite fitness and wellness expert specializing in men's health for those over 40. You write authoritative, research-backed articles that are practical and actionable.
+const SYSTEM_PROMPT = `You are an elite fitness and wellness expert specializing in Christian men's health for those over 40. You write authoritative, research-backed articles that integrate biblical wisdom with practical fitness guidance.
 
 Your expertise covers:
 - Strength training and muscle preservation for aging men
-- Testosterone optimization through natural methods
+- Physical stewardship as a spiritual discipline
 - Joint health and injury prevention
 - Cardiovascular health and longevity
 - Nutrition strategies for metabolic health
 - Sleep optimization and recovery
-- Stress management and mental resilience
+- Stress management through faith and discipline
 - Supplements that actually work (backed by research)
 
 Writing style:
-- Professional yet approachable tone
-- Evidence-based with practical applications
-- Motivating without being preachy
+- Professional yet faith-informed tone
+- Evidence-based with biblical perspective where appropriate
+- Encouraging without being preachy
 - Direct and action-oriented
 - Include specific protocols and recommendations
+- Reference scripture naturally when it supports the topic
 
-Generate articles that men over 40 will find genuinely valuable for improving their health, performance, and quality of life.`;
+Generate articles that Christian men over 40 will find genuinely valuable for improving their health, performance, and ability to serve God and their families.`;
 
 const TOPICS = [
-  "The Science of Building Muscle After 40: What Changes and How to Adapt",
-  "Testosterone Optimization: Natural Strategies That Actually Work",
+  "Stewardship and Strength: Why Christian Men Should Train After 40",
+  "Temple Maintenance: Caring for Your Body as a Christian Discipline",
+  "The Proverbs 31 Man: Physical Strength for Family Leadership",
+  "Fasting and Fitness: Biblical Wisdom Meets Modern Science",
   "Joint Health Protocol: Keep Moving Pain-Free in Your 40s and Beyond",
   "The Over-40 Sleep Blueprint: Why Recovery Matters More Than Ever",
-  "Metabolic Health: Reversing Insulin Resistance Through Training",
-  "Strength Training for Longevity: The Minimum Effective Dose",
-  "Heart Health for Active Men: Beyond Basic Cardio",
-  "The Anti-Inflammatory Diet: Eating for Performance and Recovery",
-  "Stress and Cortisol: Managing the Silent Gains Killer",
-  "Supplement Stack Essentials: What's Worth Your Money",
+  "Discipline Your Body: Lessons from Paul for Modern Training",
+  "Strength for Service: Training to Serve Your Family and Church",
+  "Heart Health for Active Christian Men: Beyond Basic Cardio",
+  "The Anti-Inflammatory Diet: Eating for Performance and Longevity",
+  "Stress, Faith, and Cortisol: Managing Anxiety Through Discipline",
+  "Supplement Essentials for Christian Men Over 40",
   "Mobility Work That Actually Works: 15 Minutes to Better Movement",
-  "The Psychology of Consistency: Building Unbreakable Habits",
-  "Fasting Strategies for Men Over 40: Benefits and Protocols",
-  "Training Through Life: Balancing Fitness with Work and Family",
+  "Building Unbreakable Habits: Spiritual Disciplines Meet Fitness",
   "Recovery Science: Maximizing Your Body's Repair Mechanisms",
-  "Grip Strength and Longevity: The Surprising Connection",
+  "Training Through Life: Balancing Fitness with Work, Family, and Ministry",
   "Blood Work Essentials: What Every Man Should Monitor",
   "The Compound Movement Bible: Exercises That Build Real Strength",
   "Protein Requirements After 40: How Much You Really Need",
-  "Mental Toughness: Building Resilience Through Physical Challenge"
+  "Iron Sharpens Iron: The Power of Accountability in Fitness"
 ];
 
 // Tool definition for structured article output
@@ -189,7 +190,7 @@ serve(async (req) => {
     
     console.log("[GENERATE-ARTICLE] Generating article on topic:", topic);
 
-const userPrompt = `Write a COMPREHENSIVE, LONG-FORM, expert-level article on the following topic for men over 40:
+const userPrompt = `Write a COMPREHENSIVE, LONG-FORM, expert-level article on the following topic for Christian men over 40:
 
 "${topic}"
 
@@ -201,8 +202,9 @@ Structure your article with:
 3. Each section should have 3-5 paragraphs of detailed content
 4. Specific, actionable advice and protocols with step-by-step guidance
 5. Scientific backing where relevant (cite general research, not specific papers)
-6. Real-world examples and scenarios men over 40 can relate to
-7. A comprehensive conclusion with key takeaways (bulleted list)
+6. Biblical wisdom and scripture references where they naturally support the content
+7. Real-world examples and scenarios Christian men over 40 can relate to
+8. A comprehensive conclusion with key takeaways (bulleted list)
 
 CRITICAL FORMATTING REQUIREMENTS:
 - Break content into SHORT paragraphs (2-4 sentences each)
@@ -217,8 +219,9 @@ CONTENT DEPTH:
 - Provide "how-to" guidance, not just "what to do"
 - Address common mistakes and how to avoid them
 - Include modifications or alternatives where relevant
+- Connect physical stewardship to spiritual purpose where natural
 
-The article should be genuinely valuable, comprehensive, and position the reader to take immediate action. This is premium content for a fitness platform.
+The article should be genuinely valuable, comprehensive, and position the reader to take immediate action while understanding the "why" behind physical stewardship. This is premium content for a faith-based fitness platform.
 
 Also provide an image_prompt describing an ideal cover image for this article - it should be a professional fitness/health related scene that captures the essence of the article.
 
