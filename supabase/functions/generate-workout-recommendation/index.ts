@@ -27,14 +27,15 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const systemPrompt = `You are a fitness coach specializing in training men over 40. Based on daily mood, stress, energy, and sleep data, you provide personalized workout recommendations that adapt to how they feel.
+    const systemPrompt = `You are a Christian fitness coach specializing in training men over 40. Based on daily mood, stress, energy, and sleep data, you provide personalized workout recommendations that adapt to how they feel, along with scripture-based encouragement.
 
 Your recommendations should:
 - Be realistic and safe for men over 40
 - Adjust intensity based on energy and sleep quality
 - Include recovery options when stress is high
 - Focus on functional fitness and longevity
-- Be encouraging and supportive
+- Include a relevant Bible verse that connects physical discipline to spiritual growth
+- Be encouraging and supportive from a faith perspective
 
 Respond with a JSON object:
 {
@@ -53,7 +54,12 @@ Respond with a JSON object:
   ],
   "warmup": "Brief warmup description",
   "cooldown": "Brief cooldown description",
-  "motivationalNote": "Personalized encouragement based on their state"
+  "motivationalNote": "Personalized encouragement based on their state",
+  "devotional": {
+    "verse": "The scripture reference (e.g., 1 Corinthians 9:27)",
+    "text": "The full verse text",
+    "reflection": "A 2-3 sentence reflection connecting this scripture to today's workout and their current state"
+  }
 }`;
 
     const userPrompt = `Today's check-in for a man over 40:
@@ -164,7 +170,12 @@ function getDefaultRecommendation(energy: number, stress: number) {
       ],
       warmup: "2 minutes of gentle movement",
       cooldown: "5 minutes of static stretching",
-      motivationalNote: "Rest is productive. Taking care of your body today sets you up for success tomorrow."
+      motivationalNote: "Rest is productive. Taking care of your body today sets you up for success tomorrow.",
+      devotional: {
+        verse: "Matthew 11:28",
+        text: "Come to me, all you who are weary and burdened, and I will give you rest.",
+        reflection: "God honors rest and recovery. Today is about restoration—both physical and spiritual. Let this gentle session be a time of communion with your Creator."
+      }
     };
   }
   
@@ -183,6 +194,11 @@ function getDefaultRecommendation(energy: number, stress: number) {
     ],
     warmup: "5 minutes of light cardio and dynamic stretching",
     cooldown: "5 minutes of stretching focusing on worked muscles",
-    motivationalNote: "Every rep is an investment in your future self. Keep building that strength!"
+    motivationalNote: "Every rep is an investment in your future self. Keep building that strength!",
+    devotional: {
+      verse: "1 Corinthians 9:27",
+      text: "I discipline my body and keep it under control, lest after preaching to others I myself should be disqualified.",
+      reflection: "Physical discipline mirrors spiritual discipline. As you train your body today, remember you are honoring God by stewarding the temple He gave you."
+    }
   };
 }
