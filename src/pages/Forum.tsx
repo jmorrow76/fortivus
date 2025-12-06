@@ -941,12 +941,24 @@ const Forum = () => {
           </Button>
 
           <div className="mb-8">
-            <h1 className="font-heading text-3xl font-bold mb-2">
-              Community Forum
-            </h1>
-            <p className="text-muted-foreground">
-              Connect with fellow members, share experiences, and get advice.
-            </p>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-2">
+              <div>
+                <h1 className="font-heading text-3xl font-bold mb-2">
+                  Community Forum
+                </h1>
+                <p className="text-muted-foreground">
+                  Connect with fellow members, share experiences, and get advice.
+                </p>
+              </div>
+              <Button 
+                variant="outline" 
+                onClick={() => navigate("/accountability")}
+                className="self-start"
+              >
+                <HandHeart className="h-4 w-4 mr-2" />
+                Find Accountability Partner
+              </Button>
+            </div>
           </div>
 
           {loading && !categories.length ? (
