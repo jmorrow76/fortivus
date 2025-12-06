@@ -12,6 +12,7 @@ import { useGamification } from '@/hooks/useGamification';
 import { useWorkoutLog } from '@/hooks/useWorkoutLog';
 import { useOnboarding } from '@/hooks/useOnboarding';
 import PersonalizedRecommendations from '@/components/dashboard/PersonalizedRecommendations';
+import ScriptureOfDay from '@/components/dashboard/ScriptureOfDay';
 import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -313,6 +314,11 @@ export default function Dashboard() {
                 Upload Progress Photo
               </Link>
             </Button>
+          </div>
+
+          {/* Scripture of the Day */}
+          <div className="mb-8">
+            <ScriptureOfDay />
           </div>
 
           {/* Personalized Recommendations - Show if onboarding completed */}
