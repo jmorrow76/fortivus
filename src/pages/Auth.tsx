@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, ArrowLeft, Mail, CheckCircle2 } from 'lucide-react';
+import { Loader2, ArrowLeft, Mail, CheckCircle2, RefreshCw } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { z } from 'zod';
 
@@ -24,10 +24,12 @@ const Auth = () => {
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [resetEmailSent, setResetEmailSent] = useState(false);
   const [signupEmail, setSignupEmail] = useState('');
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const [isResending, setIsResending] = useState(false);
   
   const [socialLoading, setSocialLoading] = useState<'google' | 'github' | null>(null);
   
-  const { user, loading, signIn, signUp, signInWithSocial, resetPassword } = useAuth();
+  const { user, loading, signIn, signUp, signInWithSocial, resendVerificationEmail, resetPassword } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -36,6 +38,41 @@ const Auth = () => {
       navigate('/dashboard');
     }
   }, [user, loading, navigate]);
+
+  // Cooldown timer effect
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    
+    const timer = setInterval(() => {
+      setResendCooldown((prev) => prev - 1);
+    }, 1000);
+    
+    return () => clearInterval(timer);
+  }, [resendCooldown]);
+
+  const handleResendVerification = useCallback(async () => {
+    if (resendCooldown > 0 || !signupEmail) return;
+    
+    setIsResending(true);
+    try {
+      const { error } = await resendVerificationEmail(signupEmail);
+      if (error) {
+        toast({ 
+          title: 'Failed to Resend', 
+          description: error.message, 
+          variant: 'destructive' 
+        });
+      } else {
+        setResendCooldown(60);
+        toast({ 
+          title: 'Email Sent', 
+          description: 'A new verification email has been sent.' 
+        });
+      }
+    } finally {
+      setIsResending(false);
+    }
+  }, [resendCooldown, signupEmail, resendVerificationEmail, toast]);
 
   const validateForm = () => {
     const newErrors: { email?: string; password?: string } = {};
@@ -201,22 +238,35 @@ const Auth = () => {
               </div>
               <div className="space-y-3 pt-2">
                 <Button 
+                  variant="default"
+                  className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
+                  onClick={handleResendVerification}
+                  disabled={resendCooldown > 0 || isResending}
+                >
+                  {isResending ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Sending...
+                    </>
+                  ) : resendCooldown > 0 ? (
+                    <>
+                      <RefreshCw className="mr-2 h-4 w-4" />
+                      Resend in {resendCooldown}s
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw className="mr-2 h-4 w-4" />
+                      Resend Verification Email
+                    </>
+                  )}
+                </Button>
+                <Button 
                   variant="outline" 
                   className="w-full"
                   onClick={() => switchMode('login')}
                 >
                   Back to Sign In
                 </Button>
-                <p className="text-xs text-muted-foreground">
-                  Didn't receive the email?{' '}
-                  <button
-                    type="button"
-                    onClick={() => switchMode('signup')}
-                    className="text-accent hover:underline"
-                  >
-                    Try again
-                  </button>
-                </p>
               </div>
             </div>
           ) : mode === 'forgot-password' && resetEmailSent ? (
