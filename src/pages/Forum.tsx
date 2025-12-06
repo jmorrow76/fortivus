@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -34,6 +34,8 @@ import {
   Send,
   Pin,
   Lock,
+  Image as ImageIcon,
+  X,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
@@ -55,6 +57,7 @@ interface Topic {
   is_locked: boolean;
   view_count: number;
   created_at: string;
+  image_url?: string | null;
   post_count?: number;
   author_name?: string;
 }
@@ -65,6 +68,7 @@ interface Post {
   user_id: string;
   content: string;
   created_at: string;
+  image_url?: string | null;
   author_name?: string;
 }
 
@@ -97,6 +101,13 @@ const Forum = () => {
   const [newTopicTitle, setNewTopicTitle] = useState("");
   const [newTopicContent, setNewTopicContent] = useState("");
   const [newPostContent, setNewPostContent] = useState("");
+  const [topicImage, setTopicImage] = useState<File | null>(null);
+  const [topicImagePreview, setTopicImagePreview] = useState<string | null>(null);
+  const [postImage, setPostImage] = useState<File | null>(null);
+  const [postImagePreview, setPostImagePreview] = useState<string | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const topicImageRef = useRef<HTMLInputElement>(null);
+  const postImageRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchCategories();
@@ -241,6 +252,73 @@ const Forum = () => {
     }
   };
 
+  const handleImageSelect = (
+    file: File | null,
+    setImage: (f: File | null) => void,
+    setPreview: (s: string | null) => void
+  ) => {
+    if (!file) {
+      setImage(null);
+      setPreview(null);
+      return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      toast({
+        title: "Invalid file",
+        description: "Please select an image file.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "File too large",
+        description: "Image must be under 5MB.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setImage(file);
+    const reader = new FileReader();
+    reader.onload = (e) => setPreview(e.target?.result as string);
+    reader.readAsDataURL(file);
+  };
+
+  const uploadImage = async (file: File, folder: string): Promise<string | null> => {
+    if (!user) return null;
+    
+    setUploadingImage(true);
+    try {
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from("forum-images")
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from("forum-images")
+        .getPublicUrl(fileName);
+
+      return publicUrl;
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast({
+        title: "Upload failed",
+        description: "Failed to upload image. Please try again.",
+        variant: "destructive",
+      });
+      return null;
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   const handleCreateTopic = async () => {
     if (!user || !session || !selectedCategory) {
       navigate("/auth");
@@ -270,6 +348,16 @@ const Forum = () => {
     }
 
     try {
+      // Upload image if present
+      let imageUrl: string | null = null;
+      if (topicImage) {
+        imageUrl = await uploadImage(topicImage, "topics");
+        if (!imageUrl && topicImage) {
+          setPosting(false);
+          return;
+        }
+      }
+
       const { data, error } = await supabase
         .from("forum_topics")
         .insert({
@@ -277,6 +365,7 @@ const Forum = () => {
           user_id: user.id,
           title: newTopicTitle.trim(),
           content: newTopicContent.trim(),
+          image_url: imageUrl,
         })
         .select()
         .single();
@@ -290,6 +379,8 @@ const Forum = () => {
 
       setNewTopicTitle("");
       setNewTopicContent("");
+      setTopicImage(null);
+      setTopicImagePreview(null);
       setDialogOpen(false);
       fetchTopics(selectedCategory);
     } catch (error: any) {
@@ -338,10 +429,21 @@ const Forum = () => {
     }
 
     try {
+      // Upload image if present
+      let imageUrl: string | null = null;
+      if (postImage) {
+        imageUrl = await uploadImage(postImage, "posts");
+        if (!imageUrl && postImage) {
+          setPosting(false);
+          return;
+        }
+      }
+
       const { error } = await supabase.from("forum_posts").insert({
         topic_id: selectedTopic.id,
         user_id: user.id,
         content: newPostContent.trim(),
+        image_url: imageUrl,
       });
 
       if (error) throw error;
@@ -352,6 +454,8 @@ const Forum = () => {
       });
 
       setNewPostContent("");
+      setPostImage(null);
+      setPostImagePreview(null);
       fetchPosts(selectedTopic.id);
     } catch (error: any) {
       toast({
@@ -436,15 +540,61 @@ const Forum = () => {
                   rows={5}
                   maxLength={5000}
                 />
+                
+                {/* Image Upload */}
+                <div>
+                  <input
+                    type="file"
+                    ref={topicImageRef}
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => handleImageSelect(
+                      e.target.files?.[0] || null,
+                      setTopicImage,
+                      setTopicImagePreview
+                    )}
+                  />
+                  {topicImagePreview ? (
+                    <div className="relative">
+                      <img
+                        src={topicImagePreview}
+                        alt="Preview"
+                        className="w-full h-40 object-cover rounded-lg"
+                      />
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-2 right-2 h-7 w-7"
+                        onClick={() => {
+                          setTopicImage(null);
+                          setTopicImagePreview(null);
+                        }}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => topicImageRef.current?.click()}
+                    >
+                      <ImageIcon className="h-4 w-4 mr-2" />
+                      Add Photo (optional)
+                    </Button>
+                  )}
+                </div>
+
                 <Button
                   onClick={handleCreateTopic}
-                  disabled={posting}
+                  disabled={posting || uploadingImage}
                   className="w-full"
                 >
-                  {posting ? (
+                  {(posting || uploadingImage) ? (
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
                   ) : null}
-                  Post Topic
+                  {uploadingImage ? "Uploading..." : "Post Topic"}
                 </Button>
               </div>
             </DialogContent>
@@ -565,8 +715,15 @@ const Forum = () => {
             </span>
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-3">
           <p className="whitespace-pre-wrap">{selectedTopic?.content}</p>
+          {selectedTopic?.image_url && (
+            <img
+              src={selectedTopic.image_url}
+              alt="Topic attachment"
+              className="w-full max-h-96 object-contain rounded-lg"
+            />
+          )}
         </CardContent>
       </Card>
 
@@ -599,6 +756,13 @@ const Forum = () => {
                       </span>
                     </div>
                     <p className="text-sm whitespace-pre-wrap">{post.content}</p>
+                    {post.image_url && (
+                      <img
+                        src={post.image_url}
+                        alt="Reply attachment"
+                        className="mt-2 max-w-full max-h-64 object-contain rounded-lg"
+                      />
+                    )}
                   </div>
                 </div>
               </CardContent>
@@ -621,17 +785,64 @@ const Forum = () => {
                 rows={3}
                 maxLength={5000}
               />
+              
+              {/* Image Upload for Reply */}
+              <div>
+                <input
+                  type="file"
+                  ref={postImageRef}
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => handleImageSelect(
+                    e.target.files?.[0] || null,
+                    setPostImage,
+                    setPostImagePreview
+                  )}
+                />
+                {postImagePreview ? (
+                  <div className="relative inline-block">
+                    <img
+                      src={postImagePreview}
+                      alt="Preview"
+                      className="h-24 object-cover rounded-lg"
+                    />
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      className="absolute -top-2 -right-2 h-6 w-6"
+                      onClick={() => {
+                        setPostImage(null);
+                        setPostImagePreview(null);
+                      }}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => postImageRef.current?.click()}
+                    disabled={!user}
+                  >
+                    <ImageIcon className="h-4 w-4 mr-2" />
+                    Add Photo
+                  </Button>
+                )}
+              </div>
+
               <Button
                 onClick={handleCreatePost}
-                disabled={posting || !user}
+                disabled={posting || uploadingImage || !user}
                 className="w-full sm:w-auto"
               >
-                {posting ? (
+                {(posting || uploadingImage) ? (
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
                 ) : (
                   <Send className="h-4 w-4 mr-2" />
                 )}
-                Post Reply
+                {uploadingImage ? "Uploading..." : "Post Reply"}
               </Button>
             </div>
           </CardContent>

@@ -586,6 +586,7 @@ export type Database = {
           content: string
           created_at: string
           id: string
+          image_url: string | null
           is_moderated: boolean | null
           moderation_reason: string | null
           topic_id: string
@@ -596,6 +597,7 @@ export type Database = {
           content: string
           created_at?: string
           id?: string
+          image_url?: string | null
           is_moderated?: boolean | null
           moderation_reason?: string | null
           topic_id: string
@@ -606,6 +608,7 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          image_url?: string | null
           is_moderated?: boolean | null
           moderation_reason?: string | null
           topic_id?: string
@@ -628,6 +631,7 @@ export type Database = {
           content: string
           created_at: string
           id: string
+          image_url: string | null
           is_locked: boolean | null
           is_pinned: boolean | null
           title: string
@@ -640,6 +644,7 @@ export type Database = {
           content: string
           created_at?: string
           id?: string
+          image_url?: string | null
           is_locked?: boolean | null
           is_pinned?: boolean | null
           title: string
@@ -652,6 +657,7 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          image_url?: string | null
           is_locked?: boolean | null
           is_pinned?: boolean | null
           title?: string
