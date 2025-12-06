@@ -21,33 +21,46 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const authHeader = req.headers.get("authorization");
     if (!authHeader) {
+      console.error("[MANAGE-USER-ROLE] No authorization header");
       throw new Error("No authorization header");
     }
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
     
     const adminClient = createClient(supabaseUrl, supabaseServiceKey);
-    const userClient = createClient(supabaseUrl, supabaseAnonKey, {
-      global: { headers: { Authorization: authHeader } },
+
+    // Use service role client to get user from JWT
+    const token = authHeader.replace("Bearer ", "");
+    const { data: { user }, error: authError } = await adminClient.auth.getUser(token);
+    
+    console.log("[MANAGE-USER-ROLE] Auth check:", { 
+      hasUser: !!user, 
+      userId: user?.id,
+      email: user?.email,
+      authError: authError?.message 
     });
 
-    // Verify the requesting user is authenticated and is admin
-    const { data: { user }, error: authError } = await userClient.auth.getUser();
     if (authError || !user) {
+      console.error("[MANAGE-USER-ROLE] Auth failed:", authError?.message);
       throw new Error("Unauthorized");
     }
 
     // Check if requesting user is admin
-    const { data: roleData } = await adminClient
+    const { data: roleData, error: roleError } = await adminClient
       .from("user_roles")
       .select("role")
       .eq("user_id", user.id)
       .eq("role", "admin")
       .maybeSingle();
 
+    console.log("[MANAGE-USER-ROLE] Admin check:", { 
+      hasAdminRole: !!roleData, 
+      roleError: roleError?.message 
+    });
+
     if (!roleData) {
+      console.error("[MANAGE-USER-ROLE] User is not admin:", user.email);
       throw new Error("Admin access required");
     }
 
