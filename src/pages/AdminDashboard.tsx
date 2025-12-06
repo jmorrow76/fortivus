@@ -13,7 +13,18 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { Shield, Users, Crown, TrendingUp, Calendar, Trash2, Plus, Loader2, Bot, Play, UserPlus, FileText, Mail, Send, Eye } from 'lucide-react';
+import { Shield, Users, Crown, TrendingUp, Calendar, Trash2, Plus, Loader2, Bot, Play, UserPlus, FileText, Mail, Send, Eye, Ban, UserX } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { format } from 'date-fns';
 
 interface SubscriptionGrant {
@@ -39,6 +50,7 @@ interface UserData {
   current_streak: number;
   total_checkins: number;
   roles: ('admin' | 'moderator' | 'user')[];
+  banned_at: string | null;
 }
 
 interface Analytics {
@@ -80,9 +92,10 @@ const AdminDashboard = () => {
   // Users management
   const [allUsers, setAllUsers] = useState<UserData[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
-  const [userFilter, setUserFilter] = useState<'all' | 'real' | 'simulated' | 'elite'>('real');
+  const [userFilter, setUserFilter] = useState<'all' | 'real' | 'simulated' | 'elite' | 'banned'>('real');
   const [userSearch, setUserSearch] = useState('');
   const [updatingRole, setUpdatingRole] = useState<string | null>(null);
+  const [managingUser, setManagingUser] = useState<string | null>(null);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -134,13 +147,16 @@ const AdminDashboard = () => {
     // Apply type filter
     switch (userFilter) {
       case 'real':
-        filtered = filtered.filter(u => !u.is_simulated);
+        filtered = filtered.filter(u => !u.is_simulated && !u.banned_at);
         break;
       case 'simulated':
         filtered = filtered.filter(u => u.is_simulated);
         break;
       case 'elite':
         filtered = filtered.filter(u => u.membership_type !== 'free');
+        break;
+      case 'banned':
+        filtered = filtered.filter(u => u.banned_at);
         break;
     }
     
@@ -154,6 +170,27 @@ const AdminDashboard = () => {
     }
     
     return filtered;
+  };
+
+  const handleManageUser = async (userId: string, action: 'delete' | 'ban' | 'unban') => {
+    if (!session) return;
+    setManagingUser(`${userId}-${action}`);
+    try {
+      const { data, error } = await supabase.functions.invoke('manage-user', {
+        body: { targetUserId: userId, action },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+      if (error) throw error;
+      toast.success(data?.message || `User ${action}ed successfully`);
+      fetchAllUsers();
+    } catch (error: any) {
+      console.error(`Error ${action}ing user:`, error);
+      toast.error(error.message || `Failed to ${action} user`);
+    } finally {
+      setManagingUser(null);
+    }
   };
 
   const getMembershipBadge = (type: UserData['membership_type']) => {
@@ -459,7 +496,7 @@ const AdminDashboard = () => {
                       View and manage all registered users
                     </CardDescription>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
                     <Button
                       variant={userFilter === 'real' ? 'default' : 'outline'}
                       size="sm"
@@ -480,6 +517,14 @@ const AdminDashboard = () => {
                       onClick={() => setUserFilter('simulated')}
                     >
                       Simulated
+                    </Button>
+                    <Button
+                      variant={userFilter === 'banned' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setUserFilter('banned')}
+                    >
+                      <Ban className="h-3 w-3 mr-1" />
+                      Banned
                     </Button>
                     <Button
                       variant={userFilter === 'all' ? 'default' : 'outline'}
@@ -549,7 +594,14 @@ const AdminDashboard = () => {
                             </TableCell>
                             <TableCell className="text-sm">{userData.email}</TableCell>
                             <TableCell>{getRoleBadges(userData.roles || [])}</TableCell>
-                            <TableCell>{getMembershipBadge(userData.membership_type)}</TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                {getMembershipBadge(userData.membership_type)}
+                                {userData.banned_at && (
+                                  <Badge variant="destructive" className="text-xs">Banned</Badge>
+                                )}
+                              </div>
+                            </TableCell>
                             <TableCell className="font-medium">{userData.total_xp.toLocaleString()}</TableCell>
                             <TableCell>{userData.current_streak} days</TableCell>
                             <TableCell className="text-sm text-muted-foreground">
@@ -617,6 +669,83 @@ const AdminDashboard = () => {
                                       'Remove Mod'
                                     )}
                                   </Button>
+                                )}
+                                
+                                {/* Ban/Unban button */}
+                                {userData.id !== user?.id && (
+                                  userData.banned_at ? (
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="text-xs h-7"
+                                      disabled={managingUser === `${userData.id}-unban`}
+                                      onClick={() => handleManageUser(userData.id, 'unban')}
+                                    >
+                                      {managingUser === `${userData.id}-unban` ? (
+                                        <Loader2 className="h-3 w-3 animate-spin" />
+                                      ) : (
+                                        'Unban'
+                                      )}
+                                    </Button>
+                                  ) : (
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="text-xs h-7 text-amber-600 border-amber-600 hover:bg-amber-50"
+                                      disabled={managingUser === `${userData.id}-ban`}
+                                      onClick={() => handleManageUser(userData.id, 'ban')}
+                                    >
+                                      {managingUser === `${userData.id}-ban` ? (
+                                        <Loader2 className="h-3 w-3 animate-spin" />
+                                      ) : (
+                                        <>
+                                          <Ban className="h-3 w-3 mr-1" />
+                                          Ban
+                                        </>
+                                      )}
+                                    </Button>
+                                  )
+                                )}
+                                
+                                {/* Delete button with confirmation */}
+                                {userData.id !== user?.id && (
+                                  <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                      <Button
+                                        size="sm"
+                                        variant="destructive"
+                                        className="text-xs h-7"
+                                        disabled={managingUser === `${userData.id}-delete`}
+                                      >
+                                        {managingUser === `${userData.id}-delete` ? (
+                                          <Loader2 className="h-3 w-3 animate-spin" />
+                                        ) : (
+                                          <>
+                                            <UserX className="h-3 w-3 mr-1" />
+                                            Delete
+                                          </>
+                                        )}
+                                      </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle>Delete User</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                          Are you sure you want to permanently delete <strong>{userData.email}</strong>? 
+                                          This action cannot be undone and will remove all their data.
+                                        </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction
+                                          onClick={() => handleManageUser(userData.id, 'delete')}
+                                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                        >
+                                          Delete User
+                                        </AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
                                 )}
                               </div>
                             </TableCell>

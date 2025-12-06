@@ -21,6 +21,7 @@ interface UserData {
   current_streak: number;
   total_checkins: number;
   roles: ('admin' | 'moderator' | 'user')[];
+  banned_at: string | null;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -83,7 +84,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Fetch profiles
     const { data: profiles } = await adminClient
       .from("profiles")
-      .select("user_id, display_name, avatar_url, is_simulated");
+      .select("user_id, display_name, avatar_url, is_simulated, banned_at");
 
     // Fetch user streaks
     const { data: streaks } = await adminClient
@@ -140,6 +141,7 @@ const handler = async (req: Request): Promise<Response> => {
         current_streak: streak?.current_streak || 0,
         total_checkins: streak?.total_checkins || 0,
         roles: userRolesList,
+        banned_at: profile?.banned_at || null,
       };
     });
 
