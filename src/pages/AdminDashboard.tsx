@@ -193,6 +193,47 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleGrantElite = async (userEmail: string) => {
+    setManagingUser(`${userEmail}-grant`);
+    try {
+      const { error } = await supabase
+        .from('subscription_grants')
+        .insert({ 
+          user_email: userEmail, 
+          granted_by: user?.email || 'admin',
+          notes: 'Granted from admin user table'
+        });
+      if (error) throw error;
+      toast.success('Elite membership granted');
+      fetchAllUsers();
+      fetchGrants();
+    } catch (error: any) {
+      console.error('Error granting Elite:', error);
+      toast.error(error.message || 'Failed to grant Elite');
+    } finally {
+      setManagingUser(null);
+    }
+  };
+
+  const handleRevokeElite = async (userEmail: string) => {
+    setManagingUser(`${userEmail}-revoke`);
+    try {
+      const { error } = await supabase
+        .from('subscription_grants')
+        .delete()
+        .eq('user_email', userEmail);
+      if (error) throw error;
+      toast.success('Elite membership revoked');
+      fetchAllUsers();
+      fetchGrants();
+    } catch (error: any) {
+      console.error('Error revoking Elite:', error);
+      toast.error(error.message || 'Failed to revoke Elite');
+    } finally {
+      setManagingUser(null);
+    }
+  };
+
   const getMembershipBadge = (type: UserData['membership_type']) => {
     switch (type) {
       case 'manual_grant':
@@ -706,6 +747,40 @@ const AdminDashboard = () => {
                                     </Button>
                                   )
                                 )}
+                                
+                                {/* Grant/Revoke Elite button */}
+                                {userData.membership_type === 'free' ? (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="text-xs h-7 text-primary border-primary hover:bg-primary/10"
+                                    disabled={managingUser === `${userData.email}-grant`}
+                                    onClick={() => handleGrantElite(userData.email)}
+                                  >
+                                    {managingUser === `${userData.email}-grant` ? (
+                                      <Loader2 className="h-3 w-3 animate-spin" />
+                                    ) : (
+                                      <>
+                                        <Crown className="h-3 w-3 mr-1" />
+                                        Grant Elite
+                                      </>
+                                    )}
+                                  </Button>
+                                ) : userData.membership_type === 'manual_grant' ? (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="text-xs h-7 text-destructive border-destructive hover:bg-destructive/10"
+                                    disabled={managingUser === `${userData.email}-revoke`}
+                                    onClick={() => handleRevokeElite(userData.email)}
+                                  >
+                                    {managingUser === `${userData.email}-revoke` ? (
+                                      <Loader2 className="h-3 w-3 animate-spin" />
+                                    ) : (
+                                      'Revoke Elite'
+                                    )}
+                                  </Button>
+                                ) : null}
                                 
                                 {/* Delete button with confirmation */}
                                 {userData.id !== user?.id && (
