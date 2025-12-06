@@ -5,11 +5,12 @@ import {
   TrendingUp, Lock, Zap, Settings,
   Crown, Medal, ChevronRight, Users, Camera,
   Brain, Sparkles, MapPin, Utensils, MessageCircle,
-  Battery, Shield, Moon, RotateCcw, Briefcase
+  Battery, Shield, Moon, RotateCcw, Briefcase, Lightbulb
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useGamification } from '@/hooks/useGamification';
 import { useWorkoutLog } from '@/hooks/useWorkoutLog';
+import { useOnboarding } from '@/hooks/useOnboarding';
 import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -69,6 +70,7 @@ export default function Dashboard() {
   const { user, loading: authLoading, subscription } = useAuth();
   const { badges, userBadges, challenges, userChallenges, streak, loading: gamificationLoading } = useGamification();
   const { workouts, getWeeklyStats, loading: workoutsLoading } = useWorkoutLog();
+  const { hasCompletedOnboarding, isLoading: onboardingLoading, onboardingData, getPersonalizedRecommendations } = useOnboarding();
   
   const [profile, setProfile] = useState<Profile | null>(null);
   const [leaderboardPos, setLeaderboardPos] = useState<LeaderboardPosition | null>(null);
@@ -85,6 +87,13 @@ export default function Dashboard() {
       navigate('/auth');
     }
   }, [user, authLoading, navigate]);
+
+  // Redirect to onboarding if not completed
+  useEffect(() => {
+    if (!authLoading && !onboardingLoading && user && hasCompletedOnboarding === false) {
+      navigate('/onboarding');
+    }
+  }, [user, authLoading, onboardingLoading, hasCompletedOnboarding, navigate]);
 
   useEffect(() => {
     if (user) {
@@ -219,7 +228,8 @@ export default function Dashboard() {
   };
 
   const weeklyStats = getWeeklyStats();
-  const isLoading = authLoading || gamificationLoading || workoutsLoading || loading;
+  const isLoading = authLoading || gamificationLoading || workoutsLoading || onboardingLoading || loading;
+  const recommendations = getPersonalizedRecommendations();
 
   if (isLoading) {
     return (
@@ -310,6 +320,59 @@ export default function Dashboard() {
               </Link>
             </Button>
           </div>
+
+          {/* Personalized Recommendations - Show if onboarding completed */}
+          {recommendations && (
+            <Card className="mb-8 border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Lightbulb className="h-5 w-5 text-primary" />
+                  Your Personalized Focus
+                </CardTitle>
+                <CardDescription>Based on your assessment</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="p-4 bg-background rounded-lg border">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Target className="h-4 w-4 text-primary" />
+                      <span className="text-sm font-medium">Primary Focus</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">{recommendations.primaryFocus}</p>
+                  </div>
+                  <div className="p-4 bg-background rounded-lg border">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Dumbbell className="h-4 w-4 text-primary" />
+                      <span className="text-sm font-medium">Workout Style</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">{recommendations.workoutType}</p>
+                  </div>
+                  <div className="p-4 bg-background rounded-lg border">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Utensils className="h-4 w-4 text-primary" />
+                      <span className="text-sm font-medium">Nutrition Tip</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">{recommendations.nutritionTip}</p>
+                  </div>
+                  <div className="p-4 bg-background rounded-lg border">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Battery className="h-4 w-4 text-primary" />
+                      <span className="text-sm font-medium">Recovery Priority</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">{recommendations.recoveryPriority}</p>
+                  </div>
+                </div>
+                {onboardingData && (
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <Badge variant="outline">Goal: {onboardingData.fitness_goal.replace('_', ' ')}</Badge>
+                    <Badge variant="outline">Level: {onboardingData.experience_level}</Badge>
+                    <Badge variant="outline">Age: {onboardingData.age_range}</Badge>
+                    <Badge variant="outline">{onboardingData.workout_frequency} days/week</Badge>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
           {/* Quick Stats Row */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">

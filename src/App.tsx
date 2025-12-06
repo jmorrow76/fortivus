@@ -35,6 +35,7 @@ import SleepAdaptive from "./pages/SleepAdaptive";
 import ComebackProtocol from "./pages/ComebackProtocol";
 import ExecutiveMode from "./pages/ExecutiveMode";
 import Messages from "./pages/Messages";
+import Onboarding from "./pages/Onboarding";
 import NotFound from "./pages/NotFound";
 import SupportButton from "./components/SupportButton";
 import ReferralButton from "./components/ReferralButton";
@@ -53,6 +54,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/about" element={<About />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/profile" element={<Profile />} />
