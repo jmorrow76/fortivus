@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Sparkles, Loader2, Utensils, Dumbbell, Pill, Target, Clock, ChevronDown, ChevronUp, Lock, Save, History, Trash2, FileText, Calendar } from "lucide-react";
+import { ArrowLeft, Sparkles, Loader2, Utensils, Dumbbell, Pill, Target, Clock, ChevronDown, ChevronUp, Lock, Save, History, Trash2, FileText, Calendar, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,7 +10,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { useOnboarding } from "@/hooks/useOnboarding";
 import { supabase } from "@/integrations/supabase/client";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import Navbar from "@/components/Navbar";
 import {
   Dialog,
@@ -56,6 +58,7 @@ const PersonalPlan = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user, loading: authLoading, subscription, session } = useAuth();
+  const { onboardingData, hasCompletedOnboarding, isLoading: onboardingLoading } = useOnboarding();
 
   const [goals, setGoals] = useState("");
   const [age, setAge] = useState("");
@@ -66,6 +69,7 @@ const PersonalPlan = () => {
   const [dietPreference, setDietPreference] = useState("");
   const [workoutLocation, setWorkoutLocation] = useState("");
   const [timeAvailable, setTimeAvailable] = useState("");
+  const [prefillApplied, setPrefillApplied] = useState(false);
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -88,6 +92,73 @@ const PersonalPlan = () => {
   const toggleSection = (section: keyof typeof expandedSections) => {
     setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
   };
+
+  // Auto-populate from onboarding data
+  useEffect(() => {
+    if (onboardingData && hasCompletedOnboarding && !prefillApplied) {
+      // Map onboarding data to personal plan fields
+      const goalMap: Record<string, string> = {
+        'build_muscle': 'Build lean muscle mass and increase strength',
+        'lose_fat': 'Lose body fat while maintaining muscle',
+        'improve_health': 'Improve overall health and longevity',
+        'increase_energy': 'Boost energy levels and daily performance',
+      };
+      
+      const experienceMap: Record<string, string> = {
+        'beginner': 'beginner',
+        'returning': 'intermediate',
+        'consistent': 'intermediate',
+        'advanced': 'advanced',
+      };
+
+      const equipmentToLocation: Record<string, string> = {
+        'full_gym': 'gym',
+        'home_weights': 'home',
+        'resistance_bands': 'minimal',
+        'bodyweight_only': 'bodyweight',
+      };
+
+      const frequencyToTime: Record<string, string> = {
+        '1-2': '30',
+        '3-4': '45',
+        '5-6': '60',
+        '7+': '60',
+      };
+
+      // Set goals if empty
+      if (!goals && onboardingData.fitness_goal) {
+        setGoals(goalMap[onboardingData.fitness_goal] || '');
+      }
+
+      // Set experience level
+      if (!experienceLevel && onboardingData.experience_level) {
+        setExperienceLevel(experienceMap[onboardingData.experience_level] || '');
+      }
+
+      // Set age range
+      if (!age && onboardingData.age_range) {
+        setAge(onboardingData.age_range);
+      }
+
+      // Set diet preference
+      if (!dietPreference && onboardingData.dietary_preference) {
+        setDietPreference(onboardingData.dietary_preference);
+      }
+
+      // Set workout location from equipment
+      if (!workoutLocation && onboardingData.available_equipment?.length > 0) {
+        const primaryEquipment = onboardingData.available_equipment[0];
+        setWorkoutLocation(equipmentToLocation[primaryEquipment] || '');
+      }
+
+      // Set time available from frequency
+      if (!timeAvailable && onboardingData.workout_frequency) {
+        setTimeAvailable(frequencyToTime[onboardingData.workout_frequency] || '45');
+      }
+
+      setPrefillApplied(true);
+    }
+  }, [onboardingData, hasCompletedOnboarding, prefillApplied, goals, experienceLevel, age, dietPreference, workoutLocation, timeAvailable]);
 
   // Fetch saved plans
   useEffect(() => {
@@ -573,6 +644,25 @@ const PersonalPlan = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
+                    {/* Prefill indicator */}
+                    {prefillApplied && hasCompletedOnboarding && (
+                      <Alert className="border-accent/30 bg-accent/5">
+                        <Info className="h-4 w-4 text-accent" />
+                        <AlertDescription className="text-sm">
+                          Some fields have been pre-filled from your Quick Start assessment. 
+                          <Button 
+                            variant="link" 
+                            size="sm" 
+                            onClick={() => navigate('/profile')}
+                            className="px-1 h-auto text-accent"
+                          >
+                            Update assessment
+                          </Button>
+                          or edit fields below directly.
+                        </AlertDescription>
+                      </Alert>
+                    )}
+
                     {/* Goals */}
                     <div>
                       <Label htmlFor="goals" className="text-base font-semibold">
