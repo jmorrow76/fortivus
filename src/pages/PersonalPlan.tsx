@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Sparkles, Loader2, Utensils, Dumbbell, Pill, Target, Clock, ChevronDown, ChevronUp, Lock, Save, History, Trash2, FileText } from "lucide-react";
+import { ArrowLeft, Sparkles, Loader2, Utensils, Dumbbell, Pill, Target, Clock, ChevronDown, ChevronUp, Lock, Save, History, Trash2, FileText, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -82,6 +82,8 @@ const PersonalPlan = () => {
   const [showTemplateDialog, setShowTemplateDialog] = useState(false);
   const [selectedDayForTemplate, setSelectedDayForTemplate] = useState<number | null>(null);
   const [templateName, setTemplateName] = useState("");
+  const [showFullWeekDialog, setShowFullWeekDialog] = useState(false);
+  const [isCreatingFullWeek, setIsCreatingFullWeek] = useState(false);
 
   const toggleSection = (section: keyof typeof expandedSections) => {
     setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
@@ -316,6 +318,130 @@ const PersonalPlan = () => {
       });
     } finally {
       setIsCreatingTemplate(false);
+    }
+  };
+
+  const handleCreateFullWeekTemplates = async () => {
+    if (!user || !plan) return;
+    
+    const workoutDays = plan.workout.weeklySchedule.filter(day => day.exercises && day.exercises.length > 0);
+    
+    if (workoutDays.length === 0) {
+      toast({
+        title: "No Workouts",
+        description: "Your plan doesn't have any workout days with exercises",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsCreatingFullWeek(true);
+    let createdCount = 0;
+
+    try {
+      for (const day of workoutDays) {
+        // Create the workout template
+        const { data: template, error: templateError } = await supabase
+          .from("workout_templates")
+          .insert({
+            user_id: user.id,
+            name: `${day.day} - ${day.focus}`,
+            description: `Generated from AI Personal Plan: ${goals.substring(0, 100)}`,
+          })
+          .select()
+          .single();
+
+        if (templateError) {
+          console.error("Error creating template:", templateError);
+          continue;
+        }
+
+        // Find or create exercises and add them to the template
+        for (let i = 0; i < day.exercises.length; i++) {
+          const exercise = day.exercises[i];
+          
+          // Try to find matching exercise in database
+          const { data: existingExercises } = await supabase
+            .from("exercises")
+            .select("id")
+            .ilike("name", `%${exercise.name}%`)
+            .limit(1);
+
+          let exerciseId: string;
+
+          if (existingExercises && existingExercises.length > 0) {
+            exerciseId = existingExercises[0].id;
+          } else {
+            // Create a custom exercise
+            const { data: newExercise, error: exerciseError } = await supabase
+              .from("exercises")
+              .insert({
+                name: exercise.name,
+                muscle_group: day.focus.toLowerCase().includes("leg") ? "quadriceps" :
+                             day.focus.toLowerCase().includes("chest") ? "chest" :
+                             day.focus.toLowerCase().includes("back") ? "back" :
+                             day.focus.toLowerCase().includes("shoulder") ? "shoulders" :
+                             day.focus.toLowerCase().includes("arm") ? "biceps" :
+                             "core",
+                equipment: workoutLocation === "bodyweight" ? "bodyweight" : 
+                          workoutLocation === "minimal" ? "dumbbells" : "barbell",
+                is_custom: true,
+                created_by: user.id,
+              })
+              .select()
+              .single();
+
+            if (exerciseError) {
+              console.error("Error creating exercise:", exerciseError);
+              continue;
+            }
+            exerciseId = newExercise.id;
+          }
+
+          // Parse reps
+          const repsMatch = exercise.reps.match(/\d+/);
+          const targetReps = repsMatch ? parseInt(repsMatch[0]) : 10;
+
+          await supabase
+            .from("template_exercises")
+            .insert({
+              template_id: template.id,
+              exercise_id: exerciseId,
+              sort_order: i,
+              target_sets: exercise.sets,
+              target_reps: targetReps,
+              rest_seconds: 90,
+              notes: exercise.notes || null,
+            });
+        }
+        createdCount++;
+      }
+
+      toast({
+        title: "Weekly Templates Created!",
+        description: `${createdCount} workout templates have been added`,
+        action: (
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => navigate("/workouts")}
+            className="ml-2"
+          >
+            Go to Workouts
+          </Button>
+        ),
+      });
+      
+      setShowFullWeekDialog(false);
+    } catch (error: any) {
+      console.error("Error creating templates:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create workout templates",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCreatingFullWeek(false);
     }
   };
 
@@ -772,9 +898,22 @@ const PersonalPlan = () => {
                           ))}
                         </div>
 
-                        <div className="p-4 rounded-lg bg-secondary">
-                          <h4 className="font-semibold mb-2">Cardio Recommendation</h4>
-                          <p className="text-sm text-muted-foreground">{plan.workout.cardioRecommendation}</p>
+                        <div className="flex flex-col sm:flex-row gap-3">
+                          <div className="p-4 rounded-lg bg-secondary flex-1">
+                            <h4 className="font-semibold mb-2">Cardio Recommendation</h4>
+                            <p className="text-sm text-muted-foreground">{plan.workout.cardioRecommendation}</p>
+                          </div>
+                          
+                          {plan.workout.weeklySchedule.filter(d => d.exercises?.length > 0).length > 1 && (
+                            <Button
+                              variant="default"
+                              className="sm:self-center"
+                              onClick={() => setShowFullWeekDialog(true)}
+                            >
+                              <Calendar className="h-4 w-4 mr-2" />
+                              Save Full Week as Templates
+                            </Button>
+                          )}
                         </div>
                       </CardContent>
                     )}
@@ -952,6 +1091,64 @@ const PersonalPlan = () => {
                 <>
                   <FileText className="h-4 w-4 mr-2" />
                   Create Template
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Full Week Template Dialog */}
+      <Dialog open={showFullWeekDialog} onOpenChange={setShowFullWeekDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-accent" />
+              Save Full Week as Templates
+            </DialogTitle>
+            <DialogDescription>
+              This will create separate workout templates for each training day in your plan. You can then use these templates to start workouts in the Workout Tracker.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            {plan && (
+              <div>
+                <Label className="text-sm text-muted-foreground mb-2 block">
+                  Templates to be created ({plan.workout.weeklySchedule.filter(d => d.exercises?.length > 0).length})
+                </Label>
+                <div className="max-h-64 overflow-y-auto border rounded-md divide-y">
+                  {plan.workout.weeklySchedule
+                    .filter(day => day.exercises && day.exercises.length > 0)
+                    .map((day, idx) => (
+                      <div key={idx} className="px-4 py-3">
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="font-medium">{day.day} - {day.focus}</span>
+                          <span className="text-xs text-muted-foreground">{day.exercises.length} exercises</span>
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {day.exercises.slice(0, 3).map(e => e.name).join(", ")}
+                          {day.exercises.length > 3 && ` +${day.exercises.length - 3} more`}
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowFullWeekDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleCreateFullWeekTemplates} disabled={isCreatingFullWeek}>
+              {isCreatingFullWeek ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                <>
+                  <Calendar className="h-4 w-4 mr-2" />
+                  Create All Templates
                 </>
               )}
             </Button>
