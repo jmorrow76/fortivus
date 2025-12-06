@@ -9,7 +9,7 @@ const Hero = () => {
       <div className="absolute inset-0">
         <img
           src={heroImage}
-          alt="Mature man training with weights"
+          alt="Christian man training with weights"
           className="w-full h-full object-cover object-center"
         />
         <div className="absolute inset-0 bg-black/50" />
@@ -21,27 +21,32 @@ const Hero = () => {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 border border-white/30 mb-10 animate-fade-in">
             <span className="text-xs font-medium tracking-[0.2em] uppercase text-white/90">
-              Performance for Men 40+
+              Faith-Driven Fitness for Men 40+
             </span>
           </div>
 
           {/* Headline */}
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-medium leading-[1.1] mb-8 text-white animate-fade-in-up tracking-tight">
-            Strength Has
+            Steward Your
             <br />
-            No Expiration
+            Strength
           </h1>
 
           {/* Subheadline */}
-          <p className="text-lg md:text-xl text-white/70 max-w-xl mx-auto mb-12 animate-fade-in-up delay-100 leading-relaxed">
-            AI-powered training and precision nutrition engineered for peak performance at any age.
+          <p className="text-lg md:text-xl text-white/70 max-w-xl mx-auto mb-6 animate-fade-in-up delay-100 leading-relaxed">
+            Honor God with your body through AI-powered training and biblical wisdom—engineered for Christian men seeking peak performance at any age.
+          </p>
+
+          {/* Scripture */}
+          <p className="text-sm text-white/50 italic mb-12 animate-fade-in-up delay-150">
+            "Do you not know that your bodies are temples of the Holy Spirit?" — 1 Corinthians 6:19
           </p>
 
           {/* CTAs */}
           <div className="flex justify-center animate-fade-in-up delay-200">
             <a href="#pricing">
               <Button variant="hero" size="xl" className="group">
-                Start Your Journey
+                Begin Your Journey
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Button>
             </a>
@@ -54,7 +59,7 @@ const Hero = () => {
                 50K+
               </div>
               <div className="text-xs text-white/60 mt-2 uppercase tracking-[0.15em]">
-                Members
+                Brothers
               </div>
             </div>
             <div>

@@ -19,7 +19,12 @@ serve(async (req) => {
     const { goals, currentStats, preferences } = await req.json();
     console.log("[GENERATE-PLAN] Request received:", { goals, currentStats, preferences });
 
-    const systemPrompt = `You are an expert fitness coach and nutritionist specializing in men over 40. Generate a comprehensive, personalized fitness plan based on the user's goals and current stats.
+    const systemPrompt = `You are a faith-based fitness coach and nutritionist specializing in Christian men over 40. Generate a comprehensive, personalized fitness plan that helps men steward their bodies as temples of the Holy Spirit.
+
+Your approach integrates:
+- Evidence-based fitness science optimized for men over 40
+- Biblical wisdom about physical stewardship and discipline
+- Practical guidance that fits busy lives with family and ministry commitments
 
 Return a JSON object with this exact structure:
 {
@@ -70,9 +75,14 @@ Return a JSON object with this exact structure:
   "keyPriorities": ["priority 1", "priority 2", "priority 3"]
 }
 
-Be specific, practical, and tailor everything to men over 40. Focus on joint-friendly exercises, sustainable nutrition, and evidence-based supplements.`;
+Be specific, practical, and tailor everything to Christian men over 40. Focus on:
+- Joint-friendly exercises that build sustainable strength
+- Nutrition that fuels energy for family and ministry
+- Evidence-based supplements
+- Training as an act of stewardship, not vanity
+- Building habits that honor God with the body He gave them`;
 
-    const userPrompt = `Create a personalized fitness plan for a man over 40 with the following details:
+    const userPrompt = `Create a personalized fitness plan for a Christian man over 40 with the following details:
 
 GOALS: ${goals}
 
@@ -89,7 +99,7 @@ PREFERENCES:
 - Time available: ${preferences?.timeAvailable || '45-60 minutes per session'}
 - Equipment access: ${preferences?.equipment || 'Full gym access'}
 
-Generate a complete, actionable plan optimized for their specific situation.`;
+Generate a complete, actionable plan optimized for their specific situation. Remember: this man wants to steward his body well to serve God, his family, and his community with strength and vitality.`;
 
     console.log("[GENERATE-PLAN] Calling Lovable AI...");
 

@@ -176,10 +176,10 @@ const Pricing = () => {
         <div className="section-header">
           <span className="section-label">Membership</span>
           <h2 className="section-title">
-            Invest in Your <span className="text-accent">Legacy</span>
+            Invest in Your <span className="text-accent">Stewardship</span>
           </h2>
           <p className="section-description">
-            Choose the plan that matches your commitment. Cancel anytime.
+            Choose the plan that matches your commitment to honoring God with your body. Cancel anytime.
           </p>
         </div>
 
