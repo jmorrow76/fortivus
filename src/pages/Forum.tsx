@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { useLikes } from "@/hooks/useLikes";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { LikeButton } from "@/components/LikeButton";
 import {
   Dialog,
   DialogContent,
@@ -108,6 +110,22 @@ const Forum = () => {
   const [uploadingImage, setUploadingImage] = useState(false);
   const topicImageRef = useRef<HTMLInputElement>(null);
   const postImageRef = useRef<HTMLInputElement>(null);
+
+  // Like hooks for topics and posts
+  const topicIds = useMemo(() => topics.map(t => t.id), [topics]);
+  const postIds = useMemo(() => posts.map(p => p.id), [posts]);
+  
+  const { 
+    likeCounts: topicLikeCounts, 
+    userLikes: topicUserLikes, 
+    toggleLike: toggleTopicLike 
+  } = useLikes('forum_topic', topicIds);
+  
+  const { 
+    likeCounts: postLikeCounts, 
+    userLikes: postUserLikes, 
+    toggleLike: togglePostLike 
+  } = useLikes('forum_post', postIds);
 
   useEffect(() => {
     fetchCategories();
@@ -652,10 +670,18 @@ const Forum = () => {
                       </div>
                     </div>
                     <div className="flex flex-col items-end gap-1 shrink-0">
-                      <Badge variant="secondary" className="text-xs">
-                        <MessageCircle className="h-3 w-3 mr-1" />
-                        {topic.post_count}
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        <LikeButton
+                          liked={topicUserLikes[topic.id] || false}
+                          count={topicLikeCounts[topic.id] || 0}
+                          onClick={() => toggleTopicLike(topic.id)}
+                          size="sm"
+                        />
+                        <Badge variant="secondary" className="text-xs">
+                          <MessageCircle className="h-3 w-3 mr-1" />
+                          {topic.post_count}
+                        </Badge>
+                      </div>
                       <span className="text-xs text-muted-foreground flex items-center gap-1">
                         <Eye className="h-3 w-3" />
                         {topic.view_count}
@@ -745,15 +771,23 @@ const Forum = () => {
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium text-sm">
-                        {post.author_name}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {formatDistanceToNow(new Date(post.created_at), {
-                          addSuffix: true,
-                        })}
-                      </span>
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-sm">
+                          {post.author_name}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {formatDistanceToNow(new Date(post.created_at), {
+                            addSuffix: true,
+                          })}
+                        </span>
+                      </div>
+                      <LikeButton
+                        liked={postUserLikes[post.id] || false}
+                        count={postLikeCounts[post.id] || 0}
+                        onClick={() => togglePostLike(post.id)}
+                        size="sm"
+                      />
                     </div>
                     <p className="text-sm whitespace-pre-wrap">{post.content}</p>
                     {post.image_url && (

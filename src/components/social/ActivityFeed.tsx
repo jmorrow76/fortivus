@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Award, Flame, Target, Zap, User, MessageCircle, Instagram, Share2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Loader2 } from 'lucide-react';
 import { useSocial } from '@/hooks/useSocial';
+import { useLikes } from '@/hooks/useLikes';
+import { LikeButton } from '@/components/LikeButton';
 import { formatDistanceToNow } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
@@ -16,6 +18,10 @@ export function ActivityFeed() {
   const [fetching, setFetching] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
+
+  // Like functionality for activity feed items
+  const activityIds = useMemo(() => activityFeed.map(a => a.id), [activityFeed]);
+  const { likeCounts, userLikes, toggleLike } = useLikes('activity_feed', activityIds);
 
   useEffect(() => {
     loadFeed();
@@ -178,6 +184,12 @@ export function ActivityFeed() {
                 </div>
 
                 <div className="flex items-center gap-1">
+                  <LikeButton
+                    liked={userLikes[activity.id] || false}
+                    count={likeCounts[activity.id] || 0}
+                    onClick={() => toggleLike(activity.id)}
+                    size="sm"
+                  />
                   {activity.activity_type === 'badge_earned' && (
                     <>
                       <Button
