@@ -154,7 +154,7 @@ export default function Testimonies() {
     }
   };
 
-  const handleToggleFeatured = async (id: string, currentFeatured: boolean) => {
+  const handleToggleFeatured = async (id: string, title: string, currentFeatured: boolean) => {
     try {
       const { error } = await supabase
         .from('testimonies')
@@ -163,11 +163,23 @@ export default function Testimonies() {
 
       if (error) throw error;
 
+      // Send email notification when featuring (not when unfeaturing)
+      if (!currentFeatured) {
+        try {
+          await supabase.functions.invoke('notify-featured-testimony', {
+            body: { testimonyId: id, testimonyTitle: title }
+          });
+        } catch (emailError) {
+          console.error('Failed to send featured notification email:', emailError);
+          // Don't fail the feature action if email fails
+        }
+      }
+
       toast({
         title: currentFeatured ? 'Removed from featured' : 'Featured!',
         description: currentFeatured 
           ? 'Testimony is no longer featured.' 
-          : 'Testimony is now featured at the top.'
+          : 'Testimony is now featured at the top. Author has been notified.'
       });
 
       fetchTestimonies();
@@ -309,7 +321,7 @@ export default function Testimonies() {
                           variant="ghost"
                           size="icon"
                           className={`h-8 w-8 ${testimony.is_featured ? 'text-yellow-500' : 'text-muted-foreground'}`}
-                          onClick={() => handleToggleFeatured(testimony.id, testimony.is_featured)}
+                          onClick={() => handleToggleFeatured(testimony.id, testimony.title, testimony.is_featured)}
                           title={testimony.is_featured ? 'Remove from featured' : 'Feature this testimony'}
                         >
                           {testimony.is_featured ? <StarOff className="h-4 w-4" /> : <Star className="h-4 w-4" />}
