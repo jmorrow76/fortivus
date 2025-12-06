@@ -781,6 +781,20 @@ const Forum = () => {
               className="w-full max-h-96 object-contain rounded-lg"
             />
           )}
+          {isPrayerCategory && selectedTopic && (
+            <div className="flex items-center gap-3 pt-3 border-t">
+              <PrayerButton
+                praying={topicUserPrayers[selectedTopic.id] || false}
+                count={topicPrayerCounts[selectedTopic.id] || 0}
+                onClick={() => toggleTopicPrayer(selectedTopic.id)}
+              />
+              {(topicPrayerCounts[selectedTopic.id] || 0) > 0 && (
+                <span className="text-sm text-muted-foreground">
+                  {topicPrayerCounts[selectedTopic.id]} {topicPrayerCounts[selectedTopic.id] === 1 ? 'brother is' : 'brothers are'} praying for this request
+                </span>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
 
