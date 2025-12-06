@@ -8,6 +8,8 @@ interface SubscriptionStatus {
   subscriptionEnd: string | null;
 }
 
+type SocialProvider = 'google' | 'github';
+
 interface AuthContextType {
   user: User | null;
   session: Session | null;
@@ -16,6 +18,7 @@ interface AuthContextType {
   checkSubscription: () => Promise<void>;
   signUp: (email: string, password: string, displayName?: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signInWithSocial: (provider: SocialProvider) => Promise<{ error: Error | null }>;
   resetPassword: (email: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
@@ -140,6 +143,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return { error };
   };
 
+  const signInWithSocial = async (provider: SocialProvider) => {
+    const redirectUrl = `${window.location.origin}/dashboard`;
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: redirectUrl,
+      },
+    });
+    return { error };
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
   };
@@ -153,6 +167,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       checkSubscription,
       signUp, 
       signIn, 
+      signInWithSocial,
       resetPassword,
       signOut 
     }}>
