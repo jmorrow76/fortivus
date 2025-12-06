@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Sparkles, Loader2, Utensils, Dumbbell, Pill, Target, Clock, ChevronDown, ChevronUp, Lock, Save, History, Trash2 } from "lucide-react";
+import { ArrowLeft, Sparkles, Loader2, Utensils, Dumbbell, Pill, Target, Clock, ChevronDown, ChevronUp, Lock, Save, History, Trash2, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,14 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface PersonalPlan {
   diet: {
@@ -70,6 +78,10 @@ const PersonalPlan = () => {
     workout: true,
     supplements: true,
   });
+  const [isCreatingTemplate, setIsCreatingTemplate] = useState(false);
+  const [showTemplateDialog, setShowTemplateDialog] = useState(false);
+  const [selectedDayForTemplate, setSelectedDayForTemplate] = useState<number | null>(null);
+  const [templateName, setTemplateName] = useState("");
 
   const toggleSection = (section: keyof typeof expandedSections) => {
     setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
@@ -179,6 +191,122 @@ const PersonalPlan = () => {
     setTimeAvailable(savedPlan.preferences?.timeAvailable || "");
     setPlan(savedPlan.plan_data);
     setActiveTab("create");
+  };
+
+  const handleOpenTemplateDialog = (dayIndex: number) => {
+    if (!plan) return;
+    const day = plan.workout.weeklySchedule[dayIndex];
+    setSelectedDayForTemplate(dayIndex);
+    setTemplateName(`${day.day} - ${day.focus}`);
+    setShowTemplateDialog(true);
+  };
+
+  const handleCreateWorkoutTemplate = async () => {
+    if (!user || !plan || selectedDayForTemplate === null) return;
+    
+    const day = plan.workout.weeklySchedule[selectedDayForTemplate];
+    if (!day.exercises || day.exercises.length === 0) {
+      toast({
+        title: "No Exercises",
+        description: "This workout day has no exercises to create a template from",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsCreatingTemplate(true);
+    try {
+      // Create the workout template
+      const { data: template, error: templateError } = await supabase
+        .from("workout_templates")
+        .insert({
+          user_id: user.id,
+          name: templateName.trim() || `${day.day} - ${day.focus}`,
+          description: `Generated from AI Personal Plan: ${goals.substring(0, 100)}`,
+        })
+        .select()
+        .single();
+
+      if (templateError) throw templateError;
+
+      // Find or create exercises and add them to the template
+      for (let i = 0; i < day.exercises.length; i++) {
+        const exercise = day.exercises[i];
+        
+        // Try to find matching exercise in database
+        const { data: existingExercises } = await supabase
+          .from("exercises")
+          .select("id")
+          .ilike("name", `%${exercise.name}%`)
+          .limit(1);
+
+        let exerciseId: string;
+
+        if (existingExercises && existingExercises.length > 0) {
+          exerciseId = existingExercises[0].id;
+        } else {
+          // Create a custom exercise
+          const { data: newExercise, error: exerciseError } = await supabase
+            .from("exercises")
+            .insert({
+              name: exercise.name,
+              muscle_group: day.focus.toLowerCase().includes("leg") ? "quadriceps" :
+                           day.focus.toLowerCase().includes("chest") ? "chest" :
+                           day.focus.toLowerCase().includes("back") ? "back" :
+                           day.focus.toLowerCase().includes("shoulder") ? "shoulders" :
+                           day.focus.toLowerCase().includes("arm") ? "biceps" :
+                           "core",
+              equipment: workoutLocation === "bodyweight" ? "bodyweight" : 
+                        workoutLocation === "minimal" ? "dumbbells" : "barbell",
+              is_custom: true,
+              created_by: user.id,
+            })
+            .select()
+            .single();
+
+          if (exerciseError) {
+            console.error("Error creating exercise:", exerciseError);
+            continue;
+          }
+          exerciseId = newExercise.id;
+        }
+
+        // Parse reps - handle formats like "8-12", "10", "8-10 each side"
+        const repsMatch = exercise.reps.match(/\d+/);
+        const targetReps = repsMatch ? parseInt(repsMatch[0]) : 10;
+
+        // Add exercise to template
+        await supabase
+          .from("template_exercises")
+          .insert({
+            template_id: template.id,
+            exercise_id: exerciseId,
+            sort_order: i,
+            target_sets: exercise.sets,
+            target_reps: targetReps,
+            rest_seconds: 90,
+            notes: exercise.notes || null,
+          });
+      }
+
+      toast({
+        title: "Template Created!",
+        description: `"${templateName}" has been added to your workout templates`,
+      });
+      
+      setShowTemplateDialog(false);
+      setSelectedDayForTemplate(null);
+      setTemplateName("");
+    } catch (error: any) {
+      console.error("Error creating template:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create workout template",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCreatingTemplate(false);
+    }
   };
 
   const handleGeneratePlan = async () => {
@@ -603,7 +731,20 @@ const PersonalPlan = () => {
                             <div key={idx} className="p-4 rounded-lg border border-border">
                               <div className="flex justify-between items-center mb-3">
                                 <span className="font-semibold">{day.day}</span>
-                                <span className="text-sm text-accent">{day.focus}</span>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm text-accent">{day.focus}</span>
+                                  {day.exercises.length > 0 && (
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-7 text-xs"
+                                      onClick={() => handleOpenTemplateDialog(idx)}
+                                    >
+                                      <FileText className="h-3 w-3 mr-1" />
+                                      Add to Templates
+                                    </Button>
+                                  )}
+                                </div>
                               </div>
                               {day.exercises.length > 0 && (
                                 <div className="space-y-2">
@@ -750,6 +891,46 @@ const PersonalPlan = () => {
           </Tabs>
         </div>
       </div>
+
+      {/* Create Template Dialog */}
+      <Dialog open={showTemplateDialog} onOpenChange={setShowTemplateDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create Workout Template</DialogTitle>
+            <DialogDescription>
+              This will create a reusable workout template in your Workouts section that you can use to start future workout sessions.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Label htmlFor="templateName">Template Name</Label>
+            <Input
+              id="templateName"
+              value={templateName}
+              onChange={(e) => setTemplateName(e.target.value)}
+              placeholder="Enter template name"
+              className="mt-2"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowTemplateDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleCreateWorkoutTemplate} disabled={isCreatingTemplate}>
+              {isCreatingTemplate ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                <>
+                  <FileText className="h-4 w-4 mr-2" />
+                  Create Template
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
