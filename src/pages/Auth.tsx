@@ -6,14 +6,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, ArrowLeft } from 'lucide-react';
+import { Loader2, ArrowLeft, Mail, CheckCircle2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { z } from 'zod';
 
 const emailSchema = z.string().email('Please enter a valid email address');
 const passwordSchema = z.string().min(6, 'Password must be at least 6 characters');
 
-type AuthMode = 'login' | 'signup' | 'forgot-password';
+type AuthMode = 'login' | 'signup' | 'forgot-password' | 'verification-pending';
 
 const Auth = () => {
   const [mode, setMode] = useState<AuthMode>('login');
@@ -23,6 +23,7 @@ const Auth = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [resetEmailSent, setResetEmailSent] = useState(false);
+  const [signupEmail, setSignupEmail] = useState('');
   
   const [socialLoading, setSocialLoading] = useState<'google' | 'github' | null>(null);
   
@@ -91,7 +92,9 @@ const Auth = () => {
             toast({ title: 'Sign Up Failed', description: error.message, variant: 'destructive' });
           }
         } else {
-          toast({ title: 'Account Created!', description: 'Welcome to Fortivus.' });
+          setSignupEmail(email);
+          setMode('verification-pending');
+          toast({ title: 'Check Your Email', description: 'We sent you a verification link.' });
         }
       }
     } finally {
@@ -103,6 +106,9 @@ const Auth = () => {
     setMode(newMode);
     setErrors({});
     setResetEmailSent(false);
+    if (newMode !== 'verification-pending') {
+      setSignupEmail('');
+    }
   };
 
   const handleSocialLogin = async (provider: 'google' | 'github') => {
@@ -134,6 +140,7 @@ const Auth = () => {
       case 'login': return 'Welcome Back';
       case 'signup': return 'Create Account';
       case 'forgot-password': return 'Reset Password';
+      case 'verification-pending': return 'Verify Your Email';
     }
   };
 
@@ -142,6 +149,7 @@ const Auth = () => {
       case 'login': return 'Sign in to access your account';
       case 'signup': return 'Join Fortivus to start your fitness journey';
       case 'forgot-password': return 'Enter your email to receive reset instructions';
+      case 'verification-pending': return 'One more step to complete your registration';
     }
   };
 
@@ -166,7 +174,52 @@ const Auth = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {mode === 'forgot-password' && resetEmailSent ? (
+          {mode === 'verification-pending' ? (
+            <div className="text-center space-y-6">
+              <div className="mx-auto w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center">
+                <Mail className="h-8 w-8 text-accent" />
+              </div>
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">
+                  We've sent a verification link to
+                </p>
+                <p className="font-medium text-foreground">{signupEmail}</p>
+              </div>
+              <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+                <div className="flex items-start gap-2 text-left">
+                  <CheckCircle2 className="h-4 w-4 text-accent mt-0.5 shrink-0" />
+                  <p className="text-sm text-muted-foreground">
+                    Click the link in your email to verify your account
+                  </p>
+                </div>
+                <div className="flex items-start gap-2 text-left">
+                  <CheckCircle2 className="h-4 w-4 text-accent mt-0.5 shrink-0" />
+                  <p className="text-sm text-muted-foreground">
+                    Check your spam folder if you don't see the email
+                  </p>
+                </div>
+              </div>
+              <div className="space-y-3 pt-2">
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => switchMode('login')}
+                >
+                  Back to Sign In
+                </Button>
+                <p className="text-xs text-muted-foreground">
+                  Didn't receive the email?{' '}
+                  <button
+                    type="button"
+                    onClick={() => switchMode('signup')}
+                    className="text-accent hover:underline"
+                  >
+                    Try again
+                  </button>
+                </p>
+              </div>
+            </div>
+          ) : mode === 'forgot-password' && resetEmailSent ? (
             <div className="text-center space-y-4">
               <p className="text-sm text-muted-foreground">
                 We've sent password reset instructions to <strong>{email}</strong>. 
@@ -321,27 +374,29 @@ const Auth = () => {
             </form>
           )}
           
-          <div className="mt-6 text-center space-y-2">
-            {mode === 'forgot-password' && !resetEmailSent ? (
-              <button
-                type="button"
-                onClick={() => switchMode('login')}
-                className="text-sm text-muted-foreground hover:text-accent transition-colors"
-              >
-                Back to Sign In
-              </button>
-            ) : mode !== 'forgot-password' && (
-              <button
-                type="button"
-                onClick={() => switchMode(mode === 'login' ? 'signup' : 'login')}
-                className="text-sm text-muted-foreground hover:text-accent transition-colors"
-              >
-                {mode === 'login' 
-                  ? "Don't have an account? Sign up" 
-                  : 'Already have an account? Sign in'}
-              </button>
-            )}
-          </div>
+          {mode !== 'verification-pending' && (
+            <div className="mt-6 text-center space-y-2">
+              {mode === 'forgot-password' && !resetEmailSent ? (
+                <button
+                  type="button"
+                  onClick={() => switchMode('login')}
+                  className="text-sm text-muted-foreground hover:text-accent transition-colors"
+                >
+                  Back to Sign In
+                </button>
+              ) : mode !== 'forgot-password' && (
+                <button
+                  type="button"
+                  onClick={() => switchMode(mode === 'login' ? 'signup' : 'login')}
+                  className="text-sm text-muted-foreground hover:text-accent transition-colors"
+                >
+                  {mode === 'login' 
+                    ? "Don't have an account? Sign up" 
+                    : 'Already have an account? Sign in'}
+                </button>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
