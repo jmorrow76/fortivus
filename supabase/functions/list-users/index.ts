@@ -20,6 +20,7 @@ interface UserData {
   total_xp: number;
   current_streak: number;
   total_checkins: number;
+  roles: ('admin' | 'moderator' | 'user')[];
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -90,17 +91,28 @@ const handler = async (req: Request): Promise<Response> => {
       .from("subscription_grants")
       .select("user_email, expires_at");
 
-    // Fetch Stripe subscriptions via check-subscription would be complex
-    // For now we'll identify grants and mark others as free or check Stripe
+    // Fetch user roles
+    const { data: userRoles } = await adminClient
+      .from("user_roles")
+      .select("user_id, role");
 
     const profileMap = new Map(profiles?.map(p => [p.user_id, p]) || []);
     const streakMap = new Map(streaks?.map(s => [s.user_id, s]) || []);
     const grantMap = new Map(grants?.map(g => [g.user_email.toLowerCase(), g]) || []);
+    
+    // Group roles by user_id
+    const rolesMap = new Map<string, ('admin' | 'moderator' | 'user')[]>();
+    userRoles?.forEach(ur => {
+      const existing = rolesMap.get(ur.user_id) || [];
+      existing.push(ur.role as 'admin' | 'moderator' | 'user');
+      rolesMap.set(ur.user_id, existing);
+    });
 
     const users: UserData[] = authUsers.users.map(authUser => {
       const profile = profileMap.get(authUser.id);
       const streak = streakMap.get(authUser.id);
       const grant = grantMap.get(authUser.email?.toLowerCase() || "");
+      const userRolesList = rolesMap.get(authUser.id) || [];
 
       let membershipType: UserData['membership_type'] = 'free';
       let membershipExpires: string | null = null;
@@ -109,7 +121,6 @@ const handler = async (req: Request): Promise<Response> => {
         membershipType = 'manual_grant';
         membershipExpires = grant.expires_at;
       }
-      // Note: Stripe subscriptions would need additional API calls to check
 
       return {
         id: authUser.id,
@@ -124,6 +135,7 @@ const handler = async (req: Request): Promise<Response> => {
         total_xp: streak?.total_xp || 0,
         current_streak: streak?.current_streak || 0,
         total_checkins: streak?.total_checkins || 0,
+        roles: userRolesList,
       };
     });
 

@@ -38,6 +38,7 @@ interface UserData {
   total_xp: number;
   current_streak: number;
   total_checkins: number;
+  roles: ('admin' | 'moderator' | 'user')[];
 }
 
 interface Analytics {
@@ -80,6 +81,7 @@ const AdminDashboard = () => {
   const [allUsers, setAllUsers] = useState<UserData[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [userFilter, setUserFilter] = useState<'all' | 'real' | 'simulated' | 'elite'>('real');
+  const [updatingRole, setUpdatingRole] = useState<string | null>(null);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -144,6 +146,39 @@ const AdminDashboard = () => {
       default:
         return <Badge variant="secondary">Free</Badge>;
     }
+  };
+
+  const handleRoleChange = async (userId: string, role: 'admin' | 'moderator', action: 'add' | 'remove') => {
+    setUpdatingRole(`${userId}-${role}`);
+    try {
+      const { data, error } = await supabase.functions.invoke('manage-user-role', {
+        body: { targetUserId: userId, role, action }
+      });
+      if (error) throw error;
+      toast.success(data?.message || `Role ${action === 'add' ? 'added' : 'removed'} successfully`);
+      fetchAllUsers();
+    } catch (error: any) {
+      console.error('Error updating role:', error);
+      toast.error(error.message || 'Failed to update role');
+    } finally {
+      setUpdatingRole(null);
+    }
+  };
+
+  const getRoleBadges = (roles: ('admin' | 'moderator' | 'user')[]) => {
+    return (
+      <div className="flex gap-1 flex-wrap">
+        {roles.includes('admin') && (
+          <Badge className="bg-red-600 text-white">Admin</Badge>
+        )}
+        {roles.includes('moderator') && (
+          <Badge className="bg-blue-600 text-white">Moderator</Badge>
+        )}
+        {roles.length === 0 && (
+          <Badge variant="outline" className="text-muted-foreground">User</Badge>
+        )}
+      </div>
+    );
   };
 
   const fetchContentStats = async () => {
@@ -445,12 +480,12 @@ const AdminDashboard = () => {
                         <TableRow>
                           <TableHead>User</TableHead>
                           <TableHead>Email</TableHead>
+                          <TableHead>Roles</TableHead>
                           <TableHead>Membership</TableHead>
                           <TableHead>XP</TableHead>
                           <TableHead>Streak</TableHead>
-                          <TableHead>Check-ins</TableHead>
                           <TableHead>Joined</TableHead>
-                          <TableHead>Last Active</TableHead>
+                          <TableHead>Actions</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -478,17 +513,77 @@ const AdminDashboard = () => {
                               </div>
                             </TableCell>
                             <TableCell className="text-sm">{userData.email}</TableCell>
+                            <TableCell>{getRoleBadges(userData.roles || [])}</TableCell>
                             <TableCell>{getMembershipBadge(userData.membership_type)}</TableCell>
                             <TableCell className="font-medium">{userData.total_xp.toLocaleString()}</TableCell>
                             <TableCell>{userData.current_streak} days</TableCell>
-                            <TableCell>{userData.total_checkins}</TableCell>
                             <TableCell className="text-sm text-muted-foreground">
                               {format(new Date(userData.created_at), 'MMM d, yyyy')}
                             </TableCell>
-                            <TableCell className="text-sm text-muted-foreground">
-                              {userData.last_sign_in_at 
-                                ? format(new Date(userData.last_sign_in_at), 'MMM d, yyyy')
-                                : 'Never'}
+                            <TableCell>
+                              <div className="flex gap-1 flex-wrap">
+                                {!userData.roles?.includes('admin') ? (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="text-xs h-7"
+                                    disabled={updatingRole === `${userData.id}-admin`}
+                                    onClick={() => handleRoleChange(userData.id, 'admin', 'add')}
+                                  >
+                                    {updatingRole === `${userData.id}-admin` ? (
+                                      <Loader2 className="h-3 w-3 animate-spin" />
+                                    ) : (
+                                      <>
+                                        <Shield className="h-3 w-3 mr-1" />
+                                        Make Admin
+                                      </>
+                                    )}
+                                  </Button>
+                                ) : (
+                                  <Button
+                                    size="sm"
+                                    variant="destructive"
+                                    className="text-xs h-7"
+                                    disabled={updatingRole === `${userData.id}-admin` || userData.id === user?.id}
+                                    onClick={() => handleRoleChange(userData.id, 'admin', 'remove')}
+                                  >
+                                    {updatingRole === `${userData.id}-admin` ? (
+                                      <Loader2 className="h-3 w-3 animate-spin" />
+                                    ) : (
+                                      'Remove Admin'
+                                    )}
+                                  </Button>
+                                )}
+                                {!userData.roles?.includes('moderator') ? (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="text-xs h-7"
+                                    disabled={updatingRole === `${userData.id}-moderator`}
+                                    onClick={() => handleRoleChange(userData.id, 'moderator', 'add')}
+                                  >
+                                    {updatingRole === `${userData.id}-moderator` ? (
+                                      <Loader2 className="h-3 w-3 animate-spin" />
+                                    ) : (
+                                      'Make Mod'
+                                    )}
+                                  </Button>
+                                ) : (
+                                  <Button
+                                    size="sm"
+                                    variant="destructive"
+                                    className="text-xs h-7"
+                                    disabled={updatingRole === `${userData.id}-moderator`}
+                                    onClick={() => handleRoleChange(userData.id, 'moderator', 'remove')}
+                                  >
+                                    {updatingRole === `${userData.id}-moderator` ? (
+                                      <Loader2 className="h-3 w-3 animate-spin" />
+                                    ) : (
+                                      'Remove Mod'
+                                    )}
+                                  </Button>
+                                )}
+                              </div>
                             </TableCell>
                           </TableRow>
                         ))}
