@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useAdmin } from "@/hooks/useAdmin";
+import { NotificationBell } from "@/components/NotificationBell";
 import {
   Tooltip,
   TooltipContent,
@@ -112,6 +113,7 @@ const Navbar = () => {
           <div className="hidden lg:flex items-center gap-2">
             {user ? (
               <>
+                <NotificationBell />
                 <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
                   <Link to="/">
                     <Home className="h-4 w-4" />
