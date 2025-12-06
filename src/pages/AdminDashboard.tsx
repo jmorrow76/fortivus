@@ -81,6 +81,7 @@ const AdminDashboard = () => {
   const [allUsers, setAllUsers] = useState<UserData[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [userFilter, setUserFilter] = useState<'all' | 'real' | 'simulated' | 'elite'>('real');
+  const [userSearch, setUserSearch] = useState('');
   const [updatingRole, setUpdatingRole] = useState<string | null>(null);
 
   useEffect(() => {
@@ -128,16 +129,31 @@ const AdminDashboard = () => {
   };
 
   const getFilteredUsers = () => {
+    let filtered = allUsers;
+    
+    // Apply type filter
     switch (userFilter) {
       case 'real':
-        return allUsers.filter(u => !u.is_simulated);
+        filtered = filtered.filter(u => !u.is_simulated);
+        break;
       case 'simulated':
-        return allUsers.filter(u => u.is_simulated);
+        filtered = filtered.filter(u => u.is_simulated);
+        break;
       case 'elite':
-        return allUsers.filter(u => u.membership_type !== 'free');
-      default:
-        return allUsers;
+        filtered = filtered.filter(u => u.membership_type !== 'free');
+        break;
     }
+    
+    // Apply search filter
+    if (userSearch.trim()) {
+      const search = userSearch.toLowerCase().trim();
+      filtered = filtered.filter(u => 
+        u.email.toLowerCase().includes(search) ||
+        (u.display_name && u.display_name.toLowerCase().includes(search))
+      );
+    }
+    
+    return filtered;
   };
 
   const getMembershipBadge = (type: UserData['membership_type']) => {
@@ -473,6 +489,14 @@ const AdminDashboard = () => {
                       All
                     </Button>
                   </div>
+                </div>
+                <div className="mt-4">
+                  <Input
+                    placeholder="Search by name or email..."
+                    value={userSearch}
+                    onChange={(e) => setUserSearch(e.target.value)}
+                    className="max-w-sm"
+                  />
                 </div>
               </CardHeader>
               <CardContent>
