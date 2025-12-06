@@ -53,6 +53,7 @@ export function PrayerJournal({ partnershipId, partnerName }: PrayerJournalProps
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newRequest, setNewRequest] = useState('');
   const [showAnswered, setShowAnswered] = useState(true);
+  const [showCelebration, setShowCelebration] = useState(false);
   
   // For marking as answered
   const [answeringId, setAnsweringId] = useState<string | null>(null);
@@ -143,6 +144,10 @@ export function PrayerJournal({ partnershipId, partnerName }: PrayerJournalProps
 
       if (error) throw error;
 
+      // Trigger celebration animation
+      setShowCelebration(true);
+      setTimeout(() => setShowCelebration(false), 3000);
+
       toast({
         title: 'Praise God! 🙌',
         description: 'Prayer marked as answered. What a testimony!'
@@ -198,7 +203,47 @@ export function PrayerJournal({ partnershipId, partnerName }: PrayerJournalProps
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      {/* Celebration Animation Overlay */}
+      {showCelebration && (
+        <div className="fixed inset-0 pointer-events-none z-50 flex items-center justify-center">
+          {/* Confetti particles */}
+          {[...Array(50)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-3 h-3 rounded-full"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `-10%`,
+                backgroundColor: ['#22c55e', '#eab308', '#3b82f6', '#ec4899', '#f97316'][Math.floor(Math.random() * 5)],
+                animation: `confetti-fall ${2 + Math.random() * 2}s ease-out forwards`,
+                animationDelay: `${Math.random() * 0.5}s`,
+              }}
+            />
+          ))}
+          {/* Central celebration badge */}
+          <div className="animate-scale-in bg-green-500 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3">
+            <PartyPopper className="h-8 w-8" />
+            <div>
+              <p className="font-heading font-bold text-xl">Prayer Answered!</p>
+              <p className="text-sm opacity-90">God is faithful 🙌</p>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      <style>{`
+        @keyframes confetti-fall {
+          0% {
+            transform: translateY(0) rotate(0deg) scale(1);
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(100vh) rotate(720deg) scale(0);
+            opacity: 0;
+          }
+        }
+      `}</style>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
