@@ -22,7 +22,9 @@ import {
   Check, 
   X, 
   Loader2,
-  ArrowLeft
+  ArrowLeft,
+  ClipboardCheck,
+  Calendar
 } from "lucide-react";
 
 const PRAYER_FOCUS_OPTIONS = [
@@ -51,16 +53,25 @@ const AccountabilityPartners = () => {
   const { 
     myRequest, 
     availablePartners, 
-    partnerships, 
+    partnerships,
+    checkins,
     loading,
     createRequest,
     updateRequest,
     sendPartnerRequest,
     respondToRequest,
-    endPartnership
+    endPartnership,
+    fetchCheckins,
+    submitCheckin
   } = useAccountabilityPartner();
 
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showCheckinDialog, setShowCheckinDialog] = useState<string | null>(null);
+  const [checkinData, setCheckinData] = useState({
+    prayed_for_partner: false,
+    personal_update: '',
+    prayer_request: ''
+  });
   const [formData, setFormData] = useState({
     prayer_focus: [] as string[],
     fitness_goals: [] as string[],
@@ -199,34 +210,83 @@ const AccountabilityPartners = () => {
                 </Card>
               ) : (
                 <div className="space-y-4">
-                  {activePartnerships.map((partnership) => (
-                    <Card key={partnership.id}>
-                      <CardContent className="p-6">
-                        <div className="flex items-start justify-between">
-                          <div className="flex items-center gap-4">
-                            <Avatar className="h-14 w-14">
-                              <AvatarImage src={partnership.partner?.avatar_url || ''} />
-                              <AvatarFallback className="text-lg">
-                                {partnership.partner?.display_name?.[0] || 'U'}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <h3 className="font-heading font-semibold text-lg">
-                                {partnership.partner?.display_name || 'Anonymous'}
-                              </h3>
-                              <Badge variant="secondary" className="mt-1">
-                                <Heart className="h-3 w-3 mr-1" /> Active Partner
-                              </Badge>
+                  {activePartnerships.map((partnership) => {
+                    const partnerCheckins = checkins[partnership.id] || [];
+                    const myRecentCheckin = partnerCheckins.find(c => c.user_id === user?.id);
+                    const partnerRecentCheckin = partnerCheckins.find(c => c.user_id !== user?.id);
+                    
+                    return (
+                      <Card key={partnership.id}>
+                        <CardContent className="p-6">
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center gap-4">
+                              <Avatar className="h-14 w-14">
+                                <AvatarImage src={partnership.partner?.avatar_url || ''} />
+                                <AvatarFallback className="text-lg">
+                                  {partnership.partner?.display_name?.[0] || 'U'}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <h3 className="font-heading font-semibold text-lg">
+                                  {partnership.partner?.display_name || 'Anonymous'}
+                                </h3>
+                                <Badge variant="secondary" className="mt-1">
+                                  <Heart className="h-3 w-3 mr-1" /> Active Partner
+                                </Badge>
+                              </div>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button 
+                                size="sm"
+                                onClick={() => {
+                                  fetchCheckins(partnership.id);
+                                  setShowCheckinDialog(partnership.id);
+                                }}
+                              >
+                                <ClipboardCheck className="h-4 w-4 mr-1" /> Check In
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => navigate(`/messages`)}
+                              >
+                                <MessageCircle className="h-4 w-4 mr-1" /> Message
+                              </Button>
                             </div>
                           </div>
-                          <div className="flex gap-2">
-                            <Button 
-                              size="sm" 
-                              variant="outline"
-                              onClick={() => navigate(`/messages`)}
-                            >
-                              <MessageCircle className="h-4 w-4 mr-1" /> Message
-                            </Button>
+
+                          {/* Recent Check-ins Preview */}
+                          {(myRecentCheckin || partnerRecentCheckin) && (
+                            <div className="border-t pt-4 mt-4 space-y-3">
+                              <h4 className="text-sm font-medium flex items-center gap-2">
+                                <Calendar className="h-4 w-4" /> Recent Check-ins
+                              </h4>
+                              
+                              {partnerRecentCheckin && (
+                                <div className="p-3 bg-primary/5 rounded-lg">
+                                  <p className="text-xs text-muted-foreground mb-1">
+                                    {partnership.partner?.display_name}'s update:
+                                  </p>
+                                  {partnerRecentCheckin.personal_update && (
+                                    <p className="text-sm">{partnerRecentCheckin.personal_update}</p>
+                                  )}
+                                  {partnerRecentCheckin.prayer_request && (
+                                    <p className="text-sm mt-2">
+                                      <span className="font-medium">🙏 Prayer request:</span> {partnerRecentCheckin.prayer_request}
+                                    </p>
+                                  )}
+                                </div>
+                              )}
+                              
+                              {myRecentCheckin && (
+                                <p className="text-xs text-muted-foreground">
+                                  Your last check-in: {new Date(myRecentCheckin.created_at).toLocaleDateString()}
+                                </p>
+                              )}
+                            </div>
+                          )}
+
+                          <div className="flex justify-end mt-4">
                             <Dialog>
                               <DialogTrigger asChild>
                                 <Button size="sm" variant="ghost" className="text-destructive">
@@ -252,10 +312,10 @@ const AccountabilityPartners = () => {
                               </DialogContent>
                             </Dialog>
                           </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
 
                   {pendingSent.length > 0 && (
                     <>
@@ -591,6 +651,104 @@ const AccountabilityPartners = () => {
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={() => setShowCreateForm(false)}>Cancel</Button>
             <Button onClick={handleSubmit}>Create Profile</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Weekly Check-in Dialog */}
+      <Dialog open={!!showCheckinDialog} onOpenChange={() => {
+        setShowCheckinDialog(null);
+        setCheckinData({ prayed_for_partner: false, personal_update: '', prayer_request: '' });
+      }}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <HandHeart className="h-5 w-5 text-primary" />
+              Weekly Check-in
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-5 py-4">
+            <div className="flex items-start space-x-3 p-4 bg-primary/5 rounded-lg">
+              <Checkbox
+                id="prayed"
+                checked={checkinData.prayed_for_partner}
+                onCheckedChange={(checked) => setCheckinData(prev => ({ 
+                  ...prev, 
+                  prayed_for_partner: !!checked 
+                }))}
+              />
+              <div>
+                <label htmlFor="prayed" className="font-medium cursor-pointer">
+                  I prayed for my partner this week 🙏
+                </label>
+                <p className="text-sm text-muted-foreground">
+                  Lifting each other up in prayer is the foundation of accountability
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <Label className="mb-2 block">How's your week going? (Fitness & Faith)</Label>
+              <Textarea
+                value={checkinData.personal_update}
+                onChange={(e) => setCheckinData(prev => ({ ...prev, personal_update: e.target.value }))}
+                placeholder="Share your wins, struggles, or what God's teaching you..."
+                rows={3}
+              />
+            </div>
+
+            <div>
+              <Label className="mb-2 block">Prayer Request (Optional)</Label>
+              <Textarea
+                value={checkinData.prayer_request}
+                onChange={(e) => setCheckinData(prev => ({ ...prev, prayer_request: e.target.value }))}
+                placeholder="How can your partner pray for you this week?"
+                rows={2}
+              />
+            </div>
+
+            {/* Show partner's recent check-ins */}
+            {showCheckinDialog && checkins[showCheckinDialog]?.filter(c => c.user_id !== user?.id).length > 0 && (
+              <div className="border-t pt-4">
+                <h4 className="text-sm font-medium mb-3">Partner's Recent Updates</h4>
+                <div className="space-y-2 max-h-40 overflow-y-auto">
+                  {checkins[showCheckinDialog]
+                    ?.filter(c => c.user_id !== user?.id)
+                    .slice(0, 3)
+                    .map((checkin) => (
+                      <div key={checkin.id} className="p-3 bg-muted/50 rounded-lg text-sm">
+                        <p className="text-xs text-muted-foreground mb-1">
+                          {new Date(checkin.created_at).toLocaleDateString()}
+                        </p>
+                        {checkin.personal_update && <p>{checkin.personal_update}</p>}
+                        {checkin.prayer_request && (
+                          <p className="mt-1 text-primary">
+                            🙏 {checkin.prayer_request}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setShowCheckinDialog(null)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={async () => {
+                if (showCheckinDialog) {
+                  await submitCheckin(showCheckinDialog, checkinData);
+                  setShowCheckinDialog(null);
+                  setCheckinData({ prayed_for_partner: false, personal_update: '', prayer_request: '' });
+                }
+              }}
+            >
+              <Check className="h-4 w-4 mr-1" /> Submit Check-in
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

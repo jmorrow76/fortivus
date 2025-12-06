@@ -71,3 +71,6 @@ verify_jwt = false
 
 [functions.analyze-executive-performance]
 verify_jwt = false
+
+[functions.send-accountability-reminders]
+verify_jwt = false

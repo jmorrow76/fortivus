@@ -32,12 +32,24 @@ interface Partnership {
   };
 }
 
+interface Checkin {
+  id: string;
+  partnership_id: string;
+  user_id: string;
+  prayed_for_partner: boolean;
+  partner_progress_note: string | null;
+  personal_update: string | null;
+  prayer_request: string | null;
+  created_at: string;
+}
+
 export const useAccountabilityPartner = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [myRequest, setMyRequest] = useState<AccountabilityRequest | null>(null);
   const [availablePartners, setAvailablePartners] = useState<AccountabilityRequest[]>([]);
   const [partnerships, setPartnerships] = useState<Partnership[]>([]);
+  const [checkins, setCheckins] = useState<Record<string, Checkin[]>>({});
   const [loading, setLoading] = useState(true);
 
   const fetchData = useCallback(async () => {
@@ -207,16 +219,57 @@ export const useAccountabilityPartner = () => {
     }
   };
 
+  const fetchCheckins = async (partnershipId: string) => {
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from('accountability_checkins')
+      .select('*')
+      .eq('partnership_id', partnershipId)
+      .order('created_at', { ascending: false })
+      .limit(10);
+
+    if (!error && data) {
+      setCheckins(prev => ({ ...prev, [partnershipId]: data }));
+    }
+  };
+
+  const submitCheckin = async (partnershipId: string, data: {
+    prayed_for_partner: boolean;
+    personal_update: string;
+    prayer_request: string;
+  }) => {
+    if (!user) return;
+
+    const { error } = await supabase
+      .from('accountability_checkins')
+      .insert({
+        partnership_id: partnershipId,
+        user_id: user.id,
+        ...data
+      });
+
+    if (error) {
+      toast({ title: 'Error', description: 'Failed to submit check-in', variant: 'destructive' });
+    } else {
+      toast({ title: 'Check-in Submitted! 🙏', description: 'Your partner will see your update.' });
+      fetchCheckins(partnershipId);
+    }
+  };
+
   return {
     myRequest,
     availablePartners,
     partnerships,
+    checkins,
     loading,
     createRequest,
     updateRequest,
     sendPartnerRequest,
     respondToRequest,
     endPartnership,
+    fetchCheckins,
+    submitCheckin,
     refetch: fetchData
   };
 };
