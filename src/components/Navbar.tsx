@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { 
   Menu, X, LogOut, Settings, LayoutDashboard, Shield, Home, Crown,
   ChevronDown, Battery, Moon, RotateCcw, Briefcase, MessageCircle,
-  Dumbbell, MapPin, Camera, Utensils
+  Dumbbell, MapPin, Camera, Utensils, Mail
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useAdmin } from "@/hooks/useAdmin";
@@ -115,6 +115,11 @@ const Navbar = () => {
               <>
                 <NotificationBell />
                 <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                  <Link to="/messages">
+                    <Mail className="h-4 w-4" />
+                  </Link>
+                </Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
                   <Link to="/">
                     <Home className="h-4 w-4" />
                   </Link>
@@ -200,6 +205,12 @@ const Navbar = () => {
               <div className="flex flex-col gap-3 pt-4 border-t border-border mt-2">
                 {user ? (
                   <>
+                    <Button variant="ghost" className="justify-start" asChild>
+                      <Link to="/messages" onClick={() => setIsOpen(false)}>
+                        <Mail className="h-4 w-4 mr-2" />
+                        Messages
+                      </Link>
+                    </Button>
                     <Button variant="ghost" className="justify-start" asChild>
                       <Link to="/" onClick={() => setIsOpen(false)}>
                         <Home className="h-4 w-4 mr-2" />

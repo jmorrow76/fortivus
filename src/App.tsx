@@ -34,6 +34,7 @@ import JointHealth from "./pages/JointHealth";
 import SleepAdaptive from "./pages/SleepAdaptive";
 import ComebackProtocol from "./pages/ComebackProtocol";
 import ExecutiveMode from "./pages/ExecutiveMode";
+import Messages from "./pages/Messages";
 import NotFound from "./pages/NotFound";
 import SupportButton from "./components/SupportButton";
 import ReferralButton from "./components/ReferralButton";
@@ -80,6 +81,7 @@ const App = () => (
             <Route path="/sleep-adaptive" element={<SleepAdaptive />} />
             <Route path="/comeback" element={<ComebackProtocol />} />
             <Route path="/executive-mode" element={<ExecutiveMode />} />
+            <Route path="/messages" element={<Messages />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
