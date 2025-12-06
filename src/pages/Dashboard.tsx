@@ -711,7 +711,7 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
 
-              {/* Personal Plan - Premium Feature */}
+              {/* AI Personal Plan - Premium Feature */}
               <Card className={!subscription.subscribed ? 'relative overflow-hidden' : ''}>
                 {!subscription.subscribed && (
                   <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
@@ -727,22 +727,28 @@ export default function Dashboard() {
                     <Brain className="h-4 w-4" />
                     AI Personal Plan
                   </CardTitle>
+                  <CardDescription>
+                    Detailed AI-generated diet, workout & supplements
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   {personalPlan ? (
                     <div className="space-y-2">
-                      <p className="text-sm text-muted-foreground">Current Goal:</p>
+                      <p className="text-sm text-muted-foreground">Latest Goal:</p>
                       <p className="font-medium line-clamp-2">{personalPlan.goals}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Created {format(new Date(personalPlan.created_at), 'MMM d, yyyy')}
+                      </p>
                       <Button variant="outline" size="sm" asChild className="w-full mt-2">
-                        <Link to="/personal-plan">View Plan</Link>
+                        <Link to="/personal-plan">View & Manage Plans</Link>
                       </Button>
                     </div>
                   ) : (
                     <div className="text-center">
                       <Sparkles className="h-8 w-8 mx-auto mb-2 text-primary/50" />
-                      <p className="text-sm text-muted-foreground mb-2">Get your personalized plan</p>
+                      <p className="text-sm text-muted-foreground mb-2">Generate a comprehensive plan</p>
                       <Button size="sm" asChild className="w-full">
-                        <Link to="/personal-plan">Create Plan</Link>
+                        <Link to="/personal-plan">Create AI Plan</Link>
                       </Button>
                     </div>
                   )}

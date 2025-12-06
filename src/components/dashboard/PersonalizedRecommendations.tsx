@@ -42,10 +42,10 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
           <div>
             <CardTitle className="flex items-center gap-2">
               <Lightbulb className="h-5 w-5 text-primary" />
-              Your Personalized Plan
+              Quick Start Guide
             </CardTitle>
             <CardDescription className="mt-1">
-              Customized for your goals, equipment, and schedule
+              Based on your assessment • For detailed AI-powered plans, try Elite
             </CardDescription>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -124,8 +124,8 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
                 </Link>
               </Button>
               <Button variant="outline" asChild>
-                <Link to="/personal-plan">
-                  Generate Full AI Plan
+                <Link to="/profile">
+                  Retake Assessment
                   <ChevronRight className="h-4 w-4 ml-2" />
                 </Link>
               </Button>
