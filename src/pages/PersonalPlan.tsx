@@ -745,13 +745,13 @@ const PersonalPlan = () => {
                                   <span className="text-sm text-accent">{day.focus}</span>
                                   {day.exercises.length > 0 && (
                                     <Button
-                                      variant="ghost"
+                                      variant="outline"
                                       size="sm"
-                                      className="h-7 text-xs"
+                                      className="h-8 text-xs border-accent text-accent hover:bg-accent hover:text-accent-foreground"
                                       onClick={() => handleOpenTemplateDialog(idx)}
                                     >
-                                      <FileText className="h-3 w-3 mr-1" />
-                                      Add to Templates
+                                      <FileText className="h-3.5 w-3.5 mr-1.5" />
+                                      Save as Template
                                     </Button>
                                   )}
                                 </div>
