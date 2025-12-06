@@ -32,20 +32,22 @@ const lastNames = [
 const focuses = [
   "strength training", "weight loss", "marathon training", "mobility and recovery", "powerlifting",
   "general fitness", "bodybuilding", "heart health", "CrossFit", "functional fitness",
-  "kettlebell training", "swimming", "MMA fitness", "golf fitness", "cycling",
+  "kettlebell training", "swimming", "golf fitness", "cycling",
   "HIIT training", "joint health", "Olympic lifting", "calisthenics", "hiking and outdoor fitness",
-  "boxing fitness", "yoga for athletes", "back health", "muscle building", "obstacle course racing",
-  "longevity fitness", "sports performance", "stress management", "walking and low impact", "rowing",
+  "back health", "muscle building", "obstacle course racing",
+  "longevity fitness", "sports performance", "walking and low impact", "rowing",
   "triathlon training", "home gym workouts", "stretching routines", "balance training", "grip strength",
-  "core training", "running", "tennis fitness", "posture correction", "senior athletics"
+  "core training", "running", "tennis fitness", "posture correction", "senior athletics",
+  "stewardship of the body", "faith-driven fitness", "temple care"
 ];
 
 const personalities = [
-  "analytical and methodical", "encouraging and supportive", "competitive and driven", "wise and patient",
-  "intense and focused", "balanced and helpful", "disciplined and detailed", "cautious and health-conscious",
-  "energetic and enthusiastic", "practical and no-nonsense", "technical and precise", "calm and measured",
-  "tough and resilient", "strategic and patient", "endurance-minded and steady", "high-energy and motivating",
-  "experienced and advisory", "technical and coaching", "minimalist and efficient", "adventurous and nature-loving"
+  "encouraging and faith-filled", "wise and prayerful", "disciplined and devoted",
+  "patient and encouraging", "humble and helpful", "steady and faithful",
+  "gentle but strong", "servant-hearted and supportive", "joyful and motivating",
+  "experienced and mentoring", "prayerful and thoughtful", "calm and Spirit-led",
+  "resilient and hopeful", "strategic and trusting God", "endurance-minded and persevering",
+  "energetic and praising", "accountable and brotherly", "grace-filled and patient"
 ];
 
 function generateRandomUser(existingNames: Set<string>): { name: string; age: number; focus: string; personality: string } {

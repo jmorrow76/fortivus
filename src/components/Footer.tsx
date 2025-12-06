@@ -87,6 +87,16 @@ const Footer = () => {
           ))}
         </div>
 
+        {/* Tithing Notice */}
+        <div className="py-6 mb-8 border-y border-background/10 text-center">
+          <p className="text-sm text-background/70 font-medium">
+            ✝ 10% of all proceeds go to support local churches and Christian ministries
+          </p>
+          <p className="text-xs text-background/40 mt-1 italic">
+            "Honor the LORD with your wealth and with the firstfruits of all your produce" — Proverbs 3:9
+          </p>
+        </div>
+
         {/* Bottom */}
         <div className="pt-8 border-t border-background/10 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-background/50 tracking-wide">
