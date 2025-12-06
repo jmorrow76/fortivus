@@ -14,12 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      accountability_checkins: {
+        Row: {
+          created_at: string | null
+          id: string
+          partner_progress_note: string | null
+          partnership_id: string
+          personal_update: string | null
+          prayed_for_partner: boolean | null
+          prayer_request: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          partner_progress_note?: string | null
+          partnership_id: string
+          personal_update?: string | null
+          prayed_for_partner?: boolean | null
+          prayer_request?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          partner_progress_note?: string | null
+          partnership_id?: string
+          personal_update?: string | null
+          prayed_for_partner?: boolean | null
+          prayer_request?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "accountability_checkins_partnership_id_fkey"
+            columns: ["partnership_id"]
+            isOneToOne: false
+            referencedRelation: "accountability_partnerships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       accountability_partnerships: {
         Row: {
           created_at: string | null
           ended_at: string | null
           id: string
           initiated_by: string
+          last_checkin_reminder: string | null
           status: string | null
           user1_id: string
           user2_id: string
@@ -29,6 +71,7 @@ export type Database = {
           ended_at?: string | null
           id?: string
           initiated_by: string
+          last_checkin_reminder?: string | null
           status?: string | null
           user1_id: string
           user2_id: string
@@ -38,6 +81,7 @@ export type Database = {
           ended_at?: string | null
           id?: string
           initiated_by?: string
+          last_checkin_reminder?: string | null
           status?: string | null
           user1_id?: string
           user2_id?: string
