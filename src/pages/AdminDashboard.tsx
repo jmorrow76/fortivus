@@ -13,7 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { Shield, Users, Crown, TrendingUp, Calendar, Trash2, Plus, Loader2, Bot, Play, UserPlus, FileText, Mail, Send } from 'lucide-react';
+import { Shield, Users, Crown, TrendingUp, Calendar, Trash2, Plus, Loader2, Bot, Play, UserPlus, FileText, Mail, Send, Eye } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface SubscriptionGrant {
@@ -23,6 +23,21 @@ interface SubscriptionGrant {
   expires_at: string | null;
   granted_by: string | null;
   notes: string | null;
+}
+
+interface UserData {
+  id: string;
+  email: string;
+  created_at: string;
+  last_sign_in_at: string | null;
+  display_name: string | null;
+  avatar_url: string | null;
+  membership_type: 'free' | 'elite_monthly' | 'elite_yearly' | 'lifetime' | 'manual_grant';
+  membership_expires: string | null;
+  is_simulated: boolean;
+  total_xp: number;
+  current_streak: number;
+  total_checkins: number;
 }
 
 interface Analytics {
@@ -61,6 +76,11 @@ const AdminDashboard = () => {
   const [subscriberCount, setSubscriberCount] = useState(0);
   const [articleCount, setArticleCount] = useState(0);
 
+  // Users management
+  const [allUsers, setAllUsers] = useState<UserData[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
+  const [userFilter, setUserFilter] = useState<'all' | 'real' | 'simulated' | 'elite'>('real');
+
   useEffect(() => {
     if (!authLoading && !user) {
       navigate('/auth');
@@ -80,8 +100,51 @@ const AdminDashboard = () => {
       fetchAnalytics();
       fetchSimulatedCount();
       fetchContentStats();
+      fetchAllUsers();
     }
   }, [isAdmin]);
+
+  const fetchAllUsers = async () => {
+    setLoadingUsers(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('list-users');
+      if (error) throw error;
+      setAllUsers(data?.users || []);
+    } catch (error: any) {
+      console.error('Error fetching users:', error);
+      toast.error('Failed to load users');
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
+
+  const getFilteredUsers = () => {
+    switch (userFilter) {
+      case 'real':
+        return allUsers.filter(u => !u.is_simulated);
+      case 'simulated':
+        return allUsers.filter(u => u.is_simulated);
+      case 'elite':
+        return allUsers.filter(u => u.membership_type !== 'free');
+      default:
+        return allUsers;
+    }
+  };
+
+  const getMembershipBadge = (type: UserData['membership_type']) => {
+    switch (type) {
+      case 'manual_grant':
+        return <Badge className="bg-amber-500">Elite (Grant)</Badge>;
+      case 'elite_monthly':
+        return <Badge className="bg-primary">Elite Monthly</Badge>;
+      case 'elite_yearly':
+        return <Badge className="bg-primary">Elite Yearly</Badge>;
+      case 'lifetime':
+        return <Badge className="bg-purple-600">Lifetime</Badge>;
+      default:
+        return <Badge variant="secondary">Free</Badge>;
+    }
+  };
 
   const fetchContentStats = async () => {
     const [{ count: subs }, { count: articles }] = await Promise.all([
@@ -296,8 +359,12 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        <Tabs defaultValue="analytics" className="space-y-6">
-          <TabsList>
+        <Tabs defaultValue="users" className="space-y-6">
+          <TabsList className="flex-wrap">
+            <TabsTrigger value="users" className="gap-2">
+              <Users className="h-4 w-4" />
+              Users
+            </TabsTrigger>
             <TabsTrigger value="analytics" className="gap-2">
               <TrendingUp className="h-4 w-4" />
               Analytics
@@ -315,6 +382,123 @@ const AdminDashboard = () => {
               Content
             </TabsTrigger>
           </TabsList>
+
+          {/* Users Tab */}
+          <TabsContent value="users" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Users className="h-5 w-5" />
+                      All Users ({getFilteredUsers().length})
+                    </CardTitle>
+                    <CardDescription>
+                      View and manage all registered users
+                    </CardDescription>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant={userFilter === 'real' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setUserFilter('real')}
+                    >
+                      Real Users
+                    </Button>
+                    <Button
+                      variant={userFilter === 'elite' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setUserFilter('elite')}
+                    >
+                      Elite Only
+                    </Button>
+                    <Button
+                      variant={userFilter === 'simulated' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setUserFilter('simulated')}
+                    >
+                      Simulated
+                    </Button>
+                    <Button
+                      variant={userFilter === 'all' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setUserFilter('all')}
+                    >
+                      All
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {loadingUsers ? (
+                  <div className="flex justify-center py-8">
+                    <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                  </div>
+                ) : getFilteredUsers().length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">
+                    No users found
+                  </p>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>User</TableHead>
+                          <TableHead>Email</TableHead>
+                          <TableHead>Membership</TableHead>
+                          <TableHead>XP</TableHead>
+                          <TableHead>Streak</TableHead>
+                          <TableHead>Check-ins</TableHead>
+                          <TableHead>Joined</TableHead>
+                          <TableHead>Last Active</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {getFilteredUsers().map((userData) => (
+                          <TableRow key={userData.id}>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                {userData.avatar_url ? (
+                                  <img 
+                                    src={userData.avatar_url} 
+                                    alt="" 
+                                    className="h-8 w-8 rounded-full object-cover"
+                                  />
+                                ) : (
+                                  <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-xs font-medium">
+                                    {(userData.display_name || userData.email)?.[0]?.toUpperCase() || '?'}
+                                  </div>
+                                )}
+                                <div>
+                                  <p className="font-medium">{userData.display_name || 'No name'}</p>
+                                  {userData.is_simulated && (
+                                    <Badge variant="outline" className="text-xs">Simulated</Badge>
+                                  )}
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-sm">{userData.email}</TableCell>
+                            <TableCell>{getMembershipBadge(userData.membership_type)}</TableCell>
+                            <TableCell className="font-medium">{userData.total_xp.toLocaleString()}</TableCell>
+                            <TableCell>{userData.current_streak} days</TableCell>
+                            <TableCell>{userData.total_checkins}</TableCell>
+                            <TableCell className="text-sm text-muted-foreground">
+                              {format(new Date(userData.created_at), 'MMM d, yyyy')}
+                            </TableCell>
+                            <TableCell className="text-sm text-muted-foreground">
+                              {userData.last_sign_in_at 
+                                ? format(new Date(userData.last_sign_in_at), 'MMM d, yyyy')
+                                : 'Never'}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           {/* Analytics Tab */}
           <TabsContent value="analytics" className="space-y-6">
