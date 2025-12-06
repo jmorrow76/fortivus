@@ -9,13 +9,15 @@ const corsHeaders = {
 const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 const AI_GATEWAY_URL = 'https://ai.gateway.lovable.dev/v1/chat/completions';
 
-// Topic categories for forum posts
+// Topic categories for forum posts (Christian fitness focused)
 const forumTopics = [
-  "workout routines", "nutrition tips", "supplement advice", "recovery methods",
-  "motivation struggles", "progress updates", "equipment recommendations",
-  "injury prevention", "sleep optimization", "stress management",
-  "testosterone and aging", "joint health", "cardio vs weights",
-  "meal prep ideas", "protein intake", "hydration tips"
+  "workout routines as stewardship", "nutrition tips for temple care", "supplement advice", "recovery and rest",
+  "staying motivated through faith", "progress updates and gratitude", "equipment recommendations",
+  "injury prevention and patience", "sleep as God's gift", "managing stress through prayer",
+  "men's health after 40", "joint health", "balancing cardio and strength",
+  "meal prep ideas", "protein intake", "hydration tips",
+  "praying before workouts", "accountability with brothers", "discipline as spiritual fruit",
+  "honoring God with our bodies", "scripture for motivation", "fitness as worship"
 ];
 
 async function generateAIContent(prompt: string): Promise<string> {
@@ -31,7 +33,7 @@ async function generateAIContent(prompt: string): Promise<string> {
         messages: [
           { 
             role: 'system', 
-            content: `You are simulating a fitness community member who is a man over 40. Write naturally and authentically like a real person would in an online fitness forum. Keep responses concise (2-4 sentences for replies, 3-5 sentences for posts). Be helpful, supportive, and share personal experiences. Never mention you are AI or simulated.`
+            content: `You are simulating a Christian man over 40 who is part of a faith-based fitness community. Write naturally and authentically like a real believer would in an online fitness forum. Keep responses concise (2-4 sentences for replies, 3-5 sentences for posts). Be helpful, encouraging, and occasionally reference faith, scripture, prayer, or gratitude to God. Share personal experiences about stewarding your body as a temple. Be brotherly and supportive. Never use profanity. Never mention you are AI or simulated.`
           },
           { role: 'user', content: prompt }
         ],
@@ -94,7 +96,7 @@ serve(async (req) => {
       const category = categories?.[Math.floor(Math.random() * (categories?.length || 1))];
       
       const postContent = await generateAIContent(
-        `Write a forum post about ${topic} from the perspective of a ${40 + Math.floor(Math.random() * 20)} year old man who is into fitness. Ask a question or share an experience. Keep it authentic and conversational.`
+        `Write a forum post about ${topic} from the perspective of a ${40 + Math.floor(Math.random() * 20)} year old Christian man who views fitness as stewardship of God's temple. Ask a question or share an experience. You can mention prayer, faith, or scripture naturally if relevant. Keep it authentic and conversational.`
       );
 
       if (postContent) {
@@ -133,7 +135,7 @@ serve(async (req) => {
         if (topic.user_id === replier.user_id) continue;
 
         const replyContent = await generateAIContent(
-          `Reply to this fitness forum post: "${topic.title}" - "${topic.content.slice(0, 200)}". Be helpful, share your own experience or advice as a man over 40 into fitness.`
+          `Reply to this fitness forum post: "${topic.title}" - "${topic.content.slice(0, 200)}". Be helpful, share your own experience or advice as a Christian man over 40 into fitness. Be encouraging and brotherly. You can mention prayer, faith, or scripture naturally if relevant.`
         );
 
         if (replyContent) {
