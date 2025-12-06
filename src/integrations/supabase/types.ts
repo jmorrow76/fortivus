@@ -1642,6 +1642,54 @@ export type Database = {
         }
         Relationships: []
       }
+      user_onboarding: {
+        Row: {
+          age_range: string
+          available_equipment: string[] | null
+          completed_at: string
+          created_at: string
+          current_challenges: string[] | null
+          dietary_preference: string | null
+          experience_level: string
+          fitness_goal: string
+          focus_areas: string[] | null
+          id: string
+          injuries_limitations: string | null
+          user_id: string
+          workout_frequency: string
+        }
+        Insert: {
+          age_range: string
+          available_equipment?: string[] | null
+          completed_at?: string
+          created_at?: string
+          current_challenges?: string[] | null
+          dietary_preference?: string | null
+          experience_level: string
+          fitness_goal: string
+          focus_areas?: string[] | null
+          id?: string
+          injuries_limitations?: string | null
+          user_id: string
+          workout_frequency: string
+        }
+        Update: {
+          age_range?: string
+          available_equipment?: string[] | null
+          completed_at?: string
+          created_at?: string
+          current_challenges?: string[] | null
+          dietary_preference?: string | null
+          experience_level?: string
+          fitness_goal?: string
+          focus_areas?: string[] | null
+          id?: string
+          injuries_limitations?: string | null
+          user_id?: string
+          workout_frequency?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
