@@ -236,7 +236,9 @@ export default function Dashboard() {
   const earnedBadgesCount = userBadges.length;
   const totalBadges = badges.length;
 
-  const todayStr = new Date().toISOString().split('T')[0];
+  // Use local date to match check-in date stored in local timezone
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
   const hasCheckedInToday = latestCheckin?.check_in_date === todayStr;
 
   return (
