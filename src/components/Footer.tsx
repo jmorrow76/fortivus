@@ -3,20 +3,25 @@ import { Link } from "react-router-dom";
 
 const footerLinks = {
   Platform: [
-    { label: "Dashboard", href: "/dashboard" },
-    { label: "Knowledge Hub", href: "/knowledge-hub" },
+    { label: "Member Dashboard", href: "/dashboard" },
+    { label: "Knowledge Hub", href: "/knowledge" },
     { label: "Forum", href: "/forum" },
-    { label: "Leaderboard", href: "/leaderboard" },
+    { label: "Community", href: "/community" },
   ],
-  Features: [
+  "Elite Features": [
+    { label: "AI Coach", href: "/coaching" },
+    { label: "Workouts", href: "/workouts" },
+    { label: "Run Tracker", href: "/running" },
+    { label: "Calorie Tracker", href: "/calories" },
     { label: "Body Analysis", href: "/body-analysis" },
-    { label: "Personal Plan", href: "/personal-plan" },
-    { label: "Progress Tracking", href: "/progress" },
-    { label: "Daily Check-in", href: "/daily-checkin" },
+    { label: "Progress Photos", href: "/progress" },
   ],
-  Shop: [
-    { label: "Supplements", href: "/supplements" },
-    { label: "Gear & Apparel", href: "/gear" },
+  "More Features": [
+    { label: "Hormonal Optimization", href: "/hormonal" },
+    { label: "Joint Health Analytics", href: "/joint-health" },
+    { label: "Sleep-Adaptive Workouts", href: "/sleep-adaptive" },
+    { label: "Comeback Protocol", href: "/comeback" },
+    { label: "Executive Performance", href: "/executive-mode" },
   ],
   Company: [
     { label: "About Us", href: "/about" },
