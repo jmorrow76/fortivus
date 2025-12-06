@@ -1708,6 +1708,7 @@ export type Database = {
           created_at: string
           id: string
           is_featured: boolean
+          is_weekly_spotlight: boolean
           title: string
           updated_at: string
           user_id: string
@@ -1717,6 +1718,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_featured?: boolean
+          is_weekly_spotlight?: boolean
           title: string
           updated_at?: string
           user_id: string
@@ -1726,6 +1728,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_featured?: boolean
+          is_weekly_spotlight?: boolean
           title?: string
           updated_at?: string
           user_id?: string

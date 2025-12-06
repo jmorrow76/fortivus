@@ -27,8 +27,7 @@ export default function TestimonySpotlight() {
         const { data, error } = await supabase
           .from('testimonies')
           .select('*')
-          .eq('is_featured', true)
-          .order('updated_at', { ascending: false })
+          .eq('is_weekly_spotlight', true)
           .limit(1)
           .single();
 
