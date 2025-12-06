@@ -1316,6 +1316,7 @@ export type Database = {
       subscription_grants: {
         Row: {
           expires_at: string | null
+          grant_type: string
           granted_at: string
           granted_by: string | null
           id: string
@@ -1324,6 +1325,7 @@ export type Database = {
         }
         Insert: {
           expires_at?: string | null
+          grant_type?: string
           granted_at?: string
           granted_by?: string | null
           id?: string
@@ -1332,6 +1334,7 @@ export type Database = {
         }
         Update: {
           expires_at?: string | null
+          grant_type?: string
           granted_at?: string
           granted_by?: string | null
           id?: string

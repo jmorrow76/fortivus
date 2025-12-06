@@ -94,7 +94,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Fetch subscription grants
     const { data: grants } = await adminClient
       .from("subscription_grants")
-      .select("user_email, expires_at");
+      .select("user_email, expires_at, grant_type");
 
     // Fetch user roles
     const { data: userRoles } = await adminClient
@@ -123,7 +123,7 @@ const handler = async (req: Request): Promise<Response> => {
       let membershipExpires: string | null = null;
 
       if (grant) {
-        membershipType = 'manual_grant';
+        membershipType = grant.grant_type === 'lifetime' ? 'lifetime' : 'manual_grant';
         membershipExpires = grant.expires_at;
       }
 
