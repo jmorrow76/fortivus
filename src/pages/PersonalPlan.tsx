@@ -911,15 +911,32 @@ const PersonalPlan = () => {
               This will create a reusable workout template in your Workouts section that you can use to start future workout sessions.
             </DialogDescription>
           </DialogHeader>
-          <div className="py-4">
-            <Label htmlFor="templateName">Template Name</Label>
-            <Input
-              id="templateName"
-              value={templateName}
-              onChange={(e) => setTemplateName(e.target.value)}
-              placeholder="Enter template name"
-              className="mt-2"
-            />
+          <div className="py-4 space-y-4">
+            <div>
+              <Label htmlFor="templateName">Template Name</Label>
+              <Input
+                id="templateName"
+                value={templateName}
+                onChange={(e) => setTemplateName(e.target.value)}
+                placeholder="Enter template name"
+                className="mt-2"
+              />
+            </div>
+            
+            {/* Exercise Preview */}
+            {plan && selectedDayForTemplate !== null && plan.workout.weeklySchedule[selectedDayForTemplate]?.exercises && (
+              <div>
+                <Label className="text-sm text-muted-foreground">Exercises ({plan.workout.weeklySchedule[selectedDayForTemplate].exercises.length})</Label>
+                <div className="mt-2 max-h-48 overflow-y-auto border rounded-md divide-y">
+                  {plan.workout.weeklySchedule[selectedDayForTemplate].exercises.map((exercise, idx) => (
+                    <div key={idx} className="px-3 py-2 text-sm flex justify-between items-center">
+                      <span className="font-medium">{exercise.name}</span>
+                      <span className="text-muted-foreground">{exercise.sets} × {exercise.reps}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowTemplateDialog(false)}>
