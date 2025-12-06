@@ -14,6 +14,72 @@ export type Database = {
   }
   public: {
     Tables: {
+      accountability_partnerships: {
+        Row: {
+          created_at: string | null
+          ended_at: string | null
+          id: string
+          initiated_by: string
+          status: string | null
+          user1_id: string
+          user2_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          ended_at?: string | null
+          id?: string
+          initiated_by: string
+          status?: string | null
+          user1_id: string
+          user2_id: string
+        }
+        Update: {
+          created_at?: string | null
+          ended_at?: string | null
+          id?: string
+          initiated_by?: string
+          status?: string | null
+          user1_id?: string
+          user2_id?: string
+        }
+        Relationships: []
+      }
+      accountability_requests: {
+        Row: {
+          bio: string | null
+          created_at: string | null
+          fitness_goals: string[] | null
+          id: string
+          is_active: boolean | null
+          prayer_focus: string[] | null
+          preferred_contact_frequency: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string | null
+          fitness_goals?: string[] | null
+          id?: string
+          is_active?: boolean | null
+          prayer_focus?: string[] | null
+          preferred_contact_frequency?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string | null
+          fitness_goals?: string[] | null
+          id?: string
+          is_active?: boolean | null
+          prayer_focus?: string[] | null
+          preferred_contact_frequency?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       achievement_comments: {
         Row: {
           badge_id: string | null

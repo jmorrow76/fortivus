@@ -36,6 +36,7 @@ import ComebackProtocol from "./pages/ComebackProtocol";
 import ExecutiveMode from "./pages/ExecutiveMode";
 import Messages from "./pages/Messages";
 import Onboarding from "./pages/Onboarding";
+import AccountabilityPartners from "./pages/AccountabilityPartners";
 import NotFound from "./pages/NotFound";
 import SupportButton from "./components/SupportButton";
 import ReferralButton from "./components/ReferralButton";
@@ -84,6 +85,7 @@ const App = () => (
             <Route path="/comeback" element={<ComebackProtocol />} />
             <Route path="/executive-mode" element={<ExecutiveMode />} />
             <Route path="/messages" element={<Messages />} />
+            <Route path="/accountability" element={<AccountabilityPartners />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
