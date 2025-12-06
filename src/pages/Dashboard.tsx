@@ -15,6 +15,7 @@ import PersonalizedRecommendations from '@/components/dashboard/PersonalizedReco
 import ScriptureOfDay from '@/components/dashboard/ScriptureOfDay';
 import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
+import QuickStartFAB from '@/components/QuickStartFAB';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -932,6 +933,7 @@ export default function Dashboard() {
           </div>
         </div>
       </main>
+      <QuickStartFAB />
     </div>
   );
 }
