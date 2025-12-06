@@ -8,6 +8,16 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import {
   Smile,
   Meh,
   Frown,
@@ -22,6 +32,7 @@ import {
   Flame,
   RefreshCw,
   BookOpen,
+  HandHeart,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -70,6 +81,12 @@ const MoodCheckin = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [generatingWorkout, setGeneratingWorkout] = useState(false);
+
+  // Prayer request state
+  const [prayerDialogOpen, setPrayerDialogOpen] = useState(false);
+  const [prayerTitle, setPrayerTitle] = useState("");
+  const [prayerContent, setPrayerContent] = useState("");
+  const [submittingPrayer, setSubmittingPrayer] = useState(false);
 
   // Form state
   const [moodLevel, setMoodLevel] = useState(3);
@@ -241,6 +258,112 @@ const MoodCheckin = () => {
       setGeneratingWorkout(false);
     }
   };
+
+  const handleSubmitPrayerRequest = async () => {
+    if (!user || !prayerTitle.trim() || !prayerContent.trim()) return;
+
+    setSubmittingPrayer(true);
+    try {
+      // Prayer Requests category ID
+      const prayerCategoryId = "d1068299-5bbb-46f2-b28c-730b1f960723";
+
+      const { error } = await supabase
+        .from("forum_topics")
+        .insert({
+          user_id: user.id,
+          category_id: prayerCategoryId,
+          title: prayerTitle.trim(),
+          content: prayerContent.trim(),
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Prayer request shared",
+        description: "Your brothers in Christ will be lifting you up in prayer.",
+      });
+
+      setPrayerDialogOpen(false);
+      setPrayerTitle("");
+      setPrayerContent("");
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to submit prayer request",
+        variant: "destructive",
+      });
+    } finally {
+      setSubmittingPrayer(false);
+    }
+  };
+
+  const renderPrayForMeButton = () => (
+    <Dialog open={prayerDialogOpen} onOpenChange={setPrayerDialogOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" className="gap-2">
+          <HandHeart className="h-4 w-4" />
+          Pray for Me
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <HandHeart className="h-5 w-5 text-accent" />
+            Share a Prayer Request
+          </DialogTitle>
+          <DialogDescription>
+            Share what's on your heart. Your brothers in Christ will lift you up in prayer.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4 py-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Title</label>
+            <Input
+              placeholder="e.g., Strength for a difficult week"
+              value={prayerTitle}
+              onChange={(e) => setPrayerTitle(e.target.value)}
+              maxLength={100}
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Your Prayer Request</label>
+            <Textarea
+              placeholder="Share what you'd like your brothers to pray for..."
+              value={prayerContent}
+              onChange={(e) => setPrayerContent(e.target.value)}
+              rows={4}
+              maxLength={1000}
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button
+            variant="outline"
+            onClick={() => setPrayerDialogOpen(false)}
+            disabled={submittingPrayer}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSubmitPrayerRequest}
+            disabled={submittingPrayer || !prayerTitle.trim() || !prayerContent.trim()}
+          >
+            {submittingPrayer ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                Sharing...
+              </>
+            ) : (
+              <>
+                <HandHeart className="h-4 w-4 mr-2" />
+                Share Request
+              </>
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
 
   const renderLevelSelector = (
     label: string,
@@ -471,6 +594,16 @@ const MoodCheckin = () => {
 
           {todayCheckin.workout_recommendation && 
             renderWorkoutRecommendation(todayCheckin.workout_recommendation)}
+
+          {/* Pray for Me button */}
+          <div className="mt-6 pt-4 border-t border-border">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">
+                Need prayer support from the community?
+              </p>
+              {renderPrayForMeButton()}
+            </div>
+          </div>
         </CardContent>
       </Card>
     );
@@ -534,24 +667,27 @@ const MoodCheckin = () => {
           />
         </div>
 
-        <Button
-          onClick={handleSubmit}
-          disabled={submitting}
-          className="w-full"
-          size="lg"
-        >
-          {submitting ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin mr-2" />
-              {generatingWorkout ? "Generating workout..." : "Saving..."}
-            </>
-          ) : (
-            <>
-              <CheckCircle2 className="h-4 w-4 mr-2" />
-              Complete Check-in & Get Workout
-            </>
-          )}
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Button
+            onClick={handleSubmit}
+            disabled={submitting}
+            className="flex-1"
+            size="lg"
+          >
+            {submitting ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                {generatingWorkout ? "Generating workout..." : "Saving..."}
+              </>
+            ) : (
+              <>
+                <CheckCircle2 className="h-4 w-4 mr-2" />
+                Complete Check-in & Get Workout
+              </>
+            )}
+          </Button>
+          {renderPrayForMeButton()}
+        </div>
       </CardContent>
     </Card>
   );
