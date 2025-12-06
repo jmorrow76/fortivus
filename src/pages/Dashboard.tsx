@@ -11,6 +11,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useGamification } from '@/hooks/useGamification';
 import { useWorkoutLog } from '@/hooks/useWorkoutLog';
 import { useOnboarding } from '@/hooks/useOnboarding';
+import PersonalizedRecommendations from '@/components/dashboard/PersonalizedRecommendations';
 import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -322,56 +323,13 @@ export default function Dashboard() {
           </div>
 
           {/* Personalized Recommendations - Show if onboarding completed */}
-          {recommendations && (
-            <Card className="mb-8 border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Lightbulb className="h-5 w-5 text-primary" />
-                  Your Personalized Focus
-                </CardTitle>
-                <CardDescription>Based on your assessment</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div className="p-4 bg-background rounded-lg border">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Target className="h-4 w-4 text-primary" />
-                      <span className="text-sm font-medium">Primary Focus</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground">{recommendations.primaryFocus}</p>
-                  </div>
-                  <div className="p-4 bg-background rounded-lg border">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Dumbbell className="h-4 w-4 text-primary" />
-                      <span className="text-sm font-medium">Workout Style</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground">{recommendations.workoutType}</p>
-                  </div>
-                  <div className="p-4 bg-background rounded-lg border">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Utensils className="h-4 w-4 text-primary" />
-                      <span className="text-sm font-medium">Nutrition Tip</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground">{recommendations.nutritionTip}</p>
-                  </div>
-                  <div className="p-4 bg-background rounded-lg border">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Battery className="h-4 w-4 text-primary" />
-                      <span className="text-sm font-medium">Recovery Priority</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground">{recommendations.recoveryPriority}</p>
-                  </div>
-                </div>
-                {onboardingData && (
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    <Badge variant="outline">Goal: {onboardingData.fitness_goal.replace('_', ' ')}</Badge>
-                    <Badge variant="outline">Level: {onboardingData.experience_level}</Badge>
-                    <Badge variant="outline">Age: {onboardingData.age_range}</Badge>
-                    <Badge variant="outline">{onboardingData.workout_frequency} days/week</Badge>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+          {recommendations && onboardingData && (
+            <div className="mb-8">
+              <PersonalizedRecommendations 
+                recommendations={recommendations} 
+                onboardingData={onboardingData} 
+              />
+            </div>
           )}
 
           {/* Quick Stats Row */}
