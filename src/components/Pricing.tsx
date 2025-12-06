@@ -299,10 +299,81 @@ const Pricing = () => {
           ))}
         </div>
 
+        {/* Quick Start vs AI Personal Plan Comparison */}
+        <div className="mt-16 max-w-3xl mx-auto">
+          <h3 className="font-heading text-2xl font-bold text-center mb-3">
+            Planning Tools Comparison
+          </h3>
+          <p className="text-muted-foreground text-center mb-8">
+            See the difference between our free guidance and premium AI-powered planning
+          </p>
+          <Card className="overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-secondary/50">
+                  <TableHead className="font-heading font-semibold w-[40%]">Feature</TableHead>
+                  <TableHead className="text-center font-heading font-semibold">
+                    <div className="flex flex-col items-center gap-1">
+                      <Zap className="h-4 w-4 text-muted-foreground" />
+                      <span>Quick Start Guide</span>
+                      <span className="text-xs font-normal text-muted-foreground">Free</span>
+                    </div>
+                  </TableHead>
+                  <TableHead className="text-center font-heading font-semibold bg-accent/10">
+                    <div className="flex flex-col items-center gap-1">
+                      <Sparkles className="h-4 w-4 text-accent" />
+                      <span>AI Personal Plan</span>
+                      <span className="text-xs font-normal text-accent">Elite</span>
+                    </div>
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {[
+                  { feature: "Personalized workout suggestions", quickStart: "Basic", aiPlan: "Advanced AI" },
+                  { feature: "Nutrition guidance", quickStart: "General tips", aiPlan: "Full meal plans with macros" },
+                  { feature: "Weekly schedule", quickStart: "Template-based", aiPlan: "Custom AI-generated" },
+                  { feature: "Supplement recommendations", quickStart: "Basic list", aiPlan: "Personalized with dosages" },
+                  { feature: "Based on your assessment", quickStart: true, aiPlan: true },
+                  { feature: "Considers injuries/limitations", quickStart: "Limited", aiPlan: "Full consideration" },
+                  { feature: "Save multiple plans", quickStart: false, aiPlan: true },
+                  { feature: "Convert to workout templates", quickStart: false, aiPlan: true },
+                  { feature: "Detailed exercise instructions", quickStart: false, aiPlan: true },
+                  { feature: "Calorie targets calculated", quickStart: false, aiPlan: true },
+                  { feature: "Progress timeline", quickStart: false, aiPlan: true },
+                  { feature: "Key priorities breakdown", quickStart: false, aiPlan: true },
+                ].map((row) => (
+                  <TableRow key={row.feature}>
+                    <TableCell className="font-medium text-sm">{row.feature}</TableCell>
+                    <TableCell className="text-center">
+                      {row.quickStart === true ? (
+                        <Check className="h-5 w-5 text-green-500 mx-auto" />
+                      ) : row.quickStart === false ? (
+                        <X className="h-5 w-5 text-muted-foreground/40 mx-auto" />
+                      ) : (
+                        <span className="text-sm text-muted-foreground">{row.quickStart}</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-center bg-accent/5">
+                      {row.aiPlan === true ? (
+                        <Check className="h-5 w-5 text-green-500 mx-auto" />
+                      ) : row.aiPlan === false ? (
+                        <X className="h-5 w-5 text-muted-foreground/40 mx-auto" />
+                      ) : (
+                        <span className="text-sm font-medium text-accent">{row.aiPlan}</span>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Card>
+        </div>
+
         {/* Feature Comparison Table */}
         <div className="mt-16 max-w-4xl mx-auto">
           <h3 className="font-heading text-2xl font-bold text-center mb-8">
-            Feature Comparison
+            Full Feature Comparison
           </h3>
           <Card className="overflow-hidden">
             <Table>
@@ -326,6 +397,8 @@ const Pricing = () => {
                   { feature: "Gamification & badges", free: true, elite: true, lifetime: true },
                   { feature: "Community leaderboard", free: true, elite: true, lifetime: true },
                   { feature: "Partner recommendations", free: true, elite: true, lifetime: true },
+                  { feature: "Quick Start Guide", free: true, elite: true, lifetime: true },
+                  { feature: "AI Personal Plan", free: false, elite: true, lifetime: true },
                   { feature: "AI workout recommendations", free: false, elite: true, lifetime: true },
                   { feature: "AI nutrition & meal planning", free: false, elite: true, lifetime: true },
                   { feature: "Calorie & macro tracking", free: false, elite: true, lifetime: true },
@@ -334,7 +407,7 @@ const Pricing = () => {
                   { feature: "Wearable integration", free: false, elite: true, lifetime: true },
                   { feature: "Unlimited AI Body Analysis", free: false, elite: true, lifetime: true },
                   { feature: "Progress photo tracking", free: false, elite: true, lifetime: true },
-                  { feature: "Daily check-in with AI coaching", free: false, elite: true, lifetime: true },
+                  { feature: "1-on-1 AI Coaching", free: false, elite: true, lifetime: true },
                   { feature: "Hormonal cycle optimization", free: false, elite: true, lifetime: true },
                   { feature: "Predictive joint health analytics", free: false, elite: true, lifetime: true },
                   { feature: "Sleep-adaptive auto-programming", free: false, elite: true, lifetime: true },
