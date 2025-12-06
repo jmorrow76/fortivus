@@ -13,9 +13,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Textarea } from '@/components/ui/textarea';
 import { 
   Dumbbell, Play, History, Trophy, Plus, Search, 
-  Timer, Check, X, ChevronRight, Minus, Clock, FileText, Trash2, Save, TrendingUp
+  Timer, Check, X, ChevronRight, Minus, Clock, FileText, Trash2, Save, TrendingUp, Video
 } from 'lucide-react';
 import ExerciseProgressChart from '@/components/ExerciseProgressChart';
+import ExerciseVideoLibrary from '@/components/ExerciseVideoLibrary';
 import PRCelebration from '@/components/PRCelebration';
 import { Navigate } from 'react-router-dom';
 import { format, formatDistanceToNow } from 'date-fns';
@@ -428,7 +429,7 @@ const Workouts = () => {
           </Card>
 
           <Tabs defaultValue="history" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5">
+            <TabsList className="grid w-full grid-cols-6">
               <TabsTrigger value="history" className="flex items-center gap-2">
                 <History className="w-4 h-4" />
                 <span className="hidden sm:inline">History</span>
@@ -440,6 +441,10 @@ const Workouts = () => {
               <TabsTrigger value="exercises" className="flex items-center gap-2">
                 <Dumbbell className="w-4 h-4" />
                 <span className="hidden sm:inline">Exercises</span>
+              </TabsTrigger>
+              <TabsTrigger value="tutorials" className="flex items-center gap-2">
+                <Video className="w-4 h-4" />
+                <span className="hidden sm:inline">Tutorials</span>
               </TabsTrigger>
               <TabsTrigger value="progress" className="flex items-center gap-2">
                 <TrendingUp className="w-4 h-4" />
@@ -773,6 +778,11 @@ const Workouts = () => {
                   ))}
                 </div>
               </div>
+            </TabsContent>
+
+            {/* Tutorials Tab */}
+            <TabsContent value="tutorials">
+              <ExerciseVideoLibrary />
             </TabsContent>
 
             {/* Progress Tab */}
