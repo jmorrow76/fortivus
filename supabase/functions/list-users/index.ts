@@ -30,6 +30,8 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const authHeader = req.headers.get("authorization");
+    console.log("[LIST-USERS] Auth header present:", !!authHeader);
+    
     if (!authHeader) {
       throw new Error("No authorization header");
     }
@@ -40,25 +42,27 @@ const handler = async (req: Request): Promise<Response> => {
     // Create admin client for auth operations
     const adminClient = createClient(supabaseUrl, supabaseServiceKey);
     
-    // Create user client to verify admin status
-    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
-    const userClient = createClient(supabaseUrl, supabaseAnonKey, {
-      global: { headers: { Authorization: authHeader } },
-    });
-
-    // Verify the user is authenticated and is admin
-    const { data: { user }, error: authError } = await userClient.auth.getUser();
+    // Extract the token and verify it
+    const token = authHeader.replace("Bearer ", "");
+    
+    // Verify the token using the admin client
+    const { data: { user }, error: authError } = await adminClient.auth.getUser(token);
+    
+    console.log("[LIST-USERS] User lookup result:", { userId: user?.id, email: user?.email, error: authError?.message });
+    
     if (authError || !user) {
       throw new Error("Unauthorized");
     }
 
     // Check if user is admin
-    const { data: roleData } = await adminClient
+    const { data: roleData, error: roleError } = await adminClient
       .from("user_roles")
       .select("role")
       .eq("user_id", user.id)
       .eq("role", "admin")
       .maybeSingle();
+
+    console.log("[LIST-USERS] Role check:", { roleData, roleError: roleError?.message });
 
     if (!roleData) {
       throw new Error("Admin access required");
