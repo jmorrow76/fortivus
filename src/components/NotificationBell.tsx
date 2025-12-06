@@ -39,6 +39,8 @@ export function NotificationBell() {
         return <Users className="h-4 w-4 text-purple-500" />;
       case 'prayer_request':
         return <HandHeart className="h-4 w-4 text-rose-500" />;
+      case 'prayer_answered':
+        return <HandHeart className="h-4 w-4 text-green-500" />;
       default:
         return <Zap className="h-4 w-4 text-primary" />;
     }
