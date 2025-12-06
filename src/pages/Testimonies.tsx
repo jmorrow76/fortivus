@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useAdmin } from '@/hooks/useAdmin';
 import { useToast } from '@/hooks/use-toast';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -26,7 +27,8 @@ import {
   User,
   BookOpen,
   Trash2,
-  Star
+  Star,
+  StarOff
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useLikes } from '@/hooks/useLikes';
@@ -44,6 +46,7 @@ interface Testimony {
 
 export default function Testimonies() {
   const { user } = useAuth();
+  const { isAdmin } = useAdmin();
   const { toast } = useToast();
   
   const [testimonies, setTestimonies] = useState<Testimony[]>([]);
@@ -146,6 +149,32 @@ export default function Testimonies() {
       toast({
         title: 'Error',
         description: error.message || 'Failed to delete testimony',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handleToggleFeatured = async (id: string, currentFeatured: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('testimonies')
+        .update({ is_featured: !currentFeatured })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast({
+        title: currentFeatured ? 'Removed from featured' : 'Featured!',
+        description: currentFeatured 
+          ? 'Testimony is no longer featured.' 
+          : 'Testimony is now featured at the top.'
+      });
+
+      fetchTestimonies();
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to update testimony',
         variant: 'destructive'
       });
     }
@@ -274,6 +303,17 @@ export default function Testimonies() {
                           <Star className="h-3 w-3" />
                           Featured
                         </Badge>
+                      )}
+                      {isAdmin && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className={`h-8 w-8 ${testimony.is_featured ? 'text-yellow-500' : 'text-muted-foreground'}`}
+                          onClick={() => handleToggleFeatured(testimony.id, testimony.is_featured)}
+                          title={testimony.is_featured ? 'Remove from featured' : 'Feature this testimony'}
+                        >
+                          {testimony.is_featured ? <StarOff className="h-4 w-4" /> : <Star className="h-4 w-4" />}
+                        </Button>
                       )}
                       {testimony.user_id === user?.id && (
                         <Button
