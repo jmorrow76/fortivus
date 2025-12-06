@@ -113,11 +113,12 @@ const Pricing = () => {
         "Community leaderboard",
         "Partner product recommendations",
       ],
-      cta: isOnFreePlan ? "Current Plan" : (user ? "Downgrade" : "Get Started"),
+      cta: isOnFreePlan ? "Current Plan" : "Get Started",
       variant: "outline" as const,
       popular: false,
-      disabled: isOnFreePlan || !user,
+      disabled: isOnFreePlan,
       isCurrentPlan: isOnFreePlan,
+      authLink: !user,
     },
     {
       name: "Elite",
@@ -269,6 +270,15 @@ const Pricing = () => {
                       <Loader2 className="h-4 w-4 animate-spin mr-2" />
                     ) : null}
                     Manage Subscription
+                  </Button>
+                ) : plan.authLink ? (
+                  <Button
+                    variant={plan.variant}
+                    className="w-full"
+                    size="lg"
+                    onClick={() => navigate("/auth")}
+                  >
+                    {plan.cta}
                   </Button>
                 ) : (
                   <Button
