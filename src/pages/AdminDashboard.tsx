@@ -106,10 +106,17 @@ const AdminDashboard = () => {
     }
   }, [isAdmin]);
 
+  const { session } = useAuth();
+
   const fetchAllUsers = async () => {
+    if (!session) return;
     setLoadingUsers(true);
     try {
-      const { data, error } = await supabase.functions.invoke('list-users');
+      const { data, error } = await supabase.functions.invoke('list-users', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
       if (error) throw error;
       setAllUsers(data?.users || []);
     } catch (error: any) {
@@ -149,10 +156,14 @@ const AdminDashboard = () => {
   };
 
   const handleRoleChange = async (userId: string, role: 'admin' | 'moderator', action: 'add' | 'remove') => {
+    if (!session) return;
     setUpdatingRole(`${userId}-${role}`);
     try {
       const { data, error } = await supabase.functions.invoke('manage-user-role', {
-        body: { targetUserId: userId, role, action }
+        body: { targetUserId: userId, role, action },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
       });
       if (error) throw error;
       toast.success(data?.message || `Role ${action === 'add' ? 'added' : 'removed'} successfully`);
