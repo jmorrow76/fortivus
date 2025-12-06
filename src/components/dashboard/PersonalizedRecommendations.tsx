@@ -75,7 +75,8 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
   const [templateName, setTemplateName] = useState('');
   const [isCreatingTemplate, setIsCreatingTemplate] = useState(false);
   const [isCreatingAllTemplates, setIsCreatingAllTemplates] = useState(false);
-  const [savedTemplateDays, setSavedTemplateDays] = useState<Set<string>>(new Set());
+  const [savedTemplateDays, setSavedTemplateDays] = useState<Map<string, string>>(new Map());
+  const [isResaving, setIsResaving] = useState(false);
 
   // Load existing AI plan and saved templates on mount for Elite users
   useEffect(() => {
@@ -90,12 +91,12 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
     try {
       const { data } = await supabase
         .from('workout_templates')
-        .select('name')
+        .select('id, name')
         .eq('user_id', user.id)
         .eq('description', 'Generated from AI Personal Plan');
       
       if (data) {
-        setSavedTemplateDays(new Set(data.map(t => t.name)));
+        setSavedTemplateDays(new Map(data.map(t => [t.name, t.id])));
       }
     } catch (error) {
       console.error('Error loading saved templates:', error);
@@ -264,11 +265,12 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
     }
   };
 
-  const handleOpenTemplateDialog = (dayIndex: number) => {
+  const handleOpenTemplateDialog = (dayIndex: number, resave = false) => {
     if (!aiPlan) return;
     const day = aiPlan.workout.weeklySchedule[dayIndex];
     setSelectedDayForTemplate(dayIndex);
     setTemplateName(`${day.day} - ${day.focus}`);
+    setIsResaving(resave);
     setShowTemplateDialog(true);
   };
 
@@ -299,20 +301,41 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
 
     setIsCreatingTemplate(true);
     const workoutLocation = getWorkoutLocation();
+    const templateKey = templateName.trim() || `${day.day} - ${day.focus}`;
+    const existingTemplateId = savedTemplateDays.get(templateKey);
 
     try {
-      // Create the workout template
-      const { data: template, error: templateError } = await supabase
-        .from("workout_templates")
-        .insert({
-          user_id: user.id,
-          name: templateName.trim() || `${day.day} - ${day.focus}`,
-          description: `Generated from AI Personal Plan`,
-        })
-        .select()
-        .single();
+      let templateId: string;
 
-      if (templateError) throw templateError;
+      if (isResaving && existingTemplateId) {
+        // Delete existing template exercises first
+        await supabase
+          .from("template_exercises")
+          .delete()
+          .eq("template_id", existingTemplateId);
+
+        // Update the template's updated_at
+        await supabase
+          .from("workout_templates")
+          .update({ updated_at: new Date().toISOString() })
+          .eq("id", existingTemplateId);
+
+        templateId = existingTemplateId;
+      } else {
+        // Create the workout template
+        const { data: template, error: templateError } = await supabase
+          .from("workout_templates")
+          .insert({
+            user_id: user.id,
+            name: templateKey,
+            description: `Generated from AI Personal Plan`,
+          })
+          .select()
+          .single();
+
+        if (templateError) throw templateError;
+        templateId = template.id;
+      }
 
       // Find or create exercises and add them to the template
       for (let i = 0; i < day.exercises.length; i++) {
@@ -364,7 +387,7 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
         await supabase
           .from("template_exercises")
           .insert({
-            template_id: template.id,
+            template_id: templateId,
             exercise_id: exerciseId,
             sort_order: i,
             target_sets: exercise.sets,
@@ -375,8 +398,8 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
       }
 
       toast({
-        title: "Template Created!",
-        description: `"${templateName}" has been added to your workout templates`,
+        title: isResaving ? "Template Updated!" : "Template Created!",
+        description: `"${templateKey}" has been ${isResaving ? 'updated' : 'added to your workout templates'}`,
         action: (
           <Button 
             variant="outline" 
@@ -390,11 +413,12 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
       });
       
       // Update saved template days
-      setSavedTemplateDays(prev => new Set([...prev, templateName.trim() || `${aiPlan.workout.weeklySchedule[selectedDayForTemplate].day} - ${aiPlan.workout.weeklySchedule[selectedDayForTemplate].focus}`]));
+      setSavedTemplateDays(prev => new Map([...prev, [templateKey, templateId]]));
       
       setShowTemplateDialog(false);
       setSelectedDayForTemplate(null);
       setTemplateName("");
+      setIsResaving(false);
     } catch (error: any) {
       console.error("Error creating template:", error);
       toast({
@@ -503,10 +527,8 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
         createdCount++;
       }
 
-      // Update saved template days state
-      const newSavedDays = new Set(savedTemplateDays);
-      workoutDays.forEach(day => newSavedDays.add(`${day.day} - ${day.focus}`));
-      setSavedTemplateDays(newSavedDays);
+      // Reload saved template days to get the new IDs
+      await loadSavedTemplateDays();
 
       toast({
         title: "Templates Created!",
@@ -889,16 +911,28 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
                               </span>
                               <div className="flex items-center gap-2">
                                 <Badge variant="outline">{day.focus}</Badge>
-                                {day.exercises && day.exercises.length > 0 && !isSaved && (
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => handleOpenTemplateDialog(idx)}
-                                    className="h-7 px-2 text-xs"
-                                  >
-                                    <Plus className="h-3 w-3 mr-1" />
-                                    Save Template
-                                  </Button>
+                                {day.exercises && day.exercises.length > 0 && (
+                                  isSaved ? (
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => handleOpenTemplateDialog(idx, true)}
+                                      className="h-7 px-2 text-xs"
+                                    >
+                                      <Save className="h-3 w-3 mr-1" />
+                                      Resave
+                                    </Button>
+                                  ) : (
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => handleOpenTemplateDialog(idx)}
+                                      className="h-7 px-2 text-xs"
+                                    >
+                                      <Plus className="h-3 w-3 mr-1" />
+                                      Save Template
+                                    </Button>
+                                  )
                                 )}
                               </div>
                             </div>
@@ -1053,12 +1087,18 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
       </Card>
 
       {/* Template Creation Dialog */}
-      <Dialog open={showTemplateDialog} onOpenChange={setShowTemplateDialog}>
+      <Dialog open={showTemplateDialog} onOpenChange={(open) => {
+        setShowTemplateDialog(open);
+        if (!open) setIsResaving(false);
+      }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Save as Workout Template</DialogTitle>
+            <DialogTitle>{isResaving ? 'Update Workout Template' : 'Save as Workout Template'}</DialogTitle>
             <DialogDescription>
-              Create a reusable template from this workout day that you can use anytime.
+              {isResaving 
+                ? 'Update this template with the latest exercises from your AI plan.'
+                : 'Create a reusable template from this workout day that you can use anytime.'
+              }
             </DialogDescription>
           </DialogHeader>
           
@@ -1070,12 +1110,16 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
                 value={templateName}
                 onChange={(e) => setTemplateName(e.target.value)}
                 placeholder="e.g., Monday - Upper Body"
+                disabled={isResaving}
               />
+              {isResaving && (
+                <p className="text-xs text-muted-foreground">Template name cannot be changed when resaving</p>
+              )}
             </div>
 
             {selectedDayForTemplate !== null && aiPlan && (
               <div className="space-y-2">
-                <Label>Exercises to Include</Label>
+                <Label>Exercises to {isResaving ? 'Update' : 'Include'}</Label>
                 <div className="max-h-48 overflow-y-auto space-y-1 p-3 bg-muted/50 rounded-lg">
                   {aiPlan.workout.weeklySchedule[selectedDayForTemplate].exercises?.map((ex, idx) => (
                     <div key={idx} className="flex justify-between items-center text-sm py-1">
@@ -1096,12 +1140,12 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
               {isCreatingTemplate ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Creating...
+                  {isResaving ? 'Updating...' : 'Creating...'}
                 </>
               ) : (
                 <>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Create Template
+                  <Save className="h-4 w-4 mr-2" />
+                  {isResaving ? 'Update Template' : 'Create Template'}
                 </>
               )}
             </Button>
