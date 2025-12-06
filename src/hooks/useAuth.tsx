@@ -8,7 +8,7 @@ interface SubscriptionStatus {
   subscriptionEnd: string | null;
 }
 
-type SocialProvider = 'google' | 'github';
+type SocialProvider = 'google' | 'apple' | 'facebook';
 
 interface AuthContextType {
   user: User | null;
