@@ -275,9 +275,9 @@ const FeaturesShowcase = () => {
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </a>
             </Button>
-            <Button variant="outline" size="lg" asChild>
-              <Link to="/auth">Start Free</Link>
-            </Button>
+            <Link to="/auth">
+              <Button variant="outline" size="lg">Start Free</Button>
+            </Link>
           </div>
           <p className="text-sm text-muted-foreground mt-4">
             Join 50,000+ men transforming their fitness after 40
