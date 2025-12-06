@@ -84,6 +84,7 @@ const AdminDashboard = () => {
   const [simulatedCount, setSimulatedCount] = useState(0);
   const [seedingUsers, setSeedingUsers] = useState(false);
   const [generatingActivity, setGeneratingActivity] = useState(false);
+  const [newSimUserCount, setNewSimUserCount] = useState(10);
 
   // Content management
   const [generatingArticle, setGeneratingArticle] = useState(false);
@@ -425,14 +426,17 @@ const AdminDashboard = () => {
     setSimulatedCount(count || 0);
   };
 
-  const handleSeedUsers = async () => {
+  const handleSeedUsers = async (count: number = 50) => {
     setSeedingUsers(true);
     try {
-      const { data, error } = await supabase.functions.invoke('seed-simulated-users');
+      const { data, error } = await supabase.functions.invoke('seed-simulated-users', {
+        body: { count }
+      });
       if (error) throw error;
-      toast.success(`Created ${data?.users?.length || 50} simulated users`);
+      toast.success(`Created ${data?.users?.length || count} simulated users`);
       fetchSimulatedCount();
       fetchAnalytics();
+      fetchAllUsers();
     } catch (error: any) {
       console.error('Error seeding users:', error);
       toast.error(error.message || 'Failed to seed users');
@@ -1293,16 +1297,27 @@ const AdminDashboard = () => {
                     <CardHeader className="pb-3">
                       <CardTitle className="text-base flex items-center gap-2">
                         <UserPlus className="h-4 w-4" />
-                        Seed Users
+                        Add Simulated Users
                       </CardTitle>
                       <CardDescription>
-                        Create 50 simulated male users over 40 with unique personalities
+                        Create simulated male users over 40 with unique personalities
                       </CardDescription>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="space-y-4">
+                      <div className="flex items-center gap-2">
+                        <Input
+                          type="number"
+                          min="1"
+                          max="100"
+                          value={newSimUserCount}
+                          onChange={(e) => setNewSimUserCount(Math.min(100, Math.max(1, parseInt(e.target.value) || 1)))}
+                          className="w-24"
+                        />
+                        <span className="text-sm text-muted-foreground">users (max 100)</span>
+                      </div>
                       <Button 
-                        onClick={handleSeedUsers} 
-                        disabled={seedingUsers || simulatedCount > 0}
+                        onClick={() => handleSeedUsers(newSimUserCount)} 
+                        disabled={seedingUsers}
                         className="w-full"
                       >
                         {seedingUsers ? (
@@ -1310,12 +1325,10 @@ const AdminDashboard = () => {
                             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                             Creating Users...
                           </>
-                        ) : simulatedCount > 0 ? (
-                          "Users Already Seeded"
                         ) : (
                           <>
                             <UserPlus className="h-4 w-4 mr-2" />
-                            Create 50 Users
+                            Add {newSimUserCount} User{newSimUserCount !== 1 ? 's' : ''}
                           </>
                         )}
                       </Button>
