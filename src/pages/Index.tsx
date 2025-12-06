@@ -7,6 +7,7 @@ import SuccessStories from "@/components/SuccessStories";
 import Pricing from "@/components/Pricing";
 import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
+import TestimonySpotlight from "@/components/TestimonySpotlight";
 
 const Index = () => {
   return (
@@ -18,6 +19,7 @@ const Index = () => {
         <AIAnalysis />
         <FeaturesShowcase />
         <Pricing />
+        <TestimonySpotlight />
         <SuccessStories />
         <Newsletter />
       </main>
