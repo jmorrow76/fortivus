@@ -19,6 +19,7 @@ interface AuthContextType {
   signUp: (email: string, password: string, displayName?: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signInWithSocial: (provider: SocialProvider) => Promise<{ error: Error | null }>;
+  resendVerificationEmail: (email: string) => Promise<{ error: Error | null }>;
   resetPassword: (email: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
@@ -143,6 +144,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return { error };
   };
 
+  const resendVerificationEmail = async (email: string) => {
+    const redirectUrl = `${window.location.origin}/`;
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email,
+      options: {
+        emailRedirectTo: redirectUrl,
+      },
+    });
+    return { error };
+  };
+
   const signInWithSocial = async (provider: SocialProvider) => {
     const redirectUrl = `${window.location.origin}/dashboard`;
     const { error } = await supabase.auth.signInWithOAuth({
@@ -168,6 +181,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       signUp, 
       signIn, 
       signInWithSocial,
+      resendVerificationEmail,
       resetPassword,
       signOut 
     }}>
