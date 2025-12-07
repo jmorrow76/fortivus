@@ -2,18 +2,22 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Search, Play, AlertTriangle, CheckCircle, User } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Search, Play, AlertTriangle, CheckCircle, User, Heart, Plus, ListPlus, Trash2, FolderOpen } from 'lucide-react';
+import { useExerciseFavorites } from '@/hooks/useExerciseFavorites';
+import { useAuth } from '@/hooks/useAuth';
 
-// Exercise video data with YouTube tutorial links
 // Exercise video data with YouTube tutorial links (men demonstrators only)
 const exerciseVideos = [
   {
     id: '1',
     name: 'Barbell Bench Press',
     muscle_group: 'chest',
-    youtubeId: '4Y2ZdHCOXok', // Jeff Nippard
+    youtubeId: '4Y2ZdHCOXok',
     thumbnail: 'https://img.youtube.com/vi/4Y2ZdHCOXok/mqdefault.jpg',
     formTips: [
       'Keep shoulder blades retracted and depressed',
@@ -41,7 +45,7 @@ const exerciseVideos = [
     id: '2',
     name: 'Barbell Squat',
     muscle_group: 'quadriceps',
-    youtubeId: 'ultWZbUMPL8', // Alan Thrall
+    youtubeId: 'ultWZbUMPL8',
     thumbnail: 'https://img.youtube.com/vi/ultWZbUMPL8/mqdefault.jpg',
     formTips: [
       'Keep chest up and core braced',
@@ -69,7 +73,7 @@ const exerciseVideos = [
     id: '3',
     name: 'Deadlift',
     muscle_group: 'back',
-    youtubeId: 'op9kVnSso6Q', // Alan Thrall
+    youtubeId: 'op9kVnSso6Q',
     thumbnail: 'https://img.youtube.com/vi/op9kVnSso6Q/mqdefault.jpg',
     formTips: [
       'Keep the bar close to your body throughout',
@@ -97,7 +101,7 @@ const exerciseVideos = [
     id: '4',
     name: 'Overhead Press',
     muscle_group: 'shoulders',
-    youtubeId: '_RlRDWO2jfg', // Alan Thrall
+    youtubeId: '_RlRDWO2jfg',
     thumbnail: 'https://img.youtube.com/vi/_RlRDWO2jfg/mqdefault.jpg',
     formTips: [
       'Start with bar at collar bone level',
@@ -125,7 +129,7 @@ const exerciseVideos = [
     id: '5',
     name: 'Barbell Row',
     muscle_group: 'back',
-    youtubeId: 'kBWAon7ItDw', // Jeff Nippard
+    youtubeId: 'kBWAon7ItDw',
     thumbnail: 'https://img.youtube.com/vi/kBWAon7ItDw/mqdefault.jpg',
     formTips: [
       'Hinge at hips with slight knee bend',
@@ -153,7 +157,7 @@ const exerciseVideos = [
     id: '6',
     name: 'Pull-up',
     muscle_group: 'back',
-    youtubeId: 'XB_7En-zf_M', // Calisthenicmovement (male)
+    youtubeId: 'XB_7En-zf_M',
     thumbnail: 'https://img.youtube.com/vi/XB_7En-zf_M/mqdefault.jpg',
     formTips: [
       'Start from a dead hang position',
@@ -181,7 +185,7 @@ const exerciseVideos = [
     id: '7',
     name: 'Dumbbell Curl',
     muscle_group: 'biceps',
-    youtubeId: 'sAq_ocpRh_I', // Jeff Nippard
+    youtubeId: 'sAq_ocpRh_I',
     thumbnail: 'https://img.youtube.com/vi/sAq_ocpRh_I/mqdefault.jpg',
     formTips: [
       'Keep elbows pinned to your sides',
@@ -209,7 +213,7 @@ const exerciseVideos = [
     id: '8',
     name: 'Tricep Pushdown',
     muscle_group: 'triceps',
-    youtubeId: 'REaI4rSuUhM', // ScottHermanFitness
+    youtubeId: 'REaI4rSuUhM',
     thumbnail: 'https://img.youtube.com/vi/REaI4rSuUhM/mqdefault.jpg',
     formTips: [
       'Keep elbows locked at your sides',
@@ -237,7 +241,7 @@ const exerciseVideos = [
     id: '9',
     name: 'Leg Press',
     muscle_group: 'quadriceps',
-    youtubeId: 'yZmx_Ac3880', // ScottHermanFitness
+    youtubeId: 'yZmx_Ac3880',
     thumbnail: 'https://img.youtube.com/vi/yZmx_Ac3880/mqdefault.jpg',
     formTips: [
       'Position feet shoulder-width apart',
@@ -265,7 +269,7 @@ const exerciseVideos = [
     id: '10',
     name: 'Romanian Deadlift',
     muscle_group: 'hamstrings',
-    youtubeId: '2SHsk9AzdjA', // Jeff Nippard
+    youtubeId: '2SHsk9AzdjA',
     thumbnail: 'https://img.youtube.com/vi/2SHsk9AzdjA/mqdefault.jpg',
     formTips: [
       'Keep slight bend in knees throughout',
@@ -293,7 +297,7 @@ const exerciseVideos = [
     id: '11',
     name: 'Plank',
     muscle_group: 'core',
-    youtubeId: 'pSHjTRCQxIw', // Jeff Cavaliere ATHLEAN-X
+    youtubeId: 'pSHjTRCQxIw',
     thumbnail: 'https://img.youtube.com/vi/pSHjTRCQxIw/mqdefault.jpg',
     formTips: [
       'Keep body in a straight line',
@@ -321,7 +325,7 @@ const exerciseVideos = [
     id: '12',
     name: 'Lateral Raise',
     muscle_group: 'shoulders',
-    youtubeId: 'XPPfnSEATJA', // Jeff Nippard
+    youtubeId: 'XPPfnSEATJA',
     thumbnail: 'https://img.youtube.com/vi/XPPfnSEATJA/mqdefault.jpg',
     formTips: [
       'Lead with elbows, not hands',
@@ -350,9 +354,28 @@ const exerciseVideos = [
 const muscleGroups = ['all', 'chest', 'back', 'shoulders', 'biceps', 'triceps', 'quadriceps', 'hamstrings', 'core'];
 
 const ExerciseVideoLibrary = () => {
+  const { user } = useAuth();
+  const { 
+    playlists, 
+    toggleFavorite, 
+    isFavorited, 
+    createPlaylist, 
+    deletePlaylist,
+    addToPlaylist, 
+    removeFromPlaylist,
+    getPlaylistVideos,
+    isInPlaylist
+  } = useExerciseFavorites();
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedMuscle, setSelectedMuscle] = useState('all');
   const [selectedExercise, setSelectedExercise] = useState<typeof exerciseVideos[0] | null>(null);
+  const [activeTab, setActiveTab] = useState('all');
+  const [selectedPlaylistId, setSelectedPlaylistId] = useState<string | null>(null);
+  const [showCreatePlaylist, setShowCreatePlaylist] = useState(false);
+  const [newPlaylistName, setNewPlaylistName] = useState('');
+
+  const getExerciseById = (id: string) => exerciseVideos.find(e => e.id === id);
 
   const filteredExercises = exerciseVideos.filter(ex => {
     const matchesSearch = ex.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -360,79 +383,327 @@ const ExerciseVideoLibrary = () => {
     return matchesSearch && matchesMuscle;
   });
 
+  const favoriteExercises = exerciseVideos.filter(ex => isFavorited(ex.id));
+
+  const selectedPlaylist = playlists.find(p => p.id === selectedPlaylistId);
+  const playlistVideos = selectedPlaylistId 
+    ? getPlaylistVideos(selectedPlaylistId).map(id => getExerciseById(id)).filter(Boolean)
+    : [];
+
+  const handleCreatePlaylist = async () => {
+    if (!newPlaylistName.trim()) return;
+    await createPlaylist(newPlaylistName.trim());
+    setNewPlaylistName('');
+    setShowCreatePlaylist(false);
+  };
+
+  const renderExerciseCard = (exercise: typeof exerciseVideos[0], showRemoveFromPlaylist = false) => (
+    <Card 
+      key={exercise.id} 
+      className="cursor-pointer hover:shadow-lg transition-all group overflow-hidden"
+    >
+      <div className="relative aspect-video" onClick={() => setSelectedExercise(exercise)}>
+        <img 
+          src={exercise.thumbnail} 
+          alt={exercise.name}
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center">
+            <Play className="w-6 h-6 text-primary-foreground fill-current" />
+          </div>
+        </div>
+        <Badge className="absolute top-2 right-2 capitalize">
+          {exercise.muscle_group}
+        </Badge>
+      </div>
+      <CardContent className="p-4">
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex-1" onClick={() => setSelectedExercise(exercise)}>
+            <h3 className="font-semibold">{exercise.name}</h3>
+            <p className="text-sm text-muted-foreground mt-1">
+              Form tips • Common mistakes • 40+ modifications
+            </p>
+          </div>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleFavorite(exercise.id);
+              }}
+            >
+              <Heart 
+                className={`w-4 h-4 ${isFavorited(exercise.id) ? 'fill-red-500 text-red-500' : ''}`} 
+              />
+            </Button>
+            {user && playlists.length > 0 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <ListPlus className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {playlists.map(playlist => (
+                    <DropdownMenuItem
+                      key={playlist.id}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (isInPlaylist(playlist.id, exercise.id)) {
+                          removeFromPlaylist(playlist.id, exercise.id);
+                        } else {
+                          addToPlaylist(playlist.id, exercise.id);
+                        }
+                      }}
+                    >
+                      {isInPlaylist(playlist.id, exercise.id) ? '✓ ' : ''}{playlist.name}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+            {showRemoveFromPlaylist && selectedPlaylistId && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-destructive hover:text-destructive"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  removeFromPlaylist(selectedPlaylistId, exercise.id);
+                }}
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            )}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
   return (
     <div className="space-y-6">
-      {/* Search and Filter */}
-      <div className="space-y-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Search exercise tutorials..."
-            className="pl-10"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+      {/* Tabs for All / Favorites / Playlists */}
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <TabsList>
+            <TabsTrigger value="all">All Exercises</TabsTrigger>
+            <TabsTrigger value="favorites" className="gap-2">
+              <Heart className="w-4 h-4" />
+              Favorites {favoriteExercises.length > 0 && `(${favoriteExercises.length})`}
+            </TabsTrigger>
+            <TabsTrigger value="playlists" className="gap-2">
+              <FolderOpen className="w-4 h-4" />
+              Playlists {playlists.length > 0 && `(${playlists.length})`}
+            </TabsTrigger>
+          </TabsList>
+          
+          {user && activeTab === 'playlists' && (
+            <Button onClick={() => setShowCreatePlaylist(true)} size="sm">
+              <Plus className="w-4 h-4 mr-2" />
+              New Playlist
+            </Button>
+          )}
         </div>
-        <ScrollArea className="w-full">
-          <div className="flex gap-2 pb-2">
-            {muscleGroups.map(muscle => (
-              <Badge
-                key={muscle}
-                variant={selectedMuscle === muscle ? 'default' : 'outline'}
-                className="cursor-pointer capitalize whitespace-nowrap"
-                onClick={() => setSelectedMuscle(muscle)}
-              >
-                {muscle}
-              </Badge>
-            ))}
-          </div>
-        </ScrollArea>
-      </div>
 
-      {/* Exercise Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredExercises.map(exercise => (
-          <Card 
-            key={exercise.id} 
-            className="cursor-pointer hover:shadow-lg transition-all group overflow-hidden"
-            onClick={() => setSelectedExercise(exercise)}
-          >
-            <div className="relative aspect-video">
-              <img 
-                src={exercise.thumbnail} 
-                alt={exercise.name}
-                className="w-full h-full object-cover"
+        <TabsContent value="all" className="space-y-4 mt-4">
+          {/* Search and Filter */}
+          <div className="space-y-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Search exercise tutorials..."
+                className="pl-10"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
-              <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center">
-                  <Play className="w-6 h-6 text-primary-foreground fill-current" />
-                </div>
-              </div>
-              <Badge className="absolute top-2 right-2 capitalize">
-                {exercise.muscle_group}
-              </Badge>
             </div>
-            <CardContent className="p-4">
-              <h3 className="font-semibold">{exercise.name}</h3>
-              <p className="text-sm text-muted-foreground mt-1">
-                Form tips • Common mistakes • 40+ modifications
-              </p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+            <ScrollArea className="w-full">
+              <div className="flex gap-2 pb-2">
+                {muscleGroups.map(muscle => (
+                  <Badge
+                    key={muscle}
+                    variant={selectedMuscle === muscle ? 'default' : 'outline'}
+                    className="cursor-pointer capitalize whitespace-nowrap"
+                    onClick={() => setSelectedMuscle(muscle)}
+                  >
+                    {muscle}
+                  </Badge>
+                ))}
+              </div>
+            </ScrollArea>
+          </div>
 
-      {filteredExercises.length === 0 && (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <Search className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No exercises found</h3>
-            <p className="text-muted-foreground">
-              Try adjusting your search or filter criteria.
-            </p>
-          </CardContent>
-        </Card>
-      )}
+          {/* Exercise Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredExercises.map(exercise => renderExerciseCard(exercise))}
+          </div>
+
+          {filteredExercises.length === 0 && (
+            <Card>
+              <CardContent className="py-12 text-center">
+                <Search className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                <h3 className="text-lg font-semibold mb-2">No exercises found</h3>
+                <p className="text-muted-foreground">
+                  Try adjusting your search or filter criteria.
+                </p>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
+        <TabsContent value="favorites" className="mt-4">
+          {!user ? (
+            <Card>
+              <CardContent className="py-12 text-center">
+                <Heart className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                <h3 className="text-lg font-semibold mb-2">Sign in to save favorites</h3>
+                <p className="text-muted-foreground">
+                  Create an account to save your favorite exercises for quick access.
+                </p>
+              </CardContent>
+            </Card>
+          ) : favoriteExercises.length === 0 ? (
+            <Card>
+              <CardContent className="py-12 text-center">
+                <Heart className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                <h3 className="text-lg font-semibold mb-2">No favorites yet</h3>
+                <p className="text-muted-foreground">
+                  Click the heart icon on any exercise to add it to your favorites.
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {favoriteExercises.map(exercise => renderExerciseCard(exercise))}
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="playlists" className="mt-4">
+          {!user ? (
+            <Card>
+              <CardContent className="py-12 text-center">
+                <FolderOpen className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                <h3 className="text-lg font-semibold mb-2">Sign in to create playlists</h3>
+                <p className="text-muted-foreground">
+                  Create an account to organize exercises into custom playlists.
+                </p>
+              </CardContent>
+            </Card>
+          ) : selectedPlaylistId && selectedPlaylist ? (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Button variant="ghost" size="sm" onClick={() => setSelectedPlaylistId(null)}>
+                    ← Back
+                  </Button>
+                  <div>
+                    <h3 className="font-semibold">{selectedPlaylist.name}</h3>
+                    <p className="text-sm text-muted-foreground">{playlistVideos.length} exercises</p>
+                  </div>
+                </div>
+                <Button 
+                  variant="destructive" 
+                  size="sm"
+                  onClick={() => {
+                    deletePlaylist(selectedPlaylistId);
+                    setSelectedPlaylistId(null);
+                  }}
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Delete Playlist
+                </Button>
+              </div>
+              
+              {playlistVideos.length === 0 ? (
+                <Card>
+                  <CardContent className="py-12 text-center">
+                    <ListPlus className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">Playlist is empty</h3>
+                    <p className="text-muted-foreground">
+                      Add exercises from the All Exercises tab using the playlist icon.
+                    </p>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {playlistVideos.map(exercise => exercise && renderExerciseCard(exercise, true))}
+                </div>
+              )}
+            </div>
+          ) : playlists.length === 0 ? (
+            <Card>
+              <CardContent className="py-12 text-center">
+                <FolderOpen className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                <h3 className="text-lg font-semibold mb-2">No playlists yet</h3>
+                <p className="text-muted-foreground mb-4">
+                  Create a playlist to organize your favorite exercises.
+                </p>
+                <Button onClick={() => setShowCreatePlaylist(true)}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create Your First Playlist
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {playlists.map(playlist => (
+                <Card 
+                  key={playlist.id} 
+                  className="cursor-pointer hover:shadow-lg transition-all"
+                  onClick={() => setSelectedPlaylistId(playlist.id)}
+                >
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <FolderOpen className="w-6 h-6 text-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold">{playlist.name}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {playlist.itemCount || 0} exercises
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
+
+      {/* Create Playlist Dialog */}
+      <Dialog open={showCreatePlaylist} onOpenChange={setShowCreatePlaylist}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create New Playlist</DialogTitle>
+            <DialogDescription>
+              Give your playlist a name to organize your exercises.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Input
+              placeholder="Playlist name..."
+              value={newPlaylistName}
+              onChange={(e) => setNewPlaylistName(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleCreatePlaylist()}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowCreatePlaylist(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleCreatePlaylist} disabled={!newPlaylistName.trim()}>
+              Create Playlist
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Exercise Detail Modal */}
       <Dialog open={!!selectedExercise} onOpenChange={() => setSelectedExercise(null)}>
@@ -445,6 +716,16 @@ const ExerciseVideoLibrary = () => {
                   <Badge variant="secondary" className="capitalize">
                     {selectedExercise.muscle_group}
                   </Badge>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="ml-auto"
+                    onClick={() => toggleFavorite(selectedExercise.id)}
+                  >
+                    <Heart 
+                      className={`w-5 h-5 ${isFavorited(selectedExercise.id) ? 'fill-red-500 text-red-500' : ''}`} 
+                    />
+                  </Button>
                 </DialogTitle>
               </DialogHeader>
 
