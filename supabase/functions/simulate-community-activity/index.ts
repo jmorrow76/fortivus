@@ -275,6 +275,97 @@ serve(async (req) => {
       }
     }
 
+    // 6. Create 1-2 new testimonies occasionally
+    const shouldCreateTestimony = Math.random() > 0.5; // 50% chance
+    if (shouldCreateTestimony) {
+      const numTestimonies = Math.floor(Math.random() * 2) + 1;
+      const testimonyCreators = simulatedProfiles.sort(() => 0.5 - Math.random()).slice(0, numTestimonies);
+
+      const testimonyThemes = [
+        "overcoming chronic pain through faith and fitness",
+        "losing weight and finding spiritual discipline",
+        "recovering from injury with God's help",
+        "becoming a better father through fitness",
+        "managing stress through prayer and exercise",
+        "accountability partner helping me grow",
+        "breaking bad habits through discipline",
+        "finding community and brotherhood",
+        "getting off blood pressure medication",
+        "sleeping better after years of insomnia",
+        "marriage restoration through self-care",
+        "overcoming depression with faith and fitness"
+      ];
+
+      for (const creator of testimonyCreators) {
+        const theme = testimonyThemes[Math.floor(Math.random() * testimonyThemes.length)];
+        
+        const testimonyContent = await generateAIContent(
+          `Write a heartfelt testimony (4-6 paragraphs) from a Christian man over 40 about ${theme}. Share specific details about your struggle, how you found this community, and how God worked through fitness and brotherhood to transform your life. Be genuine, grateful, and give glory to God. Include how long the journey took and specific results. This is for a faith-based fitness community.`
+        );
+
+        if (testimonyContent) {
+          const titleContent = await generateAIContent(
+            `Create a short, compelling title (max 10 words) for this testimony about ${theme}. Make it inspiring and faith-focused. Just respond with the title, no quotes.`
+          );
+
+          const title = titleContent?.slice(0, 100) || `How God Used Fitness to Transform My Life`;
+
+          const { error: testimonyError } = await supabase.from('testimonies').insert({
+            user_id: creator.user_id,
+            title: title,
+            content: testimonyContent,
+            is_featured: false,
+            is_weekly_spotlight: false,
+          });
+
+          if (!testimonyError) {
+            activities.push(`${creator.display_name} shared testimony: "${title}"`);
+          }
+        }
+      }
+    }
+
+    // 7. Like testimonies (3-8 likes)
+    const { data: testimonies } = await supabase
+      .from('testimonies')
+      .select('id, user_id')
+      .order('created_at', { ascending: false })
+      .limit(20);
+
+    if (testimonies?.length) {
+      const numLikes = Math.floor(Math.random() * 6) + 3;
+      const likers = simulatedProfiles.sort(() => 0.5 - Math.random()).slice(0, numLikes);
+
+      for (const liker of likers) {
+        // Pick a random testimony that's not their own
+        const eligibleTestimonies = testimonies.filter(t => t.user_id !== liker.user_id);
+        if (eligibleTestimonies.length === 0) continue;
+
+        const testimony = eligibleTestimonies[Math.floor(Math.random() * eligibleTestimonies.length)];
+
+        // Check if already liked
+        const { data: existingLike } = await supabase
+          .from('likes')
+          .select('id')
+          .eq('user_id', liker.user_id)
+          .eq('target_type', 'testimony')
+          .eq('target_id', testimony.id)
+          .maybeSingle();
+
+        if (!existingLike) {
+          const { error: likeError } = await supabase.from('likes').insert({
+            user_id: liker.user_id,
+            target_type: 'testimony',
+            target_id: testimony.id,
+          });
+
+          if (!likeError) {
+            activities.push(`${liker.display_name} encouraged a testimony`);
+          }
+        }
+      }
+    }
+
     console.log('Activity simulation complete:', activities);
 
     return new Response(JSON.stringify({ 
