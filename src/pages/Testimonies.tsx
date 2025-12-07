@@ -397,7 +397,17 @@ export default function Testimonies() {
                       variant="ghost"
                       size="sm"
                       className={`gap-2 ${userLikes[testimony.id] ? 'text-red-500' : 'text-muted-foreground'}`}
-                      onClick={() => toggleLike(testimony.id)}
+                      onClick={() => {
+                        if (!user) {
+                          toast({
+                            title: "Sign in required",
+                            description: "Please sign in to encourage this testimony.",
+                            variant: "destructive",
+                          });
+                          return;
+                        }
+                        toggleLike(testimony.id);
+                      }}
                     >
                       <Heart className={`h-4 w-4 ${userLikes[testimony.id] ? 'fill-current' : ''}`} />
                       {likeCounts[testimony.id] || 0} encouraged
