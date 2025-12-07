@@ -348,10 +348,262 @@ const exerciseVideos = [
       'One arm at a time for focus',
       'Warm up rotator cuff first'
     ]
+  },
+  {
+    id: '13',
+    name: 'Hip Thrust',
+    muscle_group: 'glutes',
+    youtubeId: 'xDmFkJxPzeM',
+    thumbnail: 'https://img.youtube.com/vi/xDmFkJxPzeM/mqdefault.jpg',
+    formTips: [
+      'Position upper back on bench at shoulder blade level',
+      'Feet flat, knees at 90 degrees at top',
+      'Drive through heels to lift hips',
+      'Squeeze glutes hard at the top',
+      'Keep chin tucked throughout'
+    ],
+    commonMistakes: [
+      'Hyperextending lower back at top',
+      'Feet positioned too close or far',
+      'Not achieving full hip extension',
+      'Rushing through reps',
+      'Looking up instead of forward'
+    ],
+    over40Modifications: [
+      'Start with bodyweight to master form',
+      'Use a pad on the barbell for comfort',
+      'Focus on mind-muscle connection',
+      'Keep reps controlled and moderate',
+      'Single-leg variations for imbalances'
+    ]
+  },
+  {
+    id: '14',
+    name: 'Glute Bridge',
+    muscle_group: 'glutes',
+    youtubeId: 'OUgsJ8-Vi0E',
+    thumbnail: 'https://img.youtube.com/vi/OUgsJ8-Vi0E/mqdefault.jpg',
+    formTips: [
+      'Lie flat with knees bent, feet flat',
+      'Push through heels to raise hips',
+      'Squeeze glutes at the top',
+      'Keep core engaged throughout',
+      'Lower with control'
+    ],
+    commonMistakes: [
+      'Pushing through toes instead of heels',
+      'Not squeezing glutes at top',
+      'Arching lower back excessively',
+      'Letting knees cave inward',
+      'Moving too fast'
+    ],
+    over40Modifications: [
+      'Great low-impact glute activation',
+      'Add band above knees for extra work',
+      'Hold at top for 2-3 seconds',
+      'Perfect warm-up before squats/deadlifts',
+      'Single-leg version for progression'
+    ]
+  },
+  {
+    id: '15',
+    name: 'Cable Pull-Through',
+    muscle_group: 'glutes',
+    youtubeId: 'ArMc2VZoL3k',
+    thumbnail: 'https://img.youtube.com/vi/ArMc2VZoL3k/mqdefault.jpg',
+    formTips: [
+      'Face away from cable machine',
+      'Hinge at hips, not knees',
+      'Keep arms straight throughout',
+      'Drive hips forward to stand',
+      'Squeeze glutes at the top'
+    ],
+    commonMistakes: [
+      'Squatting instead of hinging',
+      'Bending arms to pull weight',
+      'Rounding the lower back',
+      'Not fully extending hips',
+      'Using too much weight'
+    ],
+    over40Modifications: [
+      'Excellent for learning hip hinge pattern',
+      'Low spinal load alternative to deadlifts',
+      'Keep weight moderate, focus on form',
+      'Great for warming up posterior chain',
+      'Pause at top for extra glute activation'
+    ]
+  },
+  {
+    id: '16',
+    name: 'Standing Calf Raise',
+    muscle_group: 'calves',
+    youtubeId: 'gwLzBJYoWlI',
+    thumbnail: 'https://img.youtube.com/vi/gwLzBJYoWlI/mqdefault.jpg',
+    formTips: [
+      'Stand on edge of step or platform',
+      'Rise up onto balls of feet',
+      'Squeeze calves hard at the top',
+      'Lower heels below platform level',
+      'Keep knees straight but not locked'
+    ],
+    commonMistakes: [
+      'Bouncing at the bottom',
+      'Not getting full range of motion',
+      'Bending knees during movement',
+      'Going too fast',
+      'Using too much weight'
+    ],
+    over40Modifications: [
+      'Hold onto something for balance',
+      'Slow tempo (3 seconds up and down)',
+      'High reps (15-25) for calf development',
+      'Alternate straight and bent knee versions',
+      'Stretch calves between sets'
+    ]
+  },
+  {
+    id: '17',
+    name: 'Seated Calf Raise',
+    muscle_group: 'calves',
+    youtubeId: 'JbyjNymZOt0',
+    thumbnail: 'https://img.youtube.com/vi/JbyjNymZOt0/mqdefault.jpg',
+    formTips: [
+      'Sit with balls of feet on platform',
+      'Knees bent at 90 degrees',
+      'Push through balls of feet',
+      'Full range of motion is key',
+      'Squeeze at the top, stretch at bottom'
+    ],
+    commonMistakes: [
+      'Not using full range of motion',
+      'Bouncing the weight',
+      'Going too heavy',
+      'Rushing through reps',
+      'Leaning back during lift'
+    ],
+    over40Modifications: [
+      'Targets soleus muscle (bent knee)',
+      'Use moderate weight, higher reps',
+      'Pause at top and bottom',
+      'Great for Achilles tendon health',
+      'Combine with standing raises for complete development'
+    ]
+  },
+  {
+    id: '18',
+    name: 'Farmer\'s Walk',
+    muscle_group: 'forearms',
+    youtubeId: 'Fkzk_RqlYig',
+    thumbnail: 'https://img.youtube.com/vi/Fkzk_RqlYig/mqdefault.jpg',
+    formTips: [
+      'Pick up heavy dumbbells or kettlebells',
+      'Stand tall with shoulders back',
+      'Take short, controlled steps',
+      'Keep core braced throughout',
+      'Grip as hard as possible'
+    ],
+    commonMistakes: [
+      'Leaning forward or to sides',
+      'Taking steps too long',
+      'Shrugging shoulders up',
+      'Not gripping hard enough',
+      'Going too light'
+    ],
+    over40Modifications: [
+      'Start with moderate weight, build up',
+      'Focus on posture and core engagement',
+      'Great for grip strength and stability',
+      'Walk for distance or time (30-60 seconds)',
+      'Excellent functional strength builder'
+    ]
+  },
+  {
+    id: '19',
+    name: 'Wrist Curl',
+    muscle_group: 'forearms',
+    youtubeId: '7ac_qmBjXKg',
+    thumbnail: 'https://img.youtube.com/vi/7ac_qmBjXKg/mqdefault.jpg',
+    formTips: [
+      'Rest forearms on thighs, wrists over knees',
+      'Let barbell/dumbbells roll to fingers',
+      'Curl wrists up, squeezing forearms',
+      'Control the negative portion',
+      'Keep forearms stationary'
+    ],
+    commonMistakes: [
+      'Moving forearms during curl',
+      'Using momentum',
+      'Going too heavy',
+      'Not using full range of motion',
+      'Rushing through reps'
+    ],
+    over40Modifications: [
+      'Use light weight, high reps (15-20)',
+      'Great for wrist and grip health',
+      'Do both palm-up and palm-down versions',
+      'Stretch wrists between sets',
+      'Start with dumbbells for natural movement'
+    ]
+  },
+  {
+    id: '20',
+    name: 'Reverse Wrist Curl',
+    muscle_group: 'forearms',
+    youtubeId: 'F7_FPhCREpM',
+    thumbnail: 'https://img.youtube.com/vi/F7_FPhCREpM/mqdefault.jpg',
+    formTips: [
+      'Rest forearms on thighs, palms down',
+      'Extend wrists upward against resistance',
+      'Keep forearms pressed into thighs',
+      'Control both up and down phases',
+      'Focus on forearm extensor contraction'
+    ],
+    commonMistakes: [
+      'Lifting forearms off thighs',
+      'Using too much weight',
+      'Partial range of motion',
+      'Moving too fast',
+      'Neglecting this exercise entirely'
+    ],
+    over40Modifications: [
+      'Essential for elbow health and balance',
+      'Prevents tennis elbow issues',
+      'Use very light weight initially',
+      'High reps (15-25) work best',
+      'Pair with regular wrist curls'
+    ]
+  },
+  {
+    id: '21',
+    name: 'Dead Hang',
+    muscle_group: 'forearms',
+    youtubeId: 'dL9ZzqtHBvY',
+    thumbnail: 'https://img.youtube.com/vi/dL9ZzqtHBvY/mqdefault.jpg',
+    formTips: [
+      'Grip bar with overhand grip',
+      'Let body hang with arms fully extended',
+      'Engage shoulders slightly (active hang)',
+      'Breathe steadily throughout',
+      'Hold as long as possible'
+    ],
+    commonMistakes: [
+      'Gripping too narrow or wide',
+      'Completely relaxing shoulders',
+      'Holding breath',
+      'Swinging or kipping',
+      'Giving up too early'
+    ],
+    over40Modifications: [
+      'Excellent for grip strength and shoulder health',
+      'Start with shorter holds (15-30 seconds)',
+      'Great for spinal decompression',
+      'Use mixed grip if needed',
+      'Progress to single-arm hangs over time'
+    ]
   }
 ];
 
-const muscleGroups = ['all', 'chest', 'back', 'shoulders', 'biceps', 'triceps', 'quadriceps', 'hamstrings', 'core'];
+const muscleGroups = ['all', 'chest', 'back', 'shoulders', 'biceps', 'triceps', 'quadriceps', 'hamstrings', 'glutes', 'calves', 'forearms', 'core'];
 
 const ExerciseVideoLibrary = () => {
   const { user } = useAuth();
