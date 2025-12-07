@@ -120,7 +120,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [session]);
 
   const signUp = async (email: string, password: string, displayName?: string) => {
-    const redirectUrl = `${window.location.origin}/`;
+    // Always use the web URL for email verification to ensure it works before app is downloaded
+    const webUrl = 'https://58ff6705-30d4-4109-adf5-14b868fb935a.lovable.app';
+    const redirectUrl = `${webUrl}/`;
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -146,7 +148,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const resendVerificationEmail = async (email: string) => {
-    const redirectUrl = `${window.location.origin}/`;
+    // Always use the web URL for email verification
+    const webUrl = 'https://58ff6705-30d4-4109-adf5-14b868fb935a.lovable.app';
+    const redirectUrl = `${webUrl}/`;
     const { error } = await supabase.auth.resend({
       type: 'signup',
       email,
