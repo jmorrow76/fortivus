@@ -7,13 +7,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Search, Play, AlertTriangle, CheckCircle, User } from 'lucide-react';
 
 // Exercise video data with YouTube tutorial links
+// Exercise video data with YouTube tutorial links (men demonstrators only)
 const exerciseVideos = [
   {
     id: '1',
     name: 'Barbell Bench Press',
     muscle_group: 'chest',
-    youtubeId: 'rT7DgCr-3pg',
-    thumbnail: 'https://img.youtube.com/vi/rT7DgCr-3pg/mqdefault.jpg',
+    youtubeId: '4Y2ZdHCOXok', // Jeff Nippard
+    thumbnail: 'https://img.youtube.com/vi/4Y2ZdHCOXok/mqdefault.jpg',
     formTips: [
       'Keep shoulder blades retracted and depressed',
       'Maintain a slight arch in your lower back',
@@ -40,8 +41,8 @@ const exerciseVideos = [
     id: '2',
     name: 'Barbell Squat',
     muscle_group: 'quadriceps',
-    youtubeId: 'bEv6CCg2BC8',
-    thumbnail: 'https://img.youtube.com/vi/bEv6CCg2BC8/mqdefault.jpg',
+    youtubeId: 'ultWZbUMPL8', // Alan Thrall
+    thumbnail: 'https://img.youtube.com/vi/ultWZbUMPL8/mqdefault.jpg',
     formTips: [
       'Keep chest up and core braced',
       'Push knees out in line with toes',
@@ -68,8 +69,8 @@ const exerciseVideos = [
     id: '3',
     name: 'Deadlift',
     muscle_group: 'back',
-    youtubeId: 'r4MzxtBKyNE',
-    thumbnail: 'https://img.youtube.com/vi/r4MzxtBKyNE/mqdefault.jpg',
+    youtubeId: 'op9kVnSso6Q', // Alan Thrall
+    thumbnail: 'https://img.youtube.com/vi/op9kVnSso6Q/mqdefault.jpg',
     formTips: [
       'Keep the bar close to your body throughout',
       'Engage lats by pulling shoulders back',
@@ -96,8 +97,8 @@ const exerciseVideos = [
     id: '4',
     name: 'Overhead Press',
     muscle_group: 'shoulders',
-    youtubeId: 'QAQ64hK4Xxs',
-    thumbnail: 'https://img.youtube.com/vi/QAQ64hK4Xxs/mqdefault.jpg',
+    youtubeId: '_RlRDWO2jfg', // Alan Thrall
+    thumbnail: 'https://img.youtube.com/vi/_RlRDWO2jfg/mqdefault.jpg',
     formTips: [
       'Start with bar at collar bone level',
       'Brace core and squeeze glutes',
@@ -124,8 +125,8 @@ const exerciseVideos = [
     id: '5',
     name: 'Barbell Row',
     muscle_group: 'back',
-    youtubeId: 'FWJR5Ve8bnQ',
-    thumbnail: 'https://img.youtube.com/vi/FWJR5Ve8bnQ/mqdefault.jpg',
+    youtubeId: 'kBWAon7ItDw', // Jeff Nippard
+    thumbnail: 'https://img.youtube.com/vi/kBWAon7ItDw/mqdefault.jpg',
     formTips: [
       'Hinge at hips with slight knee bend',
       'Keep back flat and parallel to floor',
@@ -152,8 +153,8 @@ const exerciseVideos = [
     id: '6',
     name: 'Pull-up',
     muscle_group: 'back',
-    youtubeId: 'eGo4IYlbE5g',
-    thumbnail: 'https://img.youtube.com/vi/eGo4IYlbE5g/mqdefault.jpg',
+    youtubeId: 'XB_7En-zf_M', // Calisthenicmovement (male)
+    thumbnail: 'https://img.youtube.com/vi/XB_7En-zf_M/mqdefault.jpg',
     formTips: [
       'Start from a dead hang position',
       'Engage lats before pulling',
@@ -180,8 +181,8 @@ const exerciseVideos = [
     id: '7',
     name: 'Dumbbell Curl',
     muscle_group: 'biceps',
-    youtubeId: 'ykJmrZ5v0Oo',
-    thumbnail: 'https://img.youtube.com/vi/ykJmrZ5v0Oo/mqdefault.jpg',
+    youtubeId: 'sAq_ocpRh_I', // Jeff Nippard
+    thumbnail: 'https://img.youtube.com/vi/sAq_ocpRh_I/mqdefault.jpg',
     formTips: [
       'Keep elbows pinned to your sides',
       'Supinate wrists as you curl up',
@@ -208,8 +209,8 @@ const exerciseVideos = [
     id: '8',
     name: 'Tricep Pushdown',
     muscle_group: 'triceps',
-    youtubeId: '2-LAMcpzODU',
-    thumbnail: 'https://img.youtube.com/vi/2-LAMcpzODU/mqdefault.jpg',
+    youtubeId: 'REaI4rSuUhM', // ScottHermanFitness
+    thumbnail: 'https://img.youtube.com/vi/REaI4rSuUhM/mqdefault.jpg',
     formTips: [
       'Keep elbows locked at your sides',
       'Fully extend arms at the bottom',
@@ -236,8 +237,8 @@ const exerciseVideos = [
     id: '9',
     name: 'Leg Press',
     muscle_group: 'quadriceps',
-    youtubeId: 'IZxyjW7MPJQ',
-    thumbnail: 'https://img.youtube.com/vi/IZxyjW7MPJQ/mqdefault.jpg',
+    youtubeId: 'yZmx_Ac3880', // ScottHermanFitness
+    thumbnail: 'https://img.youtube.com/vi/yZmx_Ac3880/mqdefault.jpg',
     formTips: [
       'Position feet shoulder-width apart',
       'Lower until knees are at 90 degrees',
@@ -264,8 +265,8 @@ const exerciseVideos = [
     id: '10',
     name: 'Romanian Deadlift',
     muscle_group: 'hamstrings',
-    youtubeId: 'jEy_czb3RKA',
-    thumbnail: 'https://img.youtube.com/vi/jEy_czb3RKA/mqdefault.jpg',
+    youtubeId: '2SHsk9AzdjA', // Jeff Nippard
+    thumbnail: 'https://img.youtube.com/vi/2SHsk9AzdjA/mqdefault.jpg',
     formTips: [
       'Keep slight bend in knees throughout',
       'Push hips back, not down',
@@ -292,8 +293,8 @@ const exerciseVideos = [
     id: '11',
     name: 'Plank',
     muscle_group: 'core',
-    youtubeId: 'ASdvN_XEl_c',
-    thumbnail: 'https://img.youtube.com/vi/ASdvN_XEl_c/mqdefault.jpg',
+    youtubeId: 'pSHjTRCQxIw', // Jeff Cavaliere ATHLEAN-X
+    thumbnail: 'https://img.youtube.com/vi/pSHjTRCQxIw/mqdefault.jpg',
     formTips: [
       'Keep body in a straight line',
       'Engage core by pulling belly button in',
@@ -320,8 +321,8 @@ const exerciseVideos = [
     id: '12',
     name: 'Lateral Raise',
     muscle_group: 'shoulders',
-    youtubeId: '3VcKaXpzqRo',
-    thumbnail: 'https://img.youtube.com/vi/3VcKaXpzqRo/mqdefault.jpg',
+    youtubeId: 'XPPfnSEATJA', // Jeff Nippard
+    thumbnail: 'https://img.youtube.com/vi/XPPfnSEATJA/mqdefault.jpg',
     formTips: [
       'Lead with elbows, not hands',
       'Raise arms to shoulder height',
