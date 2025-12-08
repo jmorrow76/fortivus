@@ -221,56 +221,74 @@ const Profile = () => {
             Back to Home
           </Button>
 
-          <Card className="shadow-card">
-            <CardHeader>
+          {/* Membership Card */}
+          <Card className="shadow-card mb-6">
+            <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="font-heading text-2xl">Profile Settings</CardTitle>
-                  <CardDescription>
-                    Manage your profile information and avatar
-                  </CardDescription>
-                </div>
-                {isElite && (
-                  <div className="flex flex-col items-end gap-1">
-                    <Badge className="bg-accent text-accent-foreground font-semibold px-3 py-1.5 flex items-center gap-1.5">
-                      <Crown className="h-4 w-4" />
-                      Elite Member
-                    </Badge>
-                    {subscription.subscriptionEnd && (
-                      <span className="text-xs text-muted-foreground flex items-center gap-1">
-                        <Calendar className="h-3 w-3" />
-                        Renews {format(new Date(subscription.subscriptionEnd), "MMM d, yyyy")}
-                      </span>
-                    )}
-                  </div>
+                <CardTitle className="font-heading text-lg">Membership</CardTitle>
+                {isElite ? (
+                  <Badge className="bg-accent text-accent-foreground font-semibold px-3 py-1.5 flex items-center gap-1.5">
+                    <Crown className="h-4 w-4" />
+                    Elite Member
+                  </Badge>
+                ) : (
+                  <Badge variant="secondary">Free</Badge>
                 )}
               </div>
             </CardHeader>
-            <CardContent className="space-y-8">
-              {/* Upgrade Prompt for non-Elite users */}
-              {!isElite && (
-                <div className="p-4 rounded-lg bg-accent/10 border border-accent/20">
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 rounded-full bg-accent/20">
-                      <Sparkles className="h-5 w-5 text-accent" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-heading font-semibold text-foreground">Upgrade to Elite</h3>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Unlock AI body analysis, progress tracking, personalized build plans, and more.
-                      </p>
-                      <Button
-                        size="sm"
-                        className="mt-3"
-                        onClick={() => navigate("/#pricing")}
-                      >
-                        <Crown className="h-4 w-4 mr-2" />
-                        View Plans
-                      </Button>
-                    </div>
+            <CardContent>
+              {isElite ? (
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  {subscription.subscriptionEnd && (
+                    <span className="text-sm text-muted-foreground flex items-center gap-1.5">
+                      <Calendar className="h-4 w-4" />
+                      Renews {format(new Date(subscription.subscriptionEnd), "MMM d, yyyy")}
+                    </span>
+                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleManageSubscription}
+                    disabled={managingSubscription}
+                  >
+                    {managingSubscription ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Loading...
+                      </>
+                    ) : (
+                      <>
+                        <Settings className="h-4 w-4 mr-2" />
+                        Manage Subscription
+                      </>
+                    )}
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <div className="flex-1">
+                    <p className="text-sm text-muted-foreground">
+                      Unlock AI coaching, advanced tracking, and more.
+                    </p>
                   </div>
+                  <Button size="sm" onClick={() => navigate("/#pricing")}>
+                    <Crown className="h-4 w-4 mr-2" />
+                    Upgrade
+                  </Button>
                 </div>
               )}
+            </CardContent>
+          </Card>
+
+          {/* Profile Settings Card */}
+          <Card className="shadow-card">
+            <CardHeader>
+              <CardTitle className="font-heading text-2xl">Profile Settings</CardTitle>
+              <CardDescription>
+                Manage your profile information and avatar
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-8">
               {/* Avatar Section */}
               <div className="flex flex-col items-center gap-4">
                 <div className="relative">
@@ -421,43 +439,20 @@ const Profile = () => {
               )}
 
               {/* Save Button */}
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Button
-                  onClick={handleSave}
-                  disabled={saving}
-                  className="w-full sm:w-auto"
-                >
-                  {saving ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Saving...
-                    </>
-                  ) : (
-                    "Save Changes"
-                  )}
-                </Button>
-                
-                {isElite && (
-                  <Button
-                    variant="outline"
-                    onClick={handleManageSubscription}
-                    disabled={managingSubscription}
-                    className="w-full sm:w-auto"
-                  >
-                    {managingSubscription ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Loading...
-                      </>
-                    ) : (
-                      <>
-                        <Settings className="h-4 w-4 mr-2" />
-                        Manage Subscription
-                      </>
-                    )}
-                  </Button>
+              <Button
+                onClick={handleSave}
+                disabled={saving}
+                className="w-full sm:w-auto"
+              >
+                {saving ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  "Save Changes"
                 )}
-              </div>
+              </Button>
             </CardContent>
           </Card>
 
