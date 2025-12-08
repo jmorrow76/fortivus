@@ -366,6 +366,124 @@ serve(async (req) => {
       }
     }
 
+    // 8. Like forum topics (5-10 likes)
+    const { data: forumTopicsToLike } = await supabase
+      .from('forum_topics')
+      .select('id, user_id, title')
+      .order('created_at', { ascending: false })
+      .limit(30);
+
+    if (forumTopicsToLike?.length) {
+      const numTopicLikes = Math.floor(Math.random() * 6) + 5;
+      const topicLikers = simulatedProfiles.sort(() => 0.5 - Math.random()).slice(0, numTopicLikes);
+
+      for (const liker of topicLikers) {
+        const eligibleTopics = forumTopicsToLike.filter(t => t.user_id !== liker.user_id);
+        if (eligibleTopics.length === 0) continue;
+
+        const topic = eligibleTopics[Math.floor(Math.random() * eligibleTopics.length)];
+
+        const { data: existingLike } = await supabase
+          .from('likes')
+          .select('id')
+          .eq('user_id', liker.user_id)
+          .eq('target_type', 'forum_topic')
+          .eq('target_id', topic.id)
+          .maybeSingle();
+
+        if (!existingLike) {
+          const { error: likeError } = await supabase.from('likes').insert({
+            user_id: liker.user_id,
+            target_type: 'forum_topic',
+            target_id: topic.id,
+          });
+
+          if (!likeError) {
+            activities.push(`${liker.display_name} liked topic: "${topic.title.slice(0, 30)}..."`);
+          }
+        }
+      }
+    }
+
+    // 9. Like forum posts/replies (5-10 likes)
+    const { data: forumPostsToLike } = await supabase
+      .from('forum_posts')
+      .select('id, user_id')
+      .eq('is_moderated', false)
+      .order('created_at', { ascending: false })
+      .limit(30);
+
+    if (forumPostsToLike?.length) {
+      const numPostLikes = Math.floor(Math.random() * 6) + 5;
+      const postLikers = simulatedProfiles.sort(() => 0.5 - Math.random()).slice(0, numPostLikes);
+
+      for (const liker of postLikers) {
+        const eligiblePosts = forumPostsToLike.filter(p => p.user_id !== liker.user_id);
+        if (eligiblePosts.length === 0) continue;
+
+        const post = eligiblePosts[Math.floor(Math.random() * eligiblePosts.length)];
+
+        const { data: existingLike } = await supabase
+          .from('likes')
+          .select('id')
+          .eq('user_id', liker.user_id)
+          .eq('target_type', 'forum_post')
+          .eq('target_id', post.id)
+          .maybeSingle();
+
+        if (!existingLike) {
+          const { error: likeError } = await supabase.from('likes').insert({
+            user_id: liker.user_id,
+            target_type: 'forum_post',
+            target_id: post.id,
+          });
+
+          if (!likeError) {
+            activities.push(`${liker.display_name} liked a forum reply`);
+          }
+        }
+      }
+    }
+
+    // 10. Like activity feed items (5-10 likes)
+    const { data: activitiesToLike } = await supabase
+      .from('activity_feed')
+      .select('id, user_id, activity_type')
+      .order('created_at', { ascending: false })
+      .limit(30);
+
+    if (activitiesToLike?.length) {
+      const numActivityLikes = Math.floor(Math.random() * 6) + 5;
+      const activityLikers = simulatedProfiles.sort(() => 0.5 - Math.random()).slice(0, numActivityLikes);
+
+      for (const liker of activityLikers) {
+        const eligibleActivities = activitiesToLike.filter(a => a.user_id !== liker.user_id);
+        if (eligibleActivities.length === 0) continue;
+
+        const activity = eligibleActivities[Math.floor(Math.random() * eligibleActivities.length)];
+
+        const { data: existingLike } = await supabase
+          .from('likes')
+          .select('id')
+          .eq('user_id', liker.user_id)
+          .eq('target_type', 'activity')
+          .eq('target_id', activity.id)
+          .maybeSingle();
+
+        if (!existingLike) {
+          const { error: likeError } = await supabase.from('likes').insert({
+            user_id: liker.user_id,
+            target_type: 'activity',
+            target_id: activity.id,
+          });
+
+          if (!likeError) {
+            activities.push(`${liker.display_name} liked a ${activity.activity_type.replace('_', ' ')}`);
+          }
+        }
+      }
+    }
+
     console.log('Activity simulation complete:', activities);
 
     return new Response(JSON.stringify({ 
