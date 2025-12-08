@@ -16,8 +16,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 
-// Lazy load the map component to avoid context issues
-const RunMap = lazy(() => import('@/components/RunMap'));
+// Lazy load the map component to avoid SSR issues with Leaflet
+const RunMap = lazy(() => import('@/components/RunMap').catch(() => {
+  // Fallback if Leaflet fails to load
+  return { default: () => <div className="h-full w-full bg-muted flex items-center justify-center text-muted-foreground">Map unavailable</div> };
+}));
 
 interface Challenge {
   id: string;
