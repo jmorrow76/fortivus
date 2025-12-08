@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense, useRef, useCallback } from 'react';
+import { useState, useEffect, lazy, Suspense, useRef, useCallback, Component, ReactNode } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,11 +16,49 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 
-// Lazy load the map component to avoid SSR issues with Leaflet
-const RunMap = lazy(() => import('@/components/RunMap').catch(() => {
-  // Fallback if Leaflet fails to load
-  return { default: () => <div className="h-full w-full bg-muted flex items-center justify-center text-muted-foreground">Map unavailable</div> };
-}));
+// Error boundary for map component
+class MapErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
+  constructor(props: { children: ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('Map component error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="h-full w-full bg-muted flex items-center justify-center text-muted-foreground rounded-lg">
+          <div className="text-center p-4">
+            <MapPin className="h-8 w-8 mx-auto mb-2 opacity-50" />
+            <p className="text-sm">Map unavailable</p>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+// Lazy load the map component only on client side
+const RunMap = typeof window !== 'undefined' 
+  ? lazy(() => import('@/components/RunMap').catch(() => ({
+      default: () => (
+        <div className="h-full w-full bg-muted flex items-center justify-center text-muted-foreground rounded-lg">
+          <div className="text-center p-4">
+            <MapPin className="h-8 w-8 mx-auto mb-2 opacity-50" />
+            <p className="text-sm">Map unavailable</p>
+          </div>
+        </div>
+      )
+    })))
+  : () => null;
 
 interface Challenge {
   id: string;
@@ -580,13 +618,15 @@ export const RunTracker = () => {
         </CardHeader>
         <CardContent>
           <div className="h-[300px] md:h-[400px] rounded-lg overflow-hidden mb-4">
-            <Suspense fallback={<div className="h-full w-full bg-muted animate-pulse rounded-lg" />}>
-              <RunMap
-                center={mapCenter}
-                currentPosition={currentPosition}
-                routeCoordinates={routeCoordinates}
-              />
-            </Suspense>
+            <MapErrorBoundary>
+              <Suspense fallback={<div className="h-full w-full bg-muted animate-pulse rounded-lg" />}>
+                <RunMap
+                  center={mapCenter}
+                  currentPosition={currentPosition}
+                  routeCoordinates={routeCoordinates}
+                />
+              </Suspense>
+            </MapErrorBoundary>
           </div>
 
           {/* Interval Training Toggle (before starting) */}
