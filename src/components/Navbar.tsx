@@ -158,13 +158,29 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            className="lg:hidden p-2 text-foreground"
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          {/* Mobile Actions */}
+          <div className="lg:hidden flex items-center gap-2">
+            {user ? (
+              <>
+                <NotificationBell />
+                <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                  <Link to="/dashboard">
+                    <LayoutDashboard className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </>
+            ) : (
+              <Button variant="default" size="sm" asChild>
+                <Link to="/auth">Sign In</Link>
+              </Button>
+            )}
+            <button
+              className="p-2 text-foreground"
+              onClick={() => setIsOpen(!isOpen)}
+            >
+              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Navigation */}
