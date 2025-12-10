@@ -104,7 +104,7 @@ const Coaching = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
-      <main className="flex-1 container mx-auto px-4 pt-24 md:py-6">
+      <main className="flex-1 container mx-auto px-4 pt-32 md:pt-6 pb-6">
         {/* Desktop header */}
         <div className="mb-6 hidden md:block">
           <h1 className="text-2xl font-bold tracking-tight">AI Coaching</h1>
