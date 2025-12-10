@@ -34,7 +34,7 @@ class MapErrorBoundary extends Component<{ children: ReactNode }, { hasError: bo
   render() {
     if (this.state.hasError) {
       return (
-        <div className="h-full w-full bg-muted flex items-center justify-center text-muted-foreground rounded-lg">
+        <div className="h-[300px] md:h-[400px] w-full bg-muted flex items-center justify-center text-muted-foreground rounded-lg">
           <div className="text-center p-4">
             <MapPin className="h-8 w-8 mx-auto mb-2 opacity-50" />
             <p className="text-sm">Map unavailable</p>
@@ -50,7 +50,7 @@ class MapErrorBoundary extends Component<{ children: ReactNode }, { hasError: bo
 const RunMap = typeof window !== 'undefined' 
   ? lazy(() => import('@/components/RunMap').catch(() => ({
       default: () => (
-        <div className="h-full w-full bg-muted flex items-center justify-center text-muted-foreground rounded-lg">
+        <div className="h-[300px] md:h-[400px] w-full bg-muted flex items-center justify-center text-muted-foreground rounded-lg">
           <div className="text-center p-4">
             <MapPin className="h-8 w-8 mx-auto mb-2 opacity-50" />
             <p className="text-sm">Map unavailable</p>
@@ -619,7 +619,7 @@ export const RunTracker = () => {
         <CardContent>
           <div className="h-[300px] md:h-[400px] rounded-lg overflow-hidden mb-4">
             <MapErrorBoundary>
-              <Suspense fallback={<div className="h-full w-full bg-muted animate-pulse rounded-lg" />}>
+              <Suspense fallback={<div className="h-[300px] md:h-[400px] w-full bg-muted animate-pulse rounded-lg" />}>
                 <RunMap
                   center={mapCenter}
                   currentPosition={currentPosition}
