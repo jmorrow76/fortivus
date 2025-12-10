@@ -461,8 +461,8 @@ export default function Dashboard() {
                       <p className="text-sm text-muted-foreground">Total Runs</p>
                     </div>
                     <div className="text-center p-4 bg-muted rounded-lg">
-                      <p className="text-3xl font-bold text-primary">{runningStats.totalDistanceKm.toFixed(1)}</p>
-                      <p className="text-sm text-muted-foreground">Kilometers</p>
+                      <p className="text-3xl font-bold text-primary">{(runningStats.totalDistanceKm * 0.621371).toFixed(1)}</p>
+                      <p className="text-sm text-muted-foreground">Miles</p>
                     </div>
                     <div className="text-center p-4 bg-muted rounded-lg">
                       <p className="text-3xl font-bold text-primary">{Math.round(runningStats.totalDurationMinutes)}</p>
