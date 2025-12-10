@@ -96,17 +96,20 @@ const formatDuration = (seconds: number): string => {
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 };
 
-// Format pace (seconds per km) to mm:ss/km
+// Format pace (seconds per km stored in DB) to mm:ss/mi for display
 const formatPace = (secondsPerKm: number): string => {
   if (secondsPerKm === 0 || !isFinite(secondsPerKm)) return '--:--';
-  const mins = Math.floor(secondsPerKm / 60);
-  const secs = Math.floor(secondsPerKm % 60);
+  // Convert seconds/km to seconds/mile (1 mile = 1.60934 km)
+  const secondsPerMile = secondsPerKm * 1.60934;
+  const mins = Math.floor(secondsPerMile / 60);
+  const secs = Math.floor(secondsPerMile % 60);
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 };
 
-// Format distance in meters to km with 2 decimal places
+// Format distance in meters to miles with 2 decimal places
 const formatDistance = (meters: number): string => {
-  return (meters / 1000).toFixed(2);
+  // 1 mile = 1609.34 meters
+  return (meters / 1609.34).toFixed(2);
 };
 
 export const RunTracker = () => {
@@ -408,7 +411,7 @@ export const RunTracker = () => {
               </CardTitle>
               <CardDescription>
                 {weeklyGoal 
-                  ? `${weeklyGoal.weekly_runs} runs • ${weeklyGoal.weekly_distance_km} km this week`
+                  ? `${weeklyGoal.weekly_runs} runs • ${weeklyGoal.weekly_distance_km} mi this week`
                   : 'Set a weekly running goal to stay motivated'}
               </CardDescription>
             </div>
@@ -440,7 +443,7 @@ export const RunTracker = () => {
 
                 <div>
                   <div className="flex justify-between text-sm mb-1">
-                    <span>Distance: {weeklyProgress.totalDistanceKm.toFixed(1)} / {weeklyGoal.weekly_distance_km} km</span>
+                    <span>Distance: {weeklyProgress.totalDistanceKm.toFixed(1)} / {weeklyGoal.weekly_distance_km} mi</span>
                     <span>{Math.min(100, Math.round((weeklyProgress.totalDistanceKm / weeklyGoal.weekly_distance_km) * 100))}%</span>
                   </div>
                   <Progress value={Math.min(100, (weeklyProgress.totalDistanceKm / weeklyGoal.weekly_distance_km) * 100)} className="h-2" />
@@ -550,21 +553,21 @@ export const RunTracker = () => {
             <Card>
               <CardContent className="p-4 text-center">
                 <Footprints className="h-5 w-5 mx-auto mb-2 text-muted-foreground" />
-                <p className="text-2xl font-bold font-mono">{formatDistance(activeRun.distance)} km</p>
+                <p className="text-2xl font-bold font-mono">{formatDistance(activeRun.distance)} mi</p>
                 <p className="text-xs text-muted-foreground uppercase tracking-wide">Distance</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
                 <TrendingUp className="h-5 w-5 mx-auto mb-2 text-muted-foreground" />
-                <p className="text-2xl font-bold font-mono">{formatPace(activeRun.currentPace)}/km</p>
+                <p className="text-2xl font-bold font-mono">{formatPace(activeRun.currentPace)}/mi</p>
                 <p className="text-xs text-muted-foreground uppercase tracking-wide">Pace</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
                 <Flame className="h-5 w-5 mx-auto mb-2 text-muted-foreground" />
-                <p className="text-2xl font-bold font-mono">{Math.round((activeRun.distance / 1000) * 60)}</p>
+                <p className="text-2xl font-bold font-mono">{Math.round((activeRun.distance / 1609.34) * 100)}</p>
                 <p className="text-xs text-muted-foreground uppercase tracking-wide">Calories</p>
               </CardContent>
             </Card>
@@ -719,11 +722,11 @@ export const RunTracker = () => {
                         {format(new Date(run.started_at), 'MMM d, yyyy')}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        {formatDistance(run.distance_meters || 0)} km • {formatDuration(run.duration_seconds || 0)}
+                        {formatDistance(run.distance_meters || 0)} mi • {formatDuration(run.duration_seconds || 0)}
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-mono">{formatPace(run.avg_pace_seconds_per_km || 0)}/km</p>
+                      <p className="font-mono">{formatPace(run.avg_pace_seconds_per_km || 0)}/mi</p>
                       <p className="text-sm text-muted-foreground">{run.calories_burned} cal</p>
                     </div>
                   </div>
@@ -744,7 +747,7 @@ export const RunTracker = () => {
             {activeRun && (
               <div className="grid grid-cols-2 gap-4 text-center">
                 <div>
-                  <p className="text-2xl font-bold">{formatDistance(activeRun.distance)} km</p>
+                  <p className="text-2xl font-bold">{formatDistance(activeRun.distance)} mi</p>
                   <p className="text-sm text-muted-foreground">Distance</p>
                 </div>
                 <div>
@@ -778,7 +781,7 @@ export const RunTracker = () => {
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="goal-distance">Weekly Distance Goal (km)</Label>
+              <Label htmlFor="goal-distance">Weekly Distance Goal (miles)</Label>
               <Input
                 id="goal-distance"
                 type="number"

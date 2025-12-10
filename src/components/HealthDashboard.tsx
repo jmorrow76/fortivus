@@ -114,7 +114,7 @@ const HealthDashboard = () => {
     },
     {
       label: "Distance",
-      value: healthData.distance ? `${healthData.distance} km` : "—",
+      value: healthData.distance ? `${(healthData.distance * 0.621371).toFixed(1)} mi` : "—",
       icon: Navigation,
       color: "text-green-500",
       bgColor: "bg-green-500/10",

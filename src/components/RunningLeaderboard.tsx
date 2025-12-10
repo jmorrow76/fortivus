@@ -47,8 +47,10 @@ export function RunningLeaderboard() {
   };
 
   const formatDistance = (meters: number) => {
-    if (meters >= 1000) {
-      return `${(meters / 1000).toFixed(1)} km`;
+    // Convert meters to miles (1 mile = 1609.34 meters)
+    const miles = meters / 1609.34;
+    if (miles >= 0.1) {
+      return `${miles.toFixed(1)} mi`;
     }
     return `${Math.round(meters)} m`;
   };
