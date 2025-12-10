@@ -19,7 +19,7 @@ export default function CalorieTracking() {
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       
-      <main className="flex-1 container max-w-4xl mx-auto px-4 py-8 pt-24">
+      <main className="flex-1 container max-w-4xl mx-auto px-4 py-8 pt-32 md:pt-24">
         {!user ? (
           <Card>
             <CardContent className="p-8 text-center space-y-4">

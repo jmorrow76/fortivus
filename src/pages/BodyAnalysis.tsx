@@ -32,7 +32,7 @@ const BodyAnalysis = () => {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <main className="pt-20">
+        <main className="pt-28 md:pt-20">
           <section className="py-16 md:py-24">
             <div className="container mx-auto px-4 max-w-2xl">
               <Card className="text-center">
@@ -99,7 +99,7 @@ const BodyAnalysis = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="pt-20">
+      <main className="pt-28 md:pt-20">
         {/* Page Header */}
         <section className="py-8 md:py-12 border-b border-border">
           <div className="container mx-auto px-4">
