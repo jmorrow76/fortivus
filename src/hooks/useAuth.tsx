@@ -54,25 +54,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   });
 
   const checkSubscription = async () => {
-    if (!session) {
-      setSubscription({ subscribed: false, productId: null, subscriptionEnd: null });
-      return;
-    }
-
     try {
-      // Try to refresh the session first to ensure we have a valid token
-      const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+      // Get the current session directly from Supabase
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
       
-      if (refreshError || !refreshData.session) {
-        console.log('Session expired, signing out');
-        await supabase.auth.signOut();
+      if (!currentSession) {
         setSubscription({ subscribed: false, productId: null, subscriptionEnd: null });
         return;
       }
 
-      // Use the refreshed session token
-      const currentSession = refreshData.session;
-      
       const { data, error } = await supabase.functions.invoke('check-subscription', {
         headers: {
           Authorization: `Bearer ${currentSession.access_token}`,
@@ -80,11 +70,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
 
       if (error) {
-        // Check if it's an auth error (expired token)
+        // If token expired, just reset subscription - auth state change will handle sign out
         const errorMessage = error.message || '';
         if (errorMessage.includes('expired') || errorMessage.includes('invalid JWT')) {
-          console.log('Token expired during subscription check, signing out');
-          await supabase.auth.signOut();
+          console.log('Token expired, subscription check skipped');
           setSubscription({ subscribed: false, productId: null, subscriptionEnd: null });
           return;
         }
@@ -99,6 +88,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
     } catch (error) {
       console.error('Error checking subscription:', error);
+      setSubscription({ subscribed: false, productId: null, subscriptionEnd: null });
     }
   };
 
