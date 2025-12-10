@@ -115,7 +115,7 @@ export default function Messages() {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <div className="container mx-auto px-4 py-20 text-center">
+        <div className="container mx-auto px-4 pt-28 md:py-20 pb-16 text-center">
           <MessageCircle className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
           <h1 className="text-2xl font-bold mb-2">Sign in to view messages</h1>
           <p className="text-muted-foreground">You need to be logged in to access direct messages.</p>
@@ -129,7 +129,7 @@ export default function Messages() {
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
       
-      <main className="flex-1 container mx-auto px-4 py-8">
+      <main className="flex-1 container mx-auto px-4 pt-24 md:py-8 pb-8">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">Messages</h1>
           {totalUnread > 0 && (

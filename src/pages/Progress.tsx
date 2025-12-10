@@ -177,7 +177,7 @@ const Progress = () => {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <main className="pt-24 pb-16 px-4">
+        <main className="pt-32 md:pt-24 pb-16 px-4">
           <div className="container max-w-lg mx-auto">
             <Card className="shadow-elevated text-center">
               <CardHeader>
@@ -221,7 +221,7 @@ const Progress = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="pt-24 pb-16 px-4">
+      <main className="pt-32 md:pt-24 pb-16 px-4">
         <div className="container max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">

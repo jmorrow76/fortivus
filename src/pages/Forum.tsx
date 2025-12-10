@@ -934,7 +934,7 @@ const Forum = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="pt-24 pb-16 px-4">
+      <main className="pt-32 md:pt-24 pb-16 px-4">
         <div className="container max-w-4xl mx-auto">
           <Button variant="ghost" className="mb-6" onClick={() => navigate("/")}>
             <ArrowLeft className="h-4 w-4 mr-2" />
