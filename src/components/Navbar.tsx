@@ -185,7 +185,7 @@ const Navbar = () => {
 
         {/* Mobile Navigation */}
         {isOpen && (
-          <div className="lg:hidden py-6 border-t border-border animate-fade-in">
+          <div className="lg:hidden py-6 px-4 border-t border-border animate-fade-in">
             <div className="flex flex-col gap-4">
               {/* Mobile Elite Features Section */}
               <div className="pb-4 border-b border-border">
