@@ -39,6 +39,7 @@ import Onboarding from "./pages/Onboarding";
 import AccountabilityPartners from "./pages/AccountabilityPartners";
 import Testimonies from "./pages/Testimonies";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
 import NotFound from "./pages/NotFound";
 import SupportButton from "./components/SupportButton";
 import ReferralButton from "./components/ReferralButton";
@@ -92,6 +93,7 @@ const App = () => (
             <Route path="/accountability" element={<AccountabilityPartners />} />
             <Route path="/testimonies" element={<Testimonies />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
