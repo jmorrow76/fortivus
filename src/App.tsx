@@ -44,6 +44,7 @@ import NotFound from "./pages/NotFound";
 import SupportButton from "./components/SupportButton";
 import ReferralButton from "./components/ReferralButton";
 import ScrollToTop from "./components/ScrollToTop";
+import { CookieConsent } from "./components/CookieConsent";
 
 const queryClient = new QueryClient();
 
@@ -97,6 +98,7 @@ const App = () => (
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <CookieConsent />
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
