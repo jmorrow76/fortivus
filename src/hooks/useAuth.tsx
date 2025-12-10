@@ -60,13 +60,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     try {
+      // Try to refresh the session first to ensure we have a valid token
+      const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+      
+      if (refreshError || !refreshData.session) {
+        console.log('Session expired, signing out');
+        await supabase.auth.signOut();
+        setSubscription({ subscribed: false, productId: null, subscriptionEnd: null });
+        return;
+      }
+
+      // Use the refreshed session token
+      const currentSession = refreshData.session;
+      
       const { data, error } = await supabase.functions.invoke('check-subscription', {
         headers: {
-          Authorization: `Bearer ${session.access_token}`,
+          Authorization: `Bearer ${currentSession.access_token}`,
         },
       });
 
       if (error) {
+        // Check if it's an auth error (expired token)
+        const errorMessage = error.message || '';
+        if (errorMessage.includes('expired') || errorMessage.includes('invalid JWT')) {
+          console.log('Token expired during subscription check, signing out');
+          await supabase.auth.signOut();
+          setSubscription({ subscribed: false, productId: null, subscriptionEnd: null });
+          return;
+        }
         console.error('Error checking subscription:', error);
         return;
       }
