@@ -12,7 +12,7 @@ const Running = () => {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <main className="container mx-auto px-4 pt-40 md:pt-20 pb-16">
+        <main className="container mx-auto px-4 pt-44 md:pt-20 pb-16">
           <div className="text-center max-w-md mx-auto">
             <h1 className="text-3xl font-bold mb-4">GPS Run Tracker</h1>
             <p className="text-muted-foreground mb-6">
@@ -31,7 +31,7 @@ const Running = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="container mx-auto px-4 pt-40 md:pt-8 pb-8">
+      <main className="container mx-auto px-4 pt-44 md:pt-8 pb-8">
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
             <h1 className="text-3xl font-bold mb-2">GPS Run Tracker</h1>
