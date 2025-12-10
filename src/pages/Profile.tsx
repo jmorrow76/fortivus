@@ -20,10 +20,11 @@ import { format } from "date-fns";
 const Profile = () => {
   const { user, loading: authLoading, subscription, session } = useAuth();
   const { hasCompletedOnboarding, resetOnboarding } = useOnboarding();
+  const isManualGrant = subscription.productId === 'manual_grant';
   const isElite = subscription.subscribed && (
     subscription.productId === FORTIVUS_ELITE.monthly.product_id ||
     subscription.productId === FORTIVUS_ELITE.yearly.product_id ||
-    subscription.productId === 'manual_grant'
+    isManualGrant
   );
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -239,30 +240,37 @@ const Profile = () => {
             <CardContent>
               {isElite ? (
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                  {subscription.subscriptionEnd && (
+                  {subscription.subscriptionEnd && !isManualGrant && (
                     <span className="text-sm text-muted-foreground flex items-center gap-1.5">
                       <Calendar className="h-4 w-4" />
                       Renews {format(new Date(subscription.subscriptionEnd), "MMM d, yyyy")}
                     </span>
                   )}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleManageSubscription}
-                    disabled={managingSubscription}
-                  >
-                    {managingSubscription ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Loading...
-                      </>
-                    ) : (
-                      <>
-                        <Settings className="h-4 w-4 mr-2" />
-                        Manage Subscription
-                      </>
-                    )}
-                  </Button>
+                  {isManualGrant ? (
+                    <span className="text-sm text-muted-foreground flex items-center gap-1.5">
+                      <Sparkles className="h-4 w-4 text-accent" />
+                      Complimentary membership
+                    </span>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleManageSubscription}
+                      disabled={managingSubscription}
+                    >
+                      {managingSubscription ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Loading...
+                        </>
+                      ) : (
+                        <>
+                          <Settings className="h-4 w-4 mr-2" />
+                          Manage Subscription
+                        </>
+                      )}
+                    </Button>
+                  )}
                 </div>
               ) : (
                 <div className="flex items-center gap-3">
