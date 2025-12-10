@@ -600,8 +600,990 @@ const exerciseVideos = [
       'Use mixed grip if needed',
       'Progress to single-arm hangs over time'
     ]
+  },
+  // Additional exercises to match database
+  {
+    id: '22',
+    name: 'Incline Bench Press',
+    muscle_group: 'chest',
+    youtubeId: 'DbFgADa2PL8',
+    thumbnail: 'https://img.youtube.com/vi/DbFgADa2PL8/mqdefault.jpg',
+    formTips: [
+      'Set bench to 30-45 degree angle',
+      'Keep shoulder blades retracted',
+      'Lower bar to upper chest',
+      'Drive through feet for stability',
+      'Maintain slight arch in lower back'
+    ],
+    commonMistakes: [
+      'Bench angle too steep (becomes shoulder press)',
+      'Flaring elbows excessively',
+      'Bouncing bar off chest',
+      'Lifting hips off bench',
+      'Uneven bar path'
+    ],
+    over40Modifications: [
+      'Start with lower incline (30 degrees)',
+      'Use dumbbells for natural arm path',
+      'Control tempo to reduce joint stress',
+      'Warm up shoulders thoroughly',
+      'Consider slight grip adjustment if shoulders hurt'
+    ]
+  },
+  {
+    id: '23',
+    name: 'Incline Dumbbell Press',
+    muscle_group: 'chest',
+    youtubeId: '8iPEnn-ltC8',
+    thumbnail: 'https://img.youtube.com/vi/8iPEnn-ltC8/mqdefault.jpg',
+    formTips: [
+      'Set bench to 30-45 degree angle',
+      'Start with dumbbells at shoulder level',
+      'Press up and slightly inward',
+      'Lower with control to deep stretch',
+      'Keep core braced throughout'
+    ],
+    commonMistakes: [
+      'Going too heavy, losing form',
+      'Excessive back arch',
+      'Not achieving full range of motion',
+      'Dumbbells drifting too wide',
+      'Rushing the negative'
+    ],
+    over40Modifications: [
+      'Allows natural arm rotation',
+      'Better for shoulder health than barbell',
+      'Use moderate weight, focus on stretch',
+      'Pause at bottom for muscle activation',
+      'Great for unilateral strength balance'
+    ]
+  },
+  {
+    id: '24',
+    name: 'Dumbbell Bench Press',
+    muscle_group: 'chest',
+    youtubeId: 'VmB1G1K7v94',
+    thumbnail: 'https://img.youtube.com/vi/VmB1G1K7v94/mqdefault.jpg',
+    formTips: [
+      'Lie flat with feet on floor',
+      'Start with dumbbells at chest level',
+      'Press up, bringing dumbbells together',
+      'Lower with control, elbows at 45 degrees',
+      'Keep shoulder blades squeezed'
+    ],
+    commonMistakes: [
+      'Dumbbells wobbling due to weak stabilizers',
+      'Not lowering deep enough',
+      'Flaring elbows to 90 degrees',
+      'Arching back excessively',
+      'Using momentum'
+    ],
+    over40Modifications: [
+      'Easier on shoulders than barbell',
+      'Use neutral grip if shoulder issues',
+      'Focus on controlled tempo',
+      'Great for identifying strength imbalances',
+      'Lower weight, higher reps for joint health'
+    ]
+  },
+  {
+    id: '25',
+    name: 'Dumbbell Flyes',
+    muscle_group: 'chest',
+    youtubeId: 'eozdVDA78K0',
+    thumbnail: 'https://img.youtube.com/vi/eozdVDA78K0/mqdefault.jpg',
+    formTips: [
+      'Start with arms extended above chest',
+      'Lower with slight bend in elbows',
+      'Feel deep stretch in chest',
+      'Bring dumbbells back up in arc motion',
+      'Squeeze chest at top'
+    ],
+    commonMistakes: [
+      'Going too heavy',
+      'Straightening arms completely',
+      'Lowering too far, overstretching',
+      'Turning into a press',
+      'Rushing the movement'
+    ],
+    over40Modifications: [
+      'Use lighter weight than pressing',
+      'Keep slight bend in elbows always',
+      'Limit depth to comfortable stretch',
+      'Cable flyes are joint-friendlier option',
+      'Focus on mind-muscle connection'
+    ]
+  },
+  {
+    id: '26',
+    name: 'Cable Crossover',
+    muscle_group: 'chest',
+    youtubeId: 'taI4XduLpTk',
+    thumbnail: 'https://img.youtube.com/vi/taI4XduLpTk/mqdefault.jpg',
+    formTips: [
+      'Set pulleys at appropriate height',
+      'Step forward for tension',
+      'Bring handles together in arc',
+      'Squeeze chest at contraction',
+      'Control the return'
+    ],
+    commonMistakes: [
+      'Using too much weight',
+      'Not getting full range of motion',
+      'Leaning too far forward',
+      'Bending elbows too much',
+      'Rushing reps'
+    ],
+    over40Modifications: [
+      'Constant cable tension is joint-friendly',
+      'Experiment with different pulley heights',
+      'Use moderate weight, high reps',
+      'Great finisher after pressing',
+      'Focus on contraction over weight'
+    ]
+  },
+  {
+    id: '27',
+    name: 'Push-Up',
+    muscle_group: 'chest',
+    youtubeId: 'IODxDxX7oi4',
+    thumbnail: 'https://img.youtube.com/vi/IODxDxX7oi4/mqdefault.jpg',
+    formTips: [
+      'Keep body in straight line',
+      'Hands slightly wider than shoulders',
+      'Lower until chest nearly touches floor',
+      'Push through palms to extend',
+      'Keep core braced throughout'
+    ],
+    commonMistakes: [
+      'Sagging hips',
+      'Flaring elbows to 90 degrees',
+      'Not going through full range',
+      'Holding breath',
+      'Looking up instead of down'
+    ],
+    over40Modifications: [
+      'Start with incline push-ups if needed',
+      'Keep elbows at 45 degrees',
+      'Focus on quality over quantity',
+      'Add variety with different hand positions',
+      'Great bodyweight exercise for longevity'
+    ]
+  },
+  {
+    id: '28',
+    name: 'Dips',
+    muscle_group: 'chest',
+    youtubeId: 'vi1-BOp3lGo',
+    thumbnail: 'https://img.youtube.com/vi/vi1-BOp3lGo/mqdefault.jpg',
+    formTips: [
+      'Lean forward for chest emphasis',
+      'Lower until upper arms are parallel',
+      'Keep elbows slightly flared',
+      'Drive through palms to push up',
+      'Control the descent'
+    ],
+    commonMistakes: [
+      'Going too deep',
+      'Staying too upright (triceps focus)',
+      'Swinging body',
+      'Locking out aggressively',
+      'Using momentum'
+    ],
+    over40Modifications: [
+      'Use assisted dip machine if needed',
+      'Limit depth to 90 degrees',
+      'Watch for shoulder pain',
+      'Machine dips are safer alternative',
+      'Stop if shoulders hurt'
+    ]
+  },
+  {
+    id: '29',
+    name: 'Lat Pulldown',
+    muscle_group: 'back',
+    youtubeId: 'CAwf7n6Luuc',
+    thumbnail: 'https://img.youtube.com/vi/CAwf7n6Luuc/mqdefault.jpg',
+    formTips: [
+      'Grip bar slightly wider than shoulders',
+      'Lean back slightly',
+      'Pull bar to upper chest',
+      'Squeeze shoulder blades together',
+      'Control the weight up'
+    ],
+    commonMistakes: [
+      'Pulling behind the neck',
+      'Using too much momentum',
+      'Leaning back too far',
+      'Not getting full stretch at top',
+      'Grip too wide or narrow'
+    ],
+    over40Modifications: [
+      'Great alternative to pull-ups',
+      'Use neutral grip for shoulder comfort',
+      'Focus on lat activation',
+      'Moderate weight, controlled tempo',
+      'Avoid behind-neck variation'
+    ]
+  },
+  {
+    id: '30',
+    name: 'Seated Cable Row',
+    muscle_group: 'back',
+    youtubeId: 'GZbfZ033f74',
+    thumbnail: 'https://img.youtube.com/vi/GZbfZ033f74/mqdefault.jpg',
+    formTips: [
+      'Sit with slight knee bend',
+      'Keep chest up, back straight',
+      'Pull handle to lower chest/upper abs',
+      'Squeeze shoulder blades at contraction',
+      'Stretch forward with control'
+    ],
+    commonMistakes: [
+      'Rounding back during stretch',
+      'Using excessive body swing',
+      'Not pulling high enough',
+      'Shrugging shoulders',
+      'Rushing the movement'
+    ],
+    over40Modifications: [
+      'Excellent supported back exercise',
+      'Use V-bar or wide grip attachment',
+      'Keep movements controlled',
+      'Great for posture improvement',
+      'Focus on retraction over weight'
+    ]
+  },
+  {
+    id: '31',
+    name: 'Dumbbell Row',
+    muscle_group: 'back',
+    youtubeId: 'xl1YQvwclFw',
+    thumbnail: 'https://img.youtube.com/vi/xl1YQvwclFw/mqdefault.jpg',
+    formTips: [
+      'One knee and hand on bench',
+      'Keep back flat and parallel',
+      'Row dumbbell to hip',
+      'Lead with elbow',
+      'Squeeze back at top'
+    ],
+    commonMistakes: [
+      'Rotating torso during row',
+      'Shrugging shoulder',
+      'Not rowing high enough',
+      'Rounding upper back',
+      'Using momentum'
+    ],
+    over40Modifications: [
+      'Unilateral work corrects imbalances',
+      'Supported position protects lower back',
+      'Focus on contraction, not weight',
+      'Keep core braced',
+      'Great staple back exercise'
+    ]
+  },
+  {
+    id: '32',
+    name: 'T-Bar Row',
+    muscle_group: 'back',
+    youtubeId: 'j3Igk5nyZE4',
+    thumbnail: 'https://img.youtube.com/vi/j3Igk5nyZE4/mqdefault.jpg',
+    formTips: [
+      'Straddle the bar',
+      'Hinge at hips, keep back flat',
+      'Pull handle to chest',
+      'Squeeze back muscles at top',
+      'Lower with control'
+    ],
+    commonMistakes: [
+      'Standing too upright',
+      'Rounding lower back',
+      'Using too much momentum',
+      'Not pulling high enough',
+      'Jerking the weight'
+    ],
+    over40Modifications: [
+      'Use chest-supported version if available',
+      'Keep weight moderate',
+      'Focus on back engagement',
+      'Great for building thickness',
+      'Watch lower back position'
+    ]
+  },
+  {
+    id: '33',
+    name: 'Face Pull',
+    muscle_group: 'back',
+    youtubeId: 'rep-qVOkqgk',
+    thumbnail: 'https://img.youtube.com/vi/rep-qVOkqgk/mqdefault.jpg',
+    formTips: [
+      'Set cable at face height',
+      'Use rope attachment',
+      'Pull toward face, separating rope',
+      'External rotate at end',
+      'Squeeze rear delts and upper back'
+    ],
+    commonMistakes: [
+      'Using too much weight',
+      'Not separating the rope',
+      'Pulling to chest instead of face',
+      'Using momentum',
+      'Not externally rotating'
+    ],
+    over40Modifications: [
+      'Essential for shoulder health',
+      'Light weight, high reps (15-20)',
+      'Great for posture correction',
+      'Do 2-3 times per week',
+      'Excellent warm-up or finisher'
+    ]
+  },
+  {
+    id: '34',
+    name: 'Arnold Press',
+    muscle_group: 'shoulders',
+    youtubeId: '3ml7BH7mNwQ',
+    thumbnail: 'https://img.youtube.com/vi/3ml7BH7mNwQ/mqdefault.jpg',
+    formTips: [
+      'Start with palms facing you at shoulder level',
+      'Rotate palms outward as you press',
+      'End with palms facing forward overhead',
+      'Reverse the motion on way down',
+      'Keep core tight'
+    ],
+    commonMistakes: [
+      'Rushing the rotation',
+      'Not getting full range of motion',
+      'Using momentum',
+      'Arching back excessively',
+      'Going too heavy'
+    ],
+    over40Modifications: [
+      'Seated version for back support',
+      'Use moderate weight',
+      'Great for shoulder mobility',
+      'Can be hard on shoulders - reduce weight if painful',
+      'Focus on controlled rotation'
+    ]
+  },
+  {
+    id: '35',
+    name: 'Dumbbell Shoulder Press',
+    muscle_group: 'shoulders',
+    youtubeId: 'qEwKCR5JCog',
+    thumbnail: 'https://img.youtube.com/vi/qEwKCR5JCog/mqdefault.jpg',
+    formTips: [
+      'Start with dumbbells at shoulder level',
+      'Press straight up',
+      'Bring dumbbells together at top',
+      'Lower with control',
+      'Keep core braced'
+    ],
+    commonMistakes: [
+      'Arching lower back',
+      'Flaring elbows',
+      'Not pressing straight up',
+      'Using momentum',
+      'Locking out aggressively'
+    ],
+    over40Modifications: [
+      'Allows natural arm path',
+      'Seated with back support is safest',
+      'Neutral grip if shoulder issues',
+      'Focus on controlled reps',
+      'Great alternative to barbell'
+    ]
+  },
+  {
+    id: '36',
+    name: 'Front Raise',
+    muscle_group: 'shoulders',
+    youtubeId: 'gzDe-EROlrE',
+    thumbnail: 'https://img.youtube.com/vi/gzDe-EROlrE/mqdefault.jpg',
+    formTips: [
+      'Start with dumbbells at thighs',
+      'Raise arms straight ahead to shoulder height',
+      'Keep slight bend in elbows',
+      'Lower with control',
+      'Avoid swinging'
+    ],
+    commonMistakes: [
+      'Using momentum to swing',
+      'Raising too high',
+      'Going too heavy',
+      'Bending elbows too much',
+      'Leaning back'
+    ],
+    over40Modifications: [
+      'Often not needed (pressing hits front delts)',
+      'Use light weight if included',
+      'Alternating arms reduces fatigue',
+      'One arm at a time for focus',
+      'Skip if shoulders are fatigued'
+    ]
+  },
+  {
+    id: '37',
+    name: 'Rear Delt Fly',
+    muscle_group: 'shoulders',
+    youtubeId: 'EA7u4Q_8HQ0',
+    thumbnail: 'https://img.youtube.com/vi/EA7u4Q_8HQ0/mqdefault.jpg',
+    formTips: [
+      'Bend over with flat back',
+      'Start with arms hanging down',
+      'Raise arms out to sides',
+      'Lead with elbows',
+      'Squeeze rear delts at top'
+    ],
+    commonMistakes: [
+      'Using too much weight',
+      'Not bending over enough',
+      'Shrugging shoulders',
+      'Using momentum',
+      'Not squeezing at top'
+    ],
+    over40Modifications: [
+      'Use chest-supported bench',
+      'Light weight, high reps',
+      'Essential for shoulder balance',
+      'Face pulls work similar muscles',
+      'Focus on mind-muscle connection'
+    ]
+  },
+  {
+    id: '38',
+    name: 'Upright Row',
+    muscle_group: 'shoulders',
+    youtubeId: 'amCU-ziHITM',
+    thumbnail: 'https://img.youtube.com/vi/amCU-ziHITM/mqdefault.jpg',
+    formTips: [
+      'Grip bar or dumbbells shoulder-width',
+      'Pull up along body',
+      'Lead with elbows',
+      'Raise to chest level',
+      'Lower with control'
+    ],
+    commonMistakes: [
+      'Grip too narrow (shoulder impingement)',
+      'Pulling too high',
+      'Using momentum',
+      'Shrugging at top',
+      'Going too heavy'
+    ],
+    over40Modifications: [
+      'Wide grip reduces impingement risk',
+      'Use dumbbells for natural movement',
+      'Consider lateral raises instead',
+      'Stop at chest level, not chin',
+      'Skip if causes shoulder pain'
+    ]
+  },
+  {
+    id: '39',
+    name: 'Barbell Curl',
+    muscle_group: 'biceps',
+    youtubeId: 'LY1V6UbRHFM',
+    thumbnail: 'https://img.youtube.com/vi/LY1V6UbRHFM/mqdefault.jpg',
+    formTips: [
+      'Stand with feet shoulder-width',
+      'Grip bar shoulder-width',
+      'Keep elbows at sides',
+      'Curl bar to shoulder level',
+      'Lower with control'
+    ],
+    commonMistakes: [
+      'Swinging body for momentum',
+      'Moving elbows forward',
+      'Not going through full range',
+      'Going too heavy',
+      'Rushing reps'
+    ],
+    over40Modifications: [
+      'EZ bar reduces wrist strain',
+      'Focus on controlled tempo',
+      'Moderate weight, higher reps',
+      'Strict form over heavy weight',
+      'Preacher curls for isolation'
+    ]
+  },
+  {
+    id: '40',
+    name: 'Hammer Curl',
+    muscle_group: 'biceps',
+    youtubeId: 'zC3nLlEvin4',
+    thumbnail: 'https://img.youtube.com/vi/zC3nLlEvin4/mqdefault.jpg',
+    formTips: [
+      'Hold dumbbells with neutral grip',
+      'Keep elbows at sides',
+      'Curl up without rotating wrists',
+      'Squeeze at top',
+      'Lower with control'
+    ],
+    commonMistakes: [
+      'Swinging for momentum',
+      'Rotating wrists',
+      'Moving elbows forward',
+      'Going too heavy',
+      'Rushing the movement'
+    ],
+    over40Modifications: [
+      'Excellent for forearm development',
+      'Easier on wrists than regular curls',
+      'Great for brachialis development',
+      'Alternating or together',
+      'Include in every arm workout'
+    ]
+  },
+  {
+    id: '41',
+    name: 'Preacher Curl',
+    muscle_group: 'biceps',
+    youtubeId: 'fIWP-FRFNU0',
+    thumbnail: 'https://img.youtube.com/vi/fIWP-FRFNU0/mqdefault.jpg',
+    formTips: [
+      'Position armpits at top of pad',
+      'Let arms fully extend at bottom',
+      'Curl up, keeping upper arms on pad',
+      'Squeeze biceps at top',
+      'Lower under control'
+    ],
+    commonMistakes: [
+      'Lifting upper arms off pad',
+      'Not going through full range',
+      'Using momentum',
+      'Going too heavy',
+      'Rushing the negative'
+    ],
+    over40Modifications: [
+      'Excellent for isolation',
+      'Use moderate weight',
+      'EZ bar or dumbbells work well',
+      'Don\'t overextend at bottom',
+      'Great for peak contraction'
+    ]
+  },
+  {
+    id: '42',
+    name: 'Cable Curl',
+    muscle_group: 'biceps',
+    youtubeId: 'nfYFKVPb6Ks',
+    thumbnail: 'https://img.youtube.com/vi/nfYFKVPb6Ks/mqdefault.jpg',
+    formTips: [
+      'Stand facing cable machine',
+      'Grip bar or handles at low position',
+      'Keep elbows at sides',
+      'Curl up, squeeze at top',
+      'Lower with control'
+    ],
+    commonMistakes: [
+      'Using momentum',
+      'Moving elbows',
+      'Standing too close or far',
+      'Not getting full contraction',
+      'Rushing reps'
+    ],
+    over40Modifications: [
+      'Constant tension throughout',
+      'Great for finishing biceps',
+      'Try different attachments',
+      'High reps work well',
+      'Easy on joints'
+    ]
+  },
+  {
+    id: '43',
+    name: 'Close Grip Bench Press',
+    muscle_group: 'triceps',
+    youtubeId: 'nEF0bv2FW94',
+    thumbnail: 'https://img.youtube.com/vi/nEF0bv2FW94/mqdefault.jpg',
+    formTips: [
+      'Grip bar shoulder-width or slightly narrower',
+      'Keep elbows close to body',
+      'Lower bar to lower chest',
+      'Press up, focusing on triceps',
+      'Lock out fully at top'
+    ],
+    commonMistakes: [
+      'Grip too narrow (wrist strain)',
+      'Flaring elbows',
+      'Bouncing bar off chest',
+      'Not full range of motion',
+      'Lifting hips'
+    ],
+    over40Modifications: [
+      'Excellent compound tricep builder',
+      'Use comfortable grip width',
+      'Control the descent',
+      'Warm up thoroughly',
+      'Great for strength'
+    ]
+  },
+  {
+    id: '44',
+    name: 'Skull Crusher',
+    muscle_group: 'triceps',
+    youtubeId: 'd_KZxkY_0cM',
+    thumbnail: 'https://img.youtube.com/vi/d_KZxkY_0cM/mqdefault.jpg',
+    formTips: [
+      'Lie on bench with bar or dumbbells',
+      'Start with arms extended above chest',
+      'Lower toward forehead by bending elbows',
+      'Keep upper arms stationary',
+      'Extend back to start'
+    ],
+    commonMistakes: [
+      'Elbows flaring out',
+      'Upper arms moving',
+      'Going too heavy',
+      'Not controlling the weight',
+      'Lowering behind head'
+    ],
+    over40Modifications: [
+      'Use EZ bar for wrist comfort',
+      'Lower to behind head for less elbow stress',
+      'Moderate weight, higher reps',
+      'Stop if elbows hurt',
+      'Dumbbells allow natural movement'
+    ]
+  },
+  {
+    id: '45',
+    name: 'Overhead Tricep Extension',
+    muscle_group: 'triceps',
+    youtubeId: '_gsUck-7M74',
+    thumbnail: 'https://img.youtube.com/vi/_gsUck-7M74/mqdefault.jpg',
+    formTips: [
+      'Hold weight overhead',
+      'Keep elbows pointed up',
+      'Lower weight behind head',
+      'Extend back to start',
+      'Keep core braced'
+    ],
+    commonMistakes: [
+      'Elbows flaring out',
+      'Arching back excessively',
+      'Not full range of motion',
+      'Using momentum',
+      'Going too heavy'
+    ],
+    over40Modifications: [
+      'Seated with back support',
+      'Use cable for constant tension',
+      'Rope attachment works well',
+      'Focus on stretch and contraction',
+      'Great for long head development'
+    ]
+  },
+  {
+    id: '46',
+    name: 'Tricep Dips',
+    muscle_group: 'triceps',
+    youtubeId: '6kALZikXxLc',
+    thumbnail: 'https://img.youtube.com/vi/6kALZikXxLc/mqdefault.jpg',
+    formTips: [
+      'Stay more upright than chest dips',
+      'Keep elbows close to body',
+      'Lower until arms at 90 degrees',
+      'Push up through triceps',
+      'Lock out at top'
+    ],
+    commonMistakes: [
+      'Going too deep',
+      'Leaning forward too much',
+      'Flaring elbows',
+      'Using momentum',
+      'Shoulders rolling forward'
+    ],
+    over40Modifications: [
+      'Use assisted machine if needed',
+      'Bench dips are easier alternative',
+      'Limit depth for joint health',
+      'Watch for shoulder pain',
+      'Consider pushdowns instead'
+    ]
+  },
+  {
+    id: '47',
+    name: 'Front Squat',
+    muscle_group: 'quadriceps',
+    youtubeId: 'm4ytaCJZpl0',
+    thumbnail: 'https://img.youtube.com/vi/m4ytaCJZpl0/mqdefault.jpg',
+    formTips: [
+      'Bar rests on front delts',
+      'Elbows high, upper arms parallel',
+      'Keep torso upright',
+      'Descend to parallel or below',
+      'Drive through mid-foot'
+    ],
+    commonMistakes: [
+      'Elbows dropping',
+      'Rounding upper back',
+      'Knees caving in',
+      'Leaning forward',
+      'Not hitting depth'
+    ],
+    over40Modifications: [
+      'Requires good mobility',
+      'Cross-arm grip is easier',
+      'Use straps if wrist mobility limited',
+      'Goblet squat as alternative',
+      'Great for quad development'
+    ]
+  },
+  {
+    id: '48',
+    name: 'Leg Extension',
+    muscle_group: 'quadriceps',
+    youtubeId: 'YyvSfVjQeL0',
+    thumbnail: 'https://img.youtube.com/vi/YyvSfVjQeL0/mqdefault.jpg',
+    formTips: [
+      'Adjust pad to lower shin',
+      'Keep back against pad',
+      'Extend legs fully',
+      'Squeeze quads at top',
+      'Lower with control'
+    ],
+    commonMistakes: [
+      'Using momentum',
+      'Not full extension',
+      'Lifting hips off seat',
+      'Going too heavy',
+      'Rushing reps'
+    ],
+    over40Modifications: [
+      'Great for isolation',
+      'Use moderate weight',
+      'Focus on squeeze, not weight',
+      'Avoid locking out aggressively',
+      'Good for warming up before squats'
+    ]
+  },
+  {
+    id: '49',
+    name: 'Lunges',
+    muscle_group: 'quadriceps',
+    youtubeId: 'QOVaHwm-Q6U',
+    thumbnail: 'https://img.youtube.com/vi/QOVaHwm-Q6U/mqdefault.jpg',
+    formTips: [
+      'Step forward with one leg',
+      'Lower until back knee nearly touches floor',
+      'Keep front knee over ankle',
+      'Push through front heel to return',
+      'Keep torso upright'
+    ],
+    commonMistakes: [
+      'Front knee going past toes excessively',
+      'Leaning forward',
+      'Not stepping far enough',
+      'Losing balance',
+      'Back knee hitting floor hard'
+    ],
+    over40Modifications: [
+      'Hold onto support if needed',
+      'Reverse lunges are easier on knees',
+      'Use dumbbells for stability',
+      'Focus on balance and control',
+      'Great for functional strength'
+    ]
+  },
+  {
+    id: '50',
+    name: 'Bulgarian Split Squat',
+    muscle_group: 'quadriceps',
+    youtubeId: '2C-uNgKwPLE',
+    thumbnail: 'https://img.youtube.com/vi/2C-uNgKwPLE/mqdefault.jpg',
+    formTips: [
+      'Rear foot elevated on bench',
+      'Stand far enough forward',
+      'Lower until front thigh is parallel',
+      'Keep torso upright',
+      'Drive through front heel'
+    ],
+    commonMistakes: [
+      'Standing too close to bench',
+      'Leaning forward',
+      'Front knee caving in',
+      'Not going deep enough',
+      'Losing balance'
+    ],
+    over40Modifications: [
+      'Excellent single-leg exercise',
+      'Hold onto support initially',
+      'Lower elevation if hip flexors tight',
+      'Bodyweight first, then add weight',
+      'Great for hip mobility'
+    ]
+  },
+  {
+    id: '51',
+    name: 'Leg Curl',
+    muscle_group: 'hamstrings',
+    youtubeId: '1Tq3QdYUuHs',
+    thumbnail: 'https://img.youtube.com/vi/1Tq3QdYUuHs/mqdefault.jpg',
+    formTips: [
+      'Lie face down on machine',
+      'Position pad above heels',
+      'Curl heels toward glutes',
+      'Squeeze hamstrings at top',
+      'Lower with control'
+    ],
+    commonMistakes: [
+      'Lifting hips off pad',
+      'Not full range of motion',
+      'Using momentum',
+      'Going too heavy',
+      'Rushing the negative'
+    ],
+    over40Modifications: [
+      'Great hamstring isolation',
+      'Use moderate weight',
+      'Try seated leg curl variation',
+      'Focus on contraction',
+      'Important for knee health'
+    ]
+  },
+  {
+    id: '52',
+    name: 'Ab Wheel Rollout',
+    muscle_group: 'core',
+    youtubeId: 'rqiTPdK1c_I',
+    thumbnail: 'https://img.youtube.com/vi/rqiTPdK1c_I/mqdefault.jpg',
+    formTips: [
+      'Start on knees gripping wheel',
+      'Keep core tight, back flat',
+      'Roll out as far as possible',
+      'Pull back using abs',
+      'Avoid arching back'
+    ],
+    commonMistakes: [
+      'Hips sagging',
+      'Using momentum',
+      'Not bracing core',
+      'Going too far too soon',
+      'Arching lower back'
+    ],
+    over40Modifications: [
+      'Start with small range of motion',
+      'Wall rollouts limit range',
+      'Focus on core engagement',
+      'Progress slowly',
+      'Excellent core strength builder'
+    ]
+  },
+  {
+    id: '53',
+    name: 'Hanging Leg Raise',
+    muscle_group: 'core',
+    youtubeId: 'Pr1ieGZ5atk',
+    thumbnail: 'https://img.youtube.com/vi/Pr1ieGZ5atk/mqdefault.jpg',
+    formTips: [
+      'Hang from bar with straight arms',
+      'Raise legs keeping them straight',
+      'Curl pelvis at top for lower abs',
+      'Lower with control',
+      'Avoid swinging'
+    ],
+    commonMistakes: [
+      'Using momentum to swing',
+      'Not lifting high enough',
+      'Bending knees too much',
+      'No pelvic curl at top',
+      'Dropping legs quickly'
+    ],
+    over40Modifications: [
+      'Start with knee raises',
+      'Use captain\'s chair for support',
+      'Focus on controlled movement',
+      'Great for lower abs',
+      'Progress to straight legs over time'
+    ]
+  },
+  {
+    id: '54',
+    name: 'Cable Crunch',
+    muscle_group: 'core',
+    youtubeId: 'ToJeyhydUxU',
+    thumbnail: 'https://img.youtube.com/vi/ToJeyhydUxU/mqdefault.jpg',
+    formTips: [
+      'Kneel facing cable machine',
+      'Hold rope at forehead level',
+      'Crunch down, curling spine',
+      'Bring elbows toward knees',
+      'Return with control'
+    ],
+    commonMistakes: [
+      'Using hip flexors',
+      'Pulling with arms',
+      'Not curling spine',
+      'Going too heavy',
+      'Rushing reps'
+    ],
+    over40Modifications: [
+      'Great weighted ab exercise',
+      'Focus on spinal flexion',
+      'Moderate weight, higher reps',
+      'Feel abs working, not hip flexors',
+      'Easier on neck than floor crunches'
+    ]
+  },
+  {
+    id: '55',
+    name: 'Russian Twist',
+    muscle_group: 'core',
+    youtubeId: 'wkD8rjkodUI',
+    thumbnail: 'https://img.youtube.com/vi/wkD8rjkodUI/mqdefault.jpg',
+    formTips: [
+      'Sit with knees bent, feet off floor',
+      'Lean back slightly',
+      'Rotate torso side to side',
+      'Keep chest up',
+      'Control the movement'
+    ],
+    commonMistakes: [
+      'Moving arms, not torso',
+      'Rounding back',
+      'Going too fast',
+      'Feet moving excessively',
+      'Using momentum'
+    ],
+    over40Modifications: [
+      'Keep feet on ground if needed',
+      'No weight initially',
+      'Focus on controlled rotation',
+      'Watch for lower back strain',
+      'Great for obliques'
+    ]
+  },
+  {
+    id: '56',
+    name: 'Crunch',
+    muscle_group: 'core',
+    youtubeId: 'Xyd_fa5zoEU',
+    thumbnail: 'https://img.youtube.com/vi/Xyd_fa5zoEU/mqdefault.jpg',
+    formTips: [
+      'Lie on back, knees bent',
+      'Hands behind head or crossed on chest',
+      'Curl shoulders off floor',
+      'Squeeze abs at top',
+      'Lower with control'
+    ],
+    commonMistakes: [
+      'Pulling on neck',
+      'Full sit-up motion',
+      'Using momentum',
+      'Not engaging abs',
+      'Going too fast'
+    ],
+    over40Modifications: [
+      'Keep lower back pressed to floor',
+      'Focus on quality over quantity',
+      'Consider cable crunch alternative',
+      'No need to go high',
+      'Great basic ab exercise'
+    ]
   }
 ];
+
 
 const muscleGroups = ['all', 'chest', 'back', 'shoulders', 'biceps', 'triceps', 'quadriceps', 'hamstrings', 'glutes', 'calves', 'forearms', 'core'];
 
