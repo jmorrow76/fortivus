@@ -151,21 +151,22 @@ const Pricing = () => {
       isCurrentPlan: subscription.subscribed,
     },
     {
-      name: "Lifetime",
-      description: "One payment, forever Elite access",
-      price: "$499",
-      period: "one-time",
+      name: "Annual",
+      description: "Best value for committed members",
+      price: `$${FORTIVUS_ELITE.yearly.price}`,
+      period: "per year",
       icon: Crown,
       features: [
         "All Elite features included",
-        "Lifetime access guaranteed",
-        "No monthly payments ever",
-        "Lock in current pricing forever",
+        `Save ${savingsPercent}% vs monthly`,
+        "Priority support",
+        "Lock in current pricing",
       ],
-      cta: "Coming Soon",
+      cta: subscription.subscribed ? "Your Plan" : "Start Annual Membership",
       variant: "outline" as const,
       popular: false,
-      disabled: true,
+      disabled: subscription.subscribed && billingCycle === "yearly",
+      isCurrentPlan: subscription.subscribed && billingCycle === "yearly",
     },
   ];
 
@@ -393,7 +394,7 @@ const Pricing = () => {
                       Elite
                     </span>
                   </TableHead>
-                  <TableHead className="text-center font-heading font-semibold">Lifetime</TableHead>
+                  <TableHead className="text-center font-heading font-semibold">Annual</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
