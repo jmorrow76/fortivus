@@ -27,6 +27,7 @@ const footerLinks = {
     { label: "About Us", href: "/about" },
     { label: "Pricing", href: "/pricing" },
     { label: "Privacy Policy", href: "/privacy-policy" },
+    { label: "Terms of Service", href: "/terms-of-service" },
   ],
 };
 
