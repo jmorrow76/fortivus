@@ -70,7 +70,30 @@ const Workouts = () => {
   const [showSaveAsTemplate, setShowSaveAsTemplate] = useState(false);
   const [saveTemplateName, setSaveTemplateName] = useState('');
 
-  // Auth redirect
+  // Rest timer effect - must be before any conditional returns
+  useEffect(() => {
+    if (restTimer === null) return;
+    if (restTimer <= 0) {
+      setRestTimer(null);
+      return;
+    }
+    const interval = setInterval(() => {
+      setRestTimer(prev => (prev !== null && prev > 0) ? prev - 1 : null);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [restTimer]);
+
+  // Elapsed time effect - must be before any conditional returns
+  useEffect(() => {
+    if (!activeSession) return;
+    const interval = setInterval(() => {
+      const start = new Date(activeSession.started_at).getTime();
+      setElapsedTime(Math.floor((Date.now() - start) / 1000));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [activeSession]);
+
+  // Auth redirect - after all hooks
   if (!authLoading && !user) {
     return <Navigate to="/auth" replace />;
   }
@@ -124,28 +147,6 @@ const Workouts = () => {
     setSaveTemplateName('');
   };
 
-  // Rest timer effect
-  useEffect(() => {
-    if (restTimer === null) return;
-    if (restTimer <= 0) {
-      setRestTimer(null);
-      return;
-    }
-    const interval = setInterval(() => {
-      setRestTimer(prev => (prev !== null && prev > 0) ? prev - 1 : null);
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [restTimer]);
-
-  // Elapsed time effect
-  useEffect(() => {
-    if (!activeSession) return;
-    const interval = setInterval(() => {
-      const start = new Date(activeSession.started_at).getTime();
-      setElapsedTime(Math.floor((Date.now() - start) / 1000));
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [activeSession]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
