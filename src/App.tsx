@@ -41,6 +41,7 @@ import Testimonies from "./pages/Testimonies";
 import NotFound from "./pages/NotFound";
 import SupportButton from "./components/SupportButton";
 import ReferralButton from "./components/ReferralButton";
+import ScrollToTop from "./components/ScrollToTop";
 
 const queryClient = new QueryClient();
 
@@ -53,6 +54,7 @@ const App = () => (
         <SupportButton />
         <ReferralButton />
         <BrowserRouter>
+          <ScrollToTop />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/dashboard" element={<Dashboard />} />
