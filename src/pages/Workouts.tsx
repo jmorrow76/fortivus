@@ -429,7 +429,7 @@ const Workouts = () => {
           </Card>
 
           <Tabs defaultValue="history" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-6">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="history" className="flex items-center gap-2">
                 <History className="w-4 h-4" />
                 <span className="hidden sm:inline">History</span>
@@ -437,10 +437,6 @@ const Workouts = () => {
               <TabsTrigger value="templates" className="flex items-center gap-2">
                 <FileText className="w-4 h-4" />
                 <span className="hidden sm:inline">Templates</span>
-              </TabsTrigger>
-              <TabsTrigger value="exercises" className="flex items-center gap-2">
-                <Dumbbell className="w-4 h-4" />
-                <span className="hidden sm:inline">Exercises</span>
               </TabsTrigger>
               <TabsTrigger value="tutorials" className="flex items-center gap-2">
                 <Video className="w-4 h-4" />
@@ -729,54 +725,6 @@ const Workouts = () => {
                     ))}
                   </div>
                 )}
-              </div>
-            </TabsContent>
-
-            {/* Exercises Tab */}
-            <TabsContent value="exercises">
-              <div className="space-y-4">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search exercises..."
-                    className="pl-10"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
-                <ScrollArea className="h-12">
-                  <div className="flex gap-2 pb-2">
-                    {muscleGroups.map(muscle => (
-                      <Badge
-                        key={muscle}
-                        variant={selectedMuscle === muscle ? 'default' : 'outline'}
-                        className="cursor-pointer capitalize whitespace-nowrap"
-                        onClick={() => setSelectedMuscle(muscle)}
-                      >
-                        {muscle}
-                      </Badge>
-                    ))}
-                  </div>
-                </ScrollArea>
-                <div className="grid gap-2">
-                  {filteredExercises.map(exercise => (
-                    <Card key={exercise.id}>
-                      <CardContent className="py-3">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h3 className="font-medium">{exercise.name}</h3>
-                            <p className="text-sm text-muted-foreground capitalize">
-                              {exercise.muscle_group} • {exercise.equipment}
-                            </p>
-                          </div>
-                          <Badge variant="outline" className="capitalize">
-                            {exercise.equipment}
-                          </Badge>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
               </div>
             </TabsContent>
 
