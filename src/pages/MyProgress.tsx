@@ -377,7 +377,7 @@ const MyProgress = () => {
                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                       <MessageCircle className="h-5 w-5 text-primary" />
                     </div>
-                    <span className="text-sm font-medium">AI Coach</span>
+                    <span className="text-sm font-medium">Start Coaching Session</span>
                   </CardContent>
                 </Card>
               </Link>
@@ -388,7 +388,7 @@ const MyProgress = () => {
                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                       <Utensils className="h-5 w-5 text-primary" />
                     </div>
-                    <span className="text-sm font-medium">Food Log</span>
+                    <span className="text-sm font-medium">Log Food</span>
                   </CardContent>
                 </Card>
               </Link>
@@ -399,18 +399,18 @@ const MyProgress = () => {
                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                       <Dumbbell className="h-5 w-5 text-primary" />
                     </div>
-                    <span className="text-sm font-medium">Workouts</span>
+                    <span className="text-sm font-medium">Start Workout</span>
                   </CardContent>
                 </Card>
               </Link>
               
-              <button onClick={() => setDialogOpen(true)} className="group text-left">
+              <button onClick={() => setDialogOpen(true)} className="group text-left w-full">
                 <Card className="h-full transition-all hover:shadow-md hover:border-primary/30">
                   <CardContent className="p-4 flex flex-col items-center text-center gap-2">
                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                       <ImagePlus className="h-5 w-5 text-primary" />
                     </div>
-                    <span className="text-sm font-medium">Progress Photos</span>
+                    <span className="text-sm font-medium">Upload Progress Photo</span>
                   </CardContent>
                 </Card>
               </button>
@@ -421,7 +421,7 @@ const MyProgress = () => {
                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                       <ScanFace className="h-5 w-5 text-primary" />
                     </div>
-                    <span className="text-sm font-medium">Body Analysis</span>
+                    <span className="text-sm font-medium">Analyze Body Composition</span>
                   </CardContent>
                 </Card>
               </Link>
@@ -432,7 +432,7 @@ const MyProgress = () => {
                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                       <TrendingUp className="h-5 w-5 text-primary" />
                     </div>
-                    <span className="text-sm font-medium">Run Tracker</span>
+                    <span className="text-sm font-medium">Track a Run</span>
                   </CardContent>
                 </Card>
               </Link>
@@ -454,7 +454,7 @@ const MyProgress = () => {
                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                       <Activity className="h-5 w-5 text-primary" />
                     </div>
-                    <span className="text-sm font-medium">Hormonal</span>
+                    <span className="text-sm font-medium">Hormonal Optimization</span>
                   </CardContent>
                 </Card>
               </Link>
@@ -465,7 +465,7 @@ const MyProgress = () => {
                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                       <Moon className="h-5 w-5 text-primary" />
                     </div>
-                    <span className="text-sm font-medium">Sleep Adaptive</span>
+                    <span className="text-sm font-medium">Optimize Sleep</span>
                   </CardContent>
                 </Card>
               </Link>
@@ -476,7 +476,7 @@ const MyProgress = () => {
                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                       <Shield className="h-5 w-5 text-primary" />
                     </div>
-                    <span className="text-sm font-medium">Joint Health</span>
+                    <span className="text-sm font-medium">Assess Joint Health</span>
                   </CardContent>
                 </Card>
               </Link>
@@ -487,7 +487,7 @@ const MyProgress = () => {
                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                       <RotateCcw className="h-5 w-5 text-primary" />
                     </div>
-                    <span className="text-sm font-medium">Comeback</span>
+                    <span className="text-sm font-medium">Start Comeback Protocol</span>
                   </CardContent>
                 </Card>
               </Link>
@@ -498,7 +498,7 @@ const MyProgress = () => {
                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                       <Briefcase className="h-5 w-5 text-primary" />
                     </div>
-                    <span className="text-sm font-medium">Executive Mode</span>
+                    <span className="text-sm font-medium">Executive Performance</span>
                   </CardContent>
                 </Card>
               </Link>
