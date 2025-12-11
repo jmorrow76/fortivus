@@ -75,10 +75,10 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-6">
+          <div className="hidden lg:flex items-center gap-6" data-tour="nav-links">
             {/* Elite Features Dropdown */}
             <DropdownMenu>
-              <DropdownMenuTrigger className="text-xs font-medium tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-200 flex items-center gap-1 outline-none">
+              <DropdownMenuTrigger data-tour="elite-dropdown" className="text-xs font-medium tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-200 flex items-center gap-1 outline-none">
                 <Crown className="h-3 w-3 text-amber-500" />
                 Elite Features
                 <ChevronDown className="h-3 w-3" />
@@ -104,14 +104,14 @@ const Navbar = () => {
                 key={link.name}
                 to={link.href}
                 className="text-xs font-medium tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-200"
+                data-tour={`nav-${link.name.toLowerCase().replace(/\s+/g, '-')}`}
               >
                 {link.name}
               </Link>
             ))}
           </div>
 
-          {/* Desktop CTA */}
-          <div className="hidden lg:flex items-center gap-2">
+          <div className="hidden lg:flex items-center gap-2" data-tour="nav-actions">
             {user ? (
               <>
                 <NotificationBell />
@@ -125,7 +125,7 @@ const Navbar = () => {
                     <Home className="h-4 w-4" />
                   </Link>
                 </Button>
-                <Button variant="default" size="sm" asChild>
+                <Button variant="default" size="sm" asChild data-tour="nav-dashboard">
                   <Link to="/dashboard" className="flex items-center gap-2">
                     <LayoutDashboard className="h-4 w-4" />
                     Member Dashboard
