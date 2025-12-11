@@ -1479,6 +1479,7 @@ export type Database = {
           created_at: string
           display_name: string | null
           fat_goal: number | null
+          has_seen_tour: boolean | null
           id: string
           is_simulated: boolean | null
           landing_page_preference: string | null
@@ -1494,6 +1495,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           fat_goal?: number | null
+          has_seen_tour?: boolean | null
           id?: string
           is_simulated?: boolean | null
           landing_page_preference?: string | null
@@ -1509,6 +1511,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           fat_goal?: number | null
+          has_seen_tour?: boolean | null
           id?: string
           is_simulated?: boolean | null
           landing_page_preference?: string | null
