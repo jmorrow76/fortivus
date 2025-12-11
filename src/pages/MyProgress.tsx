@@ -4,7 +4,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { useOnboardingQuery } from "@/hooks/queries";
 import { 
   ArrowLeft, Sparkles, Camera, TrendingUp, Lock, Crown, Lightbulb,
-  MessageCircle, Utensils, Battery, Shield, Moon, RotateCcw, Briefcase, Flame
+  MessageCircle, Utensils, Battery, Shield, Moon, RotateCcw, Briefcase, Flame,
+  Dumbbell, ScanFace, ImagePlus, Activity
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -58,7 +59,7 @@ const MyProgress = () => {
   const [weight, setWeight] = useState("");
   const [notes, setNotes] = useState("");
   const [photosTab, setPhotosTab] = useState("grid");
-  
+  const [activeMainTab, setActiveMainTab] = useState("coach");
   // Today's Status state
   const [latestCheckin, setLatestCheckin] = useState<{ mood_level: number; energy_level: number; check_in_date: string } | null>(null);
 
@@ -341,8 +342,93 @@ const MyProgress = () => {
             )}
           </div>
 
+          {/* Quick Actions */}
+          <div className="mb-8">
+            <h3 className="text-sm font-medium text-muted-foreground mb-4 uppercase tracking-wider">Quick Actions</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+              <Button variant="outline" className="h-auto py-4 flex flex-col gap-2" asChild>
+                <Link to="/coaching">
+                  <MessageCircle className="h-5 w-5 text-primary" />
+                  <span className="text-xs">Start Coaching</span>
+                </Link>
+              </Button>
+              <Button variant="outline" className="h-auto py-4 flex flex-col gap-2" asChild>
+                <Link to="/calories">
+                  <Utensils className="h-5 w-5 text-orange-500" />
+                  <span className="text-xs">Log Food</span>
+                </Link>
+              </Button>
+              <Button variant="outline" className="h-auto py-4 flex flex-col gap-2" asChild>
+                <Link to="/workouts">
+                  <Dumbbell className="h-5 w-5 text-primary" />
+                  <span className="text-xs">Log Workout</span>
+                </Link>
+              </Button>
+              <Button 
+                variant="outline" 
+                className="h-auto py-4 flex flex-col gap-2"
+                onClick={() => {
+                  setActiveMainTab('photos');
+                  setDialogOpen(true);
+                }}
+              >
+                <ImagePlus className="h-5 w-5 text-emerald-500" />
+                <span className="text-xs">Progress Photo</span>
+              </Button>
+              <Button 
+                variant="outline" 
+                className="h-auto py-4 flex flex-col gap-2"
+                onClick={() => setActiveMainTab('analysis')}
+              >
+                <ScanFace className="h-5 w-5 text-purple-500" />
+                <span className="text-xs">Body Analysis</span>
+              </Button>
+              <Button variant="outline" className="h-auto py-4 flex flex-col gap-2" asChild>
+                <Link to="/hormonal">
+                  <Activity className="h-5 w-5 text-amber-500" />
+                  <span className="text-xs">Hormonal</span>
+                </Link>
+              </Button>
+              <Button variant="outline" className="h-auto py-4 flex flex-col gap-2" asChild>
+                <Link to="/sleep-adaptive">
+                  <Moon className="h-5 w-5 text-indigo-500" />
+                  <span className="text-xs">Sleep Adaptive</span>
+                </Link>
+              </Button>
+              <Button variant="outline" className="h-auto py-4 flex flex-col gap-2" asChild>
+                <Link to="/joint-health">
+                  <Shield className="h-5 w-5 text-teal-500" />
+                  <span className="text-xs">Joint Health</span>
+                </Link>
+              </Button>
+              <Button variant="outline" className="h-auto py-4 flex flex-col gap-2" asChild>
+                <Link to="/comeback">
+                  <RotateCcw className="h-5 w-5 text-rose-500" />
+                  <span className="text-xs">Comeback</span>
+                </Link>
+              </Button>
+              <Button variant="outline" className="h-auto py-4 flex flex-col gap-2" asChild>
+                <Link to="/executive">
+                  <Briefcase className="h-5 w-5 text-slate-500" />
+                  <span className="text-xs">Executive</span>
+                </Link>
+              </Button>
+              <Button variant="outline" className="h-auto py-4 flex flex-col gap-2" asChild>
+                <Link to="/checkin">
+                  <Sparkles className="h-5 w-5 text-accent" />
+                  <span className="text-xs">Daily Check-in</span>
+                </Link>
+              </Button>
+              <Button variant="outline" className="h-auto py-4 flex flex-col gap-2" asChild>
+                <Link to="/running">
+                  <TrendingUp className="h-5 w-5 text-green-500" />
+                  <span className="text-xs">Run Tracker</span>
+                </Link>
+              </Button>
+            </div>
+          </div>
 
-          <Tabs defaultValue="coach" className="w-full">
+          <Tabs value={activeMainTab} onValueChange={setActiveMainTab} className="w-full">
             <TabsList className="mb-6 flex flex-wrap gap-1 h-auto p-1">
               <TabsTrigger value="coach" className="gap-2">
                 <MessageCircle className="h-4 w-4" />
