@@ -9,16 +9,25 @@ export const useAdmin = () => {
 
   useEffect(() => {
     const checkAdminStatus = async () => {
-      if (!user || !session) {
+      if (!user) {
         setIsAdmin(false);
         setLoading(false);
         return;
       }
 
       try {
+        // Get the current session directly from Supabase to ensure fresh token
+        const { data: { session: currentSession } } = await supabase.auth.getSession();
+        
+        if (!currentSession) {
+          setIsAdmin(false);
+          setLoading(false);
+          return;
+        }
+
         const { data, error } = await supabase.functions.invoke('check-admin', {
           headers: {
-            Authorization: `Bearer ${session.access_token}`,
+            Authorization: `Bearer ${currentSession.access_token}`,
           },
         });
 
