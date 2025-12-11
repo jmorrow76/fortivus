@@ -21,10 +21,57 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const { goals, currentStats, preferences } = await req.json();
-    console.log("[GENERATE-PLAN] Request received:", { goals, currentStats, preferences });
+    // Get the user ID from the JWT token
+    const authHeader = req.headers.get('Authorization');
+    let userId: string | null = null;
+    
+    if (authHeader) {
+      const token = authHeader.replace('Bearer ', '');
+      const { data: { user } } = await supabase.auth.getUser(token);
+      userId = user?.id || null;
+    }
 
-    // Fetch recommended products from database to incorporate into the plan
+    const { goals, currentStats, preferences } = await req.json();
+    console.log("[GENERATE-PLAN] Request received:", { goals, currentStats, preferences, userId });
+
+    // Fetch the user's latest body analysis results
+    let bodyAnalysisContext = '';
+    if (userId) {
+      const { data: latestAnalysis, error: analysisError } = await supabase
+        .from("body_analysis_results")
+        .select("*")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (analysisError) {
+        console.error("[GENERATE-PLAN] Error fetching body analysis:", analysisError);
+      } else if (latestAnalysis) {
+        console.log("[GENERATE-PLAN] Found body analysis data:", {
+          bodyFatPercentage: latestAnalysis.body_fat_percentage,
+          category: latestAnalysis.body_fat_category,
+        });
+        
+        bodyAnalysisContext = `
+BODY COMPOSITION ANALYSIS (from AI body scan):
+- Body Fat Percentage: ${latestAnalysis.body_fat_percentage}%
+- Body Fat Category: ${latestAnalysis.body_fat_category}
+- Muscle Assessment: ${latestAnalysis.muscle_assessment}
+- Strengths: ${latestAnalysis.strengths?.join(', ') || 'Not assessed'}
+- Areas to Improve: ${latestAnalysis.areas_to_improve?.join(', ') || 'Not assessed'}
+- Analysis Recommendations:
+  * Nutrition: ${latestAnalysis.nutrition_recommendation || 'Not provided'}
+  * Training: ${latestAnalysis.training_recommendation || 'Not provided'}
+  * Recovery: ${latestAnalysis.recovery_recommendation || 'Not provided'}
+- Estimated Timeframe for Goals: ${latestAnalysis.estimated_timeframe || 'Not specified'}
+
+IMPORTANT: Use this body analysis data to create a more personalized plan. The body composition data should directly inform calorie targets, macro ratios, workout intensity, and priority areas for training.
+`;
+      }
+    }
+
+    // Fetch recommended products from database
     const { data: products, error: productsError } = await supabase
       .from("recommended_products")
       .select("id, title, description, amazon_url, category, price, is_featured")
@@ -61,6 +108,8 @@ Your approach integrates:
 - Evidence-based fitness science optimized for men over 40
 - Biblical wisdom about physical stewardship and discipline
 - Practical guidance that fits busy lives with family and ministry commitments
+
+${bodyAnalysisContext}
 
 ${productContext}
 
@@ -117,6 +166,11 @@ Return a JSON object with this exact structure:
       "product_id": "matching product ID from recommended products if available, or null"
     }
   ],
+  "bodyAnalysisIntegration": {
+    "usedBodyData": boolean,
+    "keyInsights": ["insight based on body analysis 1", "insight 2"],
+    "adjustmentsMade": ["adjustment made based on body composition"]
+  },
   "timeline": "realistic timeframe to see results",
   "keyPriorities": ["priority 1", "priority 2", "priority 3"]
 }
@@ -126,7 +180,8 @@ Be specific, practical, and tailor everything to Christian men over 40. Focus on
 - Nutrition that fuels energy for family and ministry
 - Evidence-based supplements with product recommendations when available
 - Training as an act of stewardship, not vanity
-- Building habits that honor God with the body He gave them`;
+- Building habits that honor God with the body He gave them
+- If body composition data is available, USE IT to make specific adjustments to calorie targets and training focus`;
 
     const userPrompt = `Create a personalized fitness plan for a Christian man over 40 with the following details:
 
@@ -145,7 +200,7 @@ PREFERENCES:
 - Time available: ${preferences?.timeAvailable || '45-60 minutes per session'}
 - Equipment access: ${preferences?.equipment || 'Full gym access'}
 
-Generate a complete, actionable plan optimized for their specific situation. When recommending supplements or gear, match with the available recommended products by including their product_id. Remember: this man wants to steward his body well to serve God, his family, and his community with strength and vitality.`;
+Generate a complete, actionable plan optimized for their specific situation. When recommending supplements or gear, match with the available recommended products by including their product_id. ${bodyAnalysisContext ? 'IMPORTANT: Incorporate the body analysis data above to make this plan highly personalized to their current body composition.' : ''} Remember: this man wants to steward his body well to serve God, his family, and his community with strength and vitality.`;
 
     console.log("[GENERATE-PLAN] Calling Lovable AI...");
 
@@ -247,7 +302,9 @@ Generate a complete, actionable plan optimized for their specific situation. Whe
       }
     }
 
-    console.log("[GENERATE-PLAN] Plan generated successfully with product integrations");
+    console.log("[GENERATE-PLAN] Plan generated successfully with product integrations and body analysis:", {
+      usedBodyData: plan.bodyAnalysisIntegration?.usedBodyData || false,
+    });
 
     return new Response(JSON.stringify({ plan }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

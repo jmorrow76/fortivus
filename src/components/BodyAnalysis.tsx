@@ -1,8 +1,10 @@
 import { useState, useRef } from 'react';
-import { Upload, Camera, Loader2, TrendingUp, Apple, Dumbbell, Moon, AlertCircle, CheckCircle, Target, Lightbulb, User, Sun } from 'lucide-react';
+import { Upload, Camera, Loader2, TrendingUp, Apple, Dumbbell, Moon, AlertCircle, CheckCircle, Target, Lightbulb, User, Sun, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
 interface AnalysisResult {
   bodyFatPercentage: number;
@@ -20,8 +22,11 @@ interface AnalysisResult {
 }
 
 const BodyAnalysis = () => {
+  const { user } = useAuth();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -78,6 +83,7 @@ const BodyAnalysis = () => {
       }
 
       setResult(data.analysis);
+      setSaved(false);
       toast.success('Analysis complete!');
     } catch (error) {
       console.error('Analysis error:', error);
@@ -89,10 +95,46 @@ const BodyAnalysis = () => {
     }
   };
 
+  const handleSaveAnalysis = async () => {
+    if (!result || !user) {
+      toast.error('Please complete an analysis first');
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const { error } = await supabase
+        .from('body_analysis_results')
+        .insert({
+          user_id: user.id,
+          body_fat_percentage: result.bodyFatPercentage,
+          body_fat_category: result.bodyFatCategory,
+          muscle_assessment: result.muscleAssessment,
+          strengths: result.strengths,
+          areas_to_improve: result.areasToImprove,
+          nutrition_recommendation: result.recommendations.nutrition,
+          training_recommendation: result.recommendations.training,
+          recovery_recommendation: result.recommendations.recovery,
+          estimated_timeframe: result.estimatedTimeframe,
+        });
+
+      if (error) throw error;
+
+      setSaved(true);
+      toast.success('Analysis saved! It will be used to personalize your AI fitness plans.');
+    } catch (error) {
+      console.error('Save error:', error);
+      toast.error('Failed to save analysis');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const resetAnalysis = () => {
     setSelectedImage(null);
     setResult(null);
     setErrorMessage(null);
+    setSaved(false);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -342,13 +384,40 @@ const BodyAnalysis = () => {
                   </Card>
                 </div>
 
-                {/* Timeframe & Disclaimer */}
+                {/* Save & Actions */}
                 <Card variant="default">
                   <CardContent className="pt-4">
                     <p className="text-sm text-center text-muted-foreground mb-4">
                       <strong className="text-foreground">Estimated timeframe to next level:</strong>{' '}
                       {result.estimatedTimeframe}
                     </p>
+                    
+                    {/* Save Button */}
+                    <div className="flex justify-center gap-3 mb-4">
+                      <Button
+                        onClick={handleSaveAnalysis}
+                        disabled={isSaving || saved || !user}
+                        className="gap-2"
+                      >
+                        {isSaving ? (
+                          <><Loader2 className="h-4 w-4 animate-spin" /> Saving...</>
+                        ) : saved ? (
+                          <><CheckCircle className="h-4 w-4" /> Saved for AI Plans</>
+                        ) : (
+                          <><Save className="h-4 w-4" /> Save for AI Plan</>
+                        )}
+                      </Button>
+                      <Button variant="outline" onClick={resetAnalysis}>
+                        Analyze Another
+                      </Button>
+                    </div>
+                    
+                    {saved && (
+                      <p className="text-sm text-center text-accent mb-4">
+                        ✓ This analysis will be used to personalize your next AI fitness plan
+                      </p>
+                    )}
+                    
                     <div className="flex items-start gap-2 text-xs text-muted-foreground bg-secondary rounded-md p-3">
                       <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
                       <p>{result.disclaimer}</p>

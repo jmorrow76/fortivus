@@ -294,6 +294,54 @@ export type Database = {
         }
         Relationships: []
       }
+      body_analysis_results: {
+        Row: {
+          areas_to_improve: string[] | null
+          body_fat_category: string | null
+          body_fat_percentage: number | null
+          created_at: string
+          estimated_timeframe: string | null
+          id: string
+          image_url: string | null
+          muscle_assessment: string | null
+          nutrition_recommendation: string | null
+          recovery_recommendation: string | null
+          strengths: string[] | null
+          training_recommendation: string | null
+          user_id: string
+        }
+        Insert: {
+          areas_to_improve?: string[] | null
+          body_fat_category?: string | null
+          body_fat_percentage?: number | null
+          created_at?: string
+          estimated_timeframe?: string | null
+          id?: string
+          image_url?: string | null
+          muscle_assessment?: string | null
+          nutrition_recommendation?: string | null
+          recovery_recommendation?: string | null
+          strengths?: string[] | null
+          training_recommendation?: string | null
+          user_id: string
+        }
+        Update: {
+          areas_to_improve?: string[] | null
+          body_fat_category?: string | null
+          body_fat_percentage?: number | null
+          created_at?: string
+          estimated_timeframe?: string | null
+          id?: string
+          image_url?: string | null
+          muscle_assessment?: string | null
+          nutrition_recommendation?: string | null
+          recovery_recommendation?: string | null
+          strengths?: string[] | null
+          training_recommendation?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       challenges: {
         Row: {
           badge_id: string | null
