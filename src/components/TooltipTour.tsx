@@ -286,16 +286,10 @@ export const fitnessJourneyTourSteps: TourStep[] = [
     placement: "bottom",
   },
   {
-    target: '[data-tour="quick-actions"]',
-    title: "Quick Actions",
-    description: "Jump into any feature with one tap. Start coaching, log food, track workouts, or analyze your body composition.",
-    placement: "top",
-  },
-  {
-    target: '[data-tour="main-features"]',
-    title: "Elite Features",
-    description: "Access AI coaching, body analysis, progress photos, and advanced features designed specifically for men over 40.",
-    placement: "top",
+    target: '[data-tour="feature-nav"]',
+    title: "Feature Navigation",
+    description: "Access all Elite features from here: AI coaching, calorie tracking, workouts, body analysis, and advanced tools designed for men over 40.",
+    placement: "bottom",
   },
 ];
 
