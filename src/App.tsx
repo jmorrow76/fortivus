@@ -48,7 +48,9 @@ import SupportButton from "./components/SupportButton";
 import ReferralButton from "./components/ReferralButton";
 import BackToTopButton from "./components/BackToTopButton";
 import ScrollToTop from "./components/ScrollToTop";
+import QuickStartFAB from "./components/QuickStartFAB";
 import { CookieConsent } from "./components/CookieConsent";
+import { QuickActionsProvider } from "./components/QuickActionsProvider";
 
 const queryClient = new QueryClient();
 
@@ -62,7 +64,9 @@ const App = () => (
         <ReferralButton />
         <BackToTopButton />
         <BrowserRouter>
+          <QuickActionsProvider />
           <ScrollToTop />
+          <QuickStartFAB />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/dashboard" element={<Dashboard />} />
@@ -74,6 +78,7 @@ const App = () => (
             <Route path="/personal-plan" element={<PersonalPlan />} />
             <Route path="/forum" element={<Forum />} />
             <Route path="/checkin" element={<DailyCheckin />} />
+            <Route path="/daily-checkin" element={<DailyCheckin />} />
             <Route path="/achievements" element={<Gamification />} />
             <Route path="/leaderboard" element={<LeaderboardPage />} />
             <Route path="/community" element={<Social />} />
