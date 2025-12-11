@@ -247,15 +247,15 @@ const TooltipTour = ({ steps, isOpen, onComplete, onSkip }: TooltipTourProps) =>
 // Pre-defined tour configurations
 export const dashboardTourSteps: TourStep[] = [
   {
-    target: '[data-tour="elite-dropdown"]',
-    title: "Elite Features",
-    description: "Access all premium features including AI Coach, Workouts, Run Tracker, and advanced health tools designed for men over 40.",
-    placement: "bottom",
-  },
-  {
     target: '[data-tour="nav-knowledge-hub"]',
     title: "Knowledge Hub",
     description: "Expert articles on fitness, nutrition, recovery, and faith-based wellness. New content added weekly.",
+    placement: "bottom",
+  },
+  {
+    target: '[data-tour="nav-forum"]',
+    title: "Community Forum",
+    description: "Connect with fellow brothers, share prayer requests, ask questions, and encourage one another.",
     placement: "bottom",
   },
   {
