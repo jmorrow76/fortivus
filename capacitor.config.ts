@@ -12,6 +12,13 @@ const config: CapacitorConfig = {
     CapacitorHealth: {
       // Health permissions will be requested at runtime
     },
+    SplashScreen: {
+      launchAutoHide: true,
+    },
+  },
+  ios: {
+    // Configure for Siri Shortcuts and Quick Actions
+    contentInset: 'automatic',
   },
 };
 
