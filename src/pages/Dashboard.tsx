@@ -344,6 +344,11 @@ export default function Dashboard() {
             <ScriptureOfDay />
           </div>
 
+          {/* Your Trends */}
+          <div className="mb-8">
+            <TrendsDashboard />
+          </div>
+
           {/* Quick Stats Row */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <Card className="bg-gradient-to-br from-primary/10 to-primary/5">
@@ -401,9 +406,6 @@ export default function Dashboard() {
           </div>
 
           <div className="space-y-6">
-              {/* Your Trends */}
-              <TrendsDashboard />
-
               {/* Weekly Workout Stats */}
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
