@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Sparkles, Loader2, Utensils, Dumbbell, Pill, Target, Clock, ChevronDown, ChevronUp, Lock, Save, History, Trash2, FileText, Calendar, Info } from "lucide-react";
+import { ArrowLeft, Sparkles, Loader2, Utensils, Dumbbell, Pill, Target, Clock, ChevronDown, ChevronUp, Lock, Save, History, Trash2, FileText, Calendar, Info, ExternalLink, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -23,6 +23,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+interface ProductLink {
+  id: string;
+  title: string;
+  amazon_url: string;
+  price?: string;
+}
+
 interface PersonalPlan {
   diet: {
     dailyCalories: number;
@@ -40,7 +47,20 @@ interface PersonalPlan {
     }[];
     cardioRecommendation: string;
   };
-  supplements: { name: string; dosage: string; timing: string; benefit: string }[];
+  supplements: { 
+    name: string; 
+    dosage: string; 
+    timing: string; 
+    benefit: string;
+    product_id?: string;
+    product?: ProductLink;
+  }[];
+  recommendedGear?: {
+    name: string;
+    reason: string;
+    product_id?: string;
+    product?: ProductLink;
+  }[];
   timeline: string;
   keyPriorities: string[];
 }
@@ -1024,11 +1044,24 @@ const PersonalPlan = () => {
                       </CardTitle>
                     </CardHeader>
                     {expandedSections.supplements && (
-                      <CardContent>
+                      <CardContent className="space-y-6">
                         <div className="space-y-4">
                           {plan.supplements.map((supp, idx) => (
                             <div key={idx} className="p-4 rounded-lg border border-border">
-                              <div className="font-semibold mb-1">{supp.name}</div>
+                              <div className="flex justify-between items-start mb-1">
+                                <div className="font-semibold">{supp.name}</div>
+                                {supp.product && (
+                                  <a 
+                                    href={supp.product.amazon_url} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1 text-sm text-accent hover:underline"
+                                  >
+                                    {supp.product.price && <span className="font-medium">{supp.product.price}</span>}
+                                    <ExternalLink className="h-3.5 w-3.5" />
+                                  </a>
+                                )}
+                              </div>
                               <div className="grid md:grid-cols-3 gap-2 text-sm">
                                 <div>
                                   <span className="text-muted-foreground">Dosage:</span>{" "}
@@ -1042,8 +1075,64 @@ const PersonalPlan = () => {
                                   {supp.benefit}
                                 </div>
                               </div>
+                              {supp.product && (
+                                <a 
+                                  href={supp.product.amazon_url} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-accent/10 text-accent text-sm hover:bg-accent/20 transition-colors"
+                                >
+                                  <ShoppingBag className="h-3.5 w-3.5" />
+                                  View Recommended Product
+                                </a>
+                              )}
                             </div>
                           ))}
+                        </div>
+
+                        {/* Recommended Gear Section */}
+                        {plan.recommendedGear && plan.recommendedGear.length > 0 && (
+                          <div className="pt-4 border-t border-border">
+                            <h4 className="font-semibold mb-3 flex items-center gap-2">
+                              <ShoppingBag className="h-4 w-4 text-accent" />
+                              Recommended Gear
+                            </h4>
+                            <div className="space-y-3">
+                              {plan.recommendedGear.map((gear, idx) => (
+                                <div key={idx} className="p-3 rounded-lg bg-secondary/50">
+                                  <div className="flex justify-between items-start">
+                                    <div>
+                                      <div className="font-medium">{gear.name}</div>
+                                      <div className="text-sm text-muted-foreground mt-1">{gear.reason}</div>
+                                    </div>
+                                    {gear.product && (
+                                      <a 
+                                        href={gear.product.amazon_url} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-1 text-sm text-accent hover:underline shrink-0"
+                                      >
+                                        {gear.product.price && <span className="font-medium">{gear.product.price}</span>}
+                                        <ExternalLink className="h-3.5 w-3.5" />
+                                      </a>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Link to full recommendations page */}
+                        <div className="pt-4 border-t border-border">
+                          <Button 
+                            variant="outline" 
+                            onClick={() => navigate("/recommendations")}
+                            className="w-full"
+                          >
+                            <ShoppingBag className="h-4 w-4 mr-2" />
+                            View All Recommended Products
+                          </Button>
                         </div>
                       </CardContent>
                     )}
