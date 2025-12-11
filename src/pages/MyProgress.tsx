@@ -13,6 +13,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import BodyAnalysisComponent from "@/components/BodyAnalysis";
 import PersonalizedRecommendations from "@/components/dashboard/PersonalizedRecommendations";
+import AIPlanPreview from "@/components/dashboard/AIPlanPreview";
 import { getPersonalizedRecommendations } from "@/lib/onboardingUtils";
 
 // Import Progress Photos components
@@ -319,6 +320,11 @@ const MyProgress = () => {
             </Card>
           </div>
 
+          {/* AI Plan Preview - Always visible */}
+          <div className="mb-8">
+            <AIPlanPreview />
+          </div>
+
           <Tabs defaultValue={defaultTab} className="w-full">
             <TabsList className="mb-6 flex flex-wrap gap-1 h-auto p-1">
               <TabsTrigger value="guide" className="gap-2">
@@ -328,10 +334,6 @@ const MyProgress = () => {
               <TabsTrigger value="coach" className="gap-2">
                 <MessageCircle className="h-4 w-4" />
                 <span className="hidden sm:inline">AI Coach</span>
-              </TabsTrigger>
-              <TabsTrigger value="plan" className="gap-2">
-                <Sparkles className="h-4 w-4" />
-                <span className="hidden sm:inline">AI Plan</span>
               </TabsTrigger>
               <TabsTrigger value="calories" className="gap-2">
                 <Utensils className="h-4 w-4" />
@@ -398,29 +400,6 @@ const MyProgress = () => {
               </Card>
             </TabsContent>
 
-            {/* AI Plan Tab */}
-            <TabsContent value="plan">
-              <Card>
-                <CardContent className="py-8">
-                  <div className="text-center mb-6">
-                    <Sparkles className="h-12 w-12 mx-auto text-accent mb-4" />
-                    <h3 className="font-semibold text-xl mb-2">AI Personal Plan</h3>
-                    <p className="text-muted-foreground max-w-md mx-auto">
-                      Generate a comprehensive diet, workout, and supplement protocol tailored to your goals. 
-                      Plans integrate with your body analysis results for maximum effectiveness.
-                    </p>
-                  </div>
-                  <div className="flex flex-wrap justify-center gap-3">
-                    <Button size="lg" asChild>
-                      <Link to="/personal-plan">
-                        <Sparkles className="h-4 w-4 mr-2" />
-                        Create or View Plans
-                      </Link>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
 
             {/* Calorie Tracker Tab */}
             <TabsContent value="calories">
