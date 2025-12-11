@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { 
   Menu, X, LogOut, Settings, LayoutDashboard, Shield, Home, Crown,
   ChevronDown, Battery, Moon, RotateCcw, Briefcase, MessageCircle,
-  Dumbbell, MapPin, Camera, Utensils, Mail
+  Dumbbell, MapPin, Camera, Utensils, Mail, ShoppingBag
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useAdmin } from "@/hooks/useAdmin";
@@ -48,12 +48,14 @@ const Navbar = () => {
     { name: "Knowledge Hub", href: "/knowledge", isPage: true },
     { name: "Forum", href: "/forum", isPage: true },
     { name: "Community", href: "/community", isPage: true },
+    { name: "Recommendations", href: "/recommendations", isPage: true },
   ];
 
   const mobileNavLinks = [
     { name: "Knowledge Hub", href: "/knowledge", isPage: true },
     { name: "Forum", href: "/forum", isPage: true },
     { name: "Community", href: "/community", isPage: true },
+    { name: "Recommendations", href: "/recommendations", isPage: true },
   ];
 
   const handleSignOut = async () => {
