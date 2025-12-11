@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Sparkles, Loader2, Utensils, Dumbbell, Pill, Target, Clock, ChevronDown, ChevronUp, Lock, Save, History, Trash2, FileText, Calendar, Info, ExternalLink, ShoppingBag } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
+import { ArrowLeft, Sparkles, Loader2, Utensils, Dumbbell, Pill, Target, Clock, ChevronDown, ChevronUp, Lock, Save, History, Trash2, FileText, Calendar, Info, ExternalLink, ShoppingBag, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -61,8 +61,20 @@ interface PersonalPlan {
     product_id?: string;
     product?: ProductLink;
   }[];
+  bodyAnalysisIntegration?: {
+    usedBodyData: boolean;
+    keyInsights: string[];
+    adjustmentsMade: string[];
+  };
   timeline: string;
   keyPriorities: string[];
+}
+
+interface BodyAnalysisData {
+  body_fat_percentage: number | null;
+  body_fat_category: string | null;
+  muscle_assessment: string | null;
+  created_at: string;
 }
 
 interface SavedPlan {
@@ -108,6 +120,33 @@ const PersonalPlan = () => {
   const [templateName, setTemplateName] = useState("");
   const [showFullWeekDialog, setShowFullWeekDialog] = useState(false);
   const [isCreatingFullWeek, setIsCreatingFullWeek] = useState(false);
+  const [latestBodyAnalysis, setLatestBodyAnalysis] = useState<BodyAnalysisData | null>(null);
+
+  // Fetch latest body analysis
+  useEffect(() => {
+    if (user) {
+      fetchLatestBodyAnalysis();
+    }
+  }, [user]);
+
+  const fetchLatestBodyAnalysis = async () => {
+    if (!user) return;
+    try {
+      const { data, error } = await supabase
+        .from('body_analysis_results')
+        .select('body_fat_percentage, body_fat_category, muscle_assessment, created_at')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (!error && data) {
+        setLatestBodyAnalysis(data);
+      }
+    } catch (error) {
+      console.error('Error fetching body analysis:', error);
+    }
+  };
 
   const toggleSection = (section: keyof typeof expandedSections) => {
     setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
@@ -810,6 +849,42 @@ const PersonalPlan = () => {
                       </div>
                     </div>
 
+                    {/* Body Analysis Integration Status */}
+                    {latestBodyAnalysis ? (
+                      <div className="bg-accent/10 border border-accent/20 rounded-lg p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
+                            <TrendingUp className="h-5 w-5 text-accent" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-medium text-sm">Body Analysis Data Available</p>
+                            <p className="text-xs text-muted-foreground">
+                              {latestBodyAnalysis.body_fat_percentage}% body fat • {latestBodyAnalysis.body_fat_category} • 
+                              Analyzed {new Date(latestBodyAnalysis.created_at).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <span className="text-xs text-accent font-medium">Will be used</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="bg-muted/50 border border-border rounded-lg p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+                            <TrendingUp className="h-5 w-5 text-muted-foreground" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-medium text-sm">No Body Analysis Data</p>
+                            <p className="text-xs text-muted-foreground">
+                              Complete a body analysis to get more personalized recommendations
+                            </p>
+                          </div>
+                          <Button variant="outline" size="sm" asChild>
+                            <Link to="/my-progress?tab=analysis">Analyze</Link>
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
                     <Button
                       onClick={handleGeneratePlan}
                       disabled={isGenerating || !goals.trim()}
@@ -832,6 +907,27 @@ const PersonalPlan = () => {
                 </Card>
               ) : (
                 <div className="space-y-6">
+                  {/* Body Analysis Integration Banner - if used */}
+                  {plan.bodyAnalysisIntegration?.usedBodyData && (
+                    <Card className="bg-accent/5 border-accent/30">
+                      <CardContent className="pt-4 pb-4">
+                        <div className="flex items-start gap-3">
+                          <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0">
+                            <TrendingUp className="h-4 w-4 text-accent" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-sm mb-1">Personalized with Your Body Analysis</p>
+                            <ul className="text-xs text-muted-foreground space-y-1">
+                              {plan.bodyAnalysisIntegration.adjustmentsMade?.slice(0, 3).map((adj, idx) => (
+                                <li key={idx}>• {adj}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
                   {/* Summary Header */}
                   <Card className="bg-accent/5 border-accent/20">
                     <CardContent className="pt-6">
