@@ -39,7 +39,7 @@ export default function Gamification() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-4xl mx-auto px-4 pt-32 md:pt-28 pb-8">
+      <div className="max-w-4xl mx-auto px-4 pt-40 md:pt-28 pb-8">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>

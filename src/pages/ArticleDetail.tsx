@@ -72,7 +72,7 @@ const ArticleDetail = () => {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <main className="pt-32 md:pt-28 pb-16">
+        <main className="pt-40 md:pt-28 pb-16">
           <div className="container mx-auto px-4 max-w-3xl">
             <Skeleton className="h-8 w-48 mb-8" />
             <Skeleton className="h-64 w-full mb-8 rounded-lg" />
@@ -94,7 +94,7 @@ const ArticleDetail = () => {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <main className="pt-32 md:pt-28 pb-16">
+        <main className="pt-40 md:pt-28 pb-16">
           <div className="container mx-auto px-4 text-center">
             <h1 className="text-2xl font-bold mb-4">Article Not Found</h1>
             <p className="text-muted-foreground mb-8">
@@ -116,7 +116,7 @@ const ArticleDetail = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="pt-32 md:pt-28 pb-16">
+      <main className="pt-40 md:pt-28 pb-16">
         <article className="container mx-auto px-4 max-w-3xl">
           {/* Back Link */}
           <Link 
