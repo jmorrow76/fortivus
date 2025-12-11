@@ -17,7 +17,7 @@ import HealthDashboard from "@/components/HealthDashboard";
 import { NotificationSettings } from "@/components/NotificationSettings";
 import { SocialConnections } from "@/components/SocialConnections";
 import PromoCodeRedemption from "@/components/PromoCodeRedemption";
-import WelcomeTour from "@/components/WelcomeTour";
+import TooltipTour, { dashboardTourSteps, fitnessJourneyTourSteps } from "@/components/TooltipTour";
 import { format } from "date-fns";
 
 const Profile = () => {
@@ -575,10 +575,10 @@ const Profile = () => {
         </div>
       </main>
       
-      <WelcomeTour
-        open={showWelcomeTour}
+      <TooltipTour
+        steps={landingPagePreference === "fitness-journey" ? fitnessJourneyTourSteps : dashboardTourSteps}
+        isOpen={showWelcomeTour}
         onComplete={() => setShowWelcomeTour(false)}
-        landingPage={landingPagePreference}
       />
     </div>
   );

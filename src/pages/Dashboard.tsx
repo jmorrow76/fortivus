@@ -24,6 +24,7 @@ import { TrendsDashboard } from '@/components/TrendsDashboard';
 import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
 import QuickStartFAB from '@/components/QuickStartFAB';
+import TooltipTour, { dashboardTourSteps } from '@/components/TooltipTour';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -36,6 +37,7 @@ import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'rec
 interface Profile {
   display_name: string | null;
   avatar_url: string | null;
+  has_seen_tour: boolean | null;
 }
 
 interface LeaderboardPosition {
@@ -95,6 +97,7 @@ export default function Dashboard() {
   const [exerciseChart, setExerciseChart] = useState<ExerciseChartData | null>(null);
   const [recentPRs, setRecentPRs] = useState<RecentPR[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showTour, setShowTour] = useState(false);
 
   // Compute hasCompletedOnboarding from query data
   const hasCompletedOnboarding = onboardingData !== null && onboardingData !== undefined;
@@ -123,7 +126,7 @@ export default function Dashboard() {
 
     try {
       const [profileRes, leaderboardRes, checkinRes, photosRes, runsRes, runningBadgesRes, prsRes] = await Promise.all([
-        supabase.from('profiles').select('display_name, avatar_url').eq('user_id', user.id).maybeSingle(),
+        supabase.from('profiles').select('display_name, avatar_url, has_seen_tour').eq('user_id', user.id).maybeSingle(),
         supabase.from('leaderboard_view').select('*').order('total_xp', { ascending: false }),
         supabase.from('mood_checkins').select('id, mood_level, energy_level, check_in_date').eq('user_id', user.id).order('check_in_date', { ascending: false }).limit(1).maybeSingle(),
         supabase.from('progress_photos').select('id', { count: 'exact' }).eq('user_id', user.id),
@@ -132,7 +135,13 @@ export default function Dashboard() {
         supabase.from('personal_records').select('id, value, reps_at_weight, achieved_at, exercises(name)').eq('user_id', user.id).order('achieved_at', { ascending: false }).limit(5),
       ]);
 
-      if (profileRes.data) setProfile(profileRes.data);
+      if (profileRes.data) {
+        setProfile(profileRes.data);
+        // Show tour if user hasn't seen it
+        if (profileRes.data.has_seen_tour === false) {
+          setTimeout(() => setShowTour(true), 500);
+        }
+      }
       if (checkinRes.data) setLatestCheckin(checkinRes.data);
       if (photosRes.count !== null) setProgressPhotos(photosRes.count);
       
@@ -334,7 +343,7 @@ export default function Dashboard() {
           </div>
 
           {/* Scripture of the Day */}
-          <div className="mb-8">
+          <div className="mb-8" data-tour="scripture">
             <ScriptureOfDay />
           </div>
 
@@ -344,7 +353,7 @@ export default function Dashboard() {
           </div>
 
           {/* Quick Stats Row */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8" data-tour="streak-stats">
             <Card className="bg-gradient-to-br from-primary/10 to-primary/5">
               <CardContent className="pt-6">
                 <div className="flex items-center gap-3">
@@ -401,7 +410,7 @@ export default function Dashboard() {
 
           <div className="space-y-6">
               {/* Weekly Workout Stats */}
-              <Card>
+              <Card data-tour="weekly-training">
                 <CardHeader className="flex flex-row items-center justify-between">
                   <div>
                     <CardTitle className="flex items-center gap-2">
@@ -639,7 +648,7 @@ export default function Dashboard() {
               </Card>
 
               {/* Active Challenges */}
-              <Card>
+              <Card data-tour="community">
                 <CardHeader className="flex flex-row items-center justify-between">
                   <div>
                     <CardTitle className="flex items-center gap-2">
@@ -691,6 +700,19 @@ export default function Dashboard() {
         </div>
       </main>
       <QuickStartFAB />
+      <TooltipTour
+        steps={dashboardTourSteps}
+        isOpen={showTour}
+        onComplete={async () => {
+          setShowTour(false);
+          if (user) {
+            await supabase
+              .from('profiles')
+              .update({ has_seen_tour: true })
+              .eq('user_id', user.id);
+          }
+        }}
+      />
     </div>
   );
 }

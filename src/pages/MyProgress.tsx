@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useOnboardingQuery } from "@/hooks/queries";
@@ -15,13 +15,13 @@ import Footer from "@/components/Footer";
 import BodyAnalysisComponent from "@/components/BodyAnalysis";
 import PersonalizedRecommendations from "@/components/dashboard/PersonalizedRecommendations";
 import ScriptureOfDay from "@/components/dashboard/ScriptureOfDay";
+import TooltipTour, { fitnessJourneyTourSteps } from "@/components/TooltipTour";
 
 import { getPersonalizedRecommendations } from "@/lib/onboardingUtils";
 
 // Import Progress Photos components
 import PhotoComparison from "@/components/PhotoComparison";
 import WeightChart from "@/components/WeightChart";
-import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
@@ -61,6 +61,7 @@ const MyProgress = () => {
   const [notes, setNotes] = useState("");
   const [photosTab, setPhotosTab] = useState("grid");
   const [activeMainTab, setActiveMainTab] = useState("coach");
+  const [showTour, setShowTour] = useState(false);
   // Today's Status state
   const [latestCheckin, setLatestCheckin] = useState<{ mood_level: number; energy_level: number; check_in_date: string } | null>(null);
 
@@ -74,8 +75,26 @@ const MyProgress = () => {
     if (user && subscription.subscribed) {
       fetchPhotos();
       fetchTodayStatus();
+      checkTourStatus();
     }
   }, [user, subscription.subscribed]);
+
+  const checkTourStatus = async () => {
+    if (!user) return;
+    try {
+      const { data } = await supabase
+        .from("profiles")
+        .select("has_seen_tour")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      
+      if (data?.has_seen_tour === false) {
+        setTimeout(() => setShowTour(true), 500);
+      }
+    } catch (error) {
+      console.error("Error checking tour status:", error);
+    }
+  };
 
   const fetchTodayStatus = async () => {
     if (!user) return;
@@ -321,12 +340,12 @@ const MyProgress = () => {
           </div>
 
           {/* Scripture of the Day */}
-          <div className="mb-8">
+          <div className="mb-8" data-tour="scripture">
             <ScriptureOfDay />
           </div>
 
           {/* Quick Start Guide - Always visible */}
-          <div className="mb-8">
+          <div className="mb-8" data-tour="quick-start">
             {recommendations && onboardingData ? (
               <PersonalizedRecommendations 
                 recommendations={recommendations} 
@@ -349,9 +368,9 @@ const MyProgress = () => {
           </div>
 
           {/* Quick Actions */}
-          <div className="mb-8">
+          <div className="mb-8" data-tour="quick-actions">
             <h3 className="text-sm font-medium text-muted-foreground mb-4 uppercase tracking-wider">Quick Actions</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3" data-tour="main-features">
               <Button variant="outline" className="h-auto py-4 flex flex-col gap-2" asChild>
                 <Link to="/coaching">
                   <MessageCircle className="h-5 w-5 text-primary" />
@@ -437,6 +456,19 @@ const MyProgress = () => {
         </div>
       </main>
       <Footer />
+      <TooltipTour
+        steps={fitnessJourneyTourSteps}
+        isOpen={showTour}
+        onComplete={async () => {
+          setShowTour(false);
+          if (user) {
+            await supabase
+              .from("profiles")
+              .update({ has_seen_tour: true })
+              .eq("user_id", user.id);
+          }
+        }}
+      />
     </div>
   );
 };
