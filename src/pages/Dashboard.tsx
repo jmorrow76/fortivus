@@ -5,7 +5,7 @@ import {
   TrendingUp, Lock, Zap, Settings,
   Crown, Medal, ChevronRight, Users, Camera,
   MapPin, Utensils, MessageCircle,
-  Battery, Shield, Moon, RotateCcw, Briefcase, Lightbulb
+  Battery, Shield, Moon, RotateCcw, Briefcase, Sparkles
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useWorkoutLog } from '@/hooks/useWorkoutLog';
@@ -327,12 +327,14 @@ export default function Dashboard() {
                 Log Workout
               </Link>
             </Button>
-            <Button variant="outline" asChild size="lg" className="flex-1 sm:flex-none">
-              <Link to="/progress">
-                <Camera className="h-5 w-5 mr-2" />
-                Upload Progress Photo
-              </Link>
-            </Button>
+            {subscription.subscribed && (
+              <Button variant="outline" asChild size="lg" className="flex-1 sm:flex-none">
+                <Link to="/my-progress">
+                  <Sparkles className="h-5 w-5 mr-2" />
+                  My Progress
+                </Link>
+              </Button>
+            )}
           </div>
 
           {/* Scripture of the Day */}
@@ -730,6 +732,52 @@ export default function Dashboard() {
               </Card>
 
 
+              {/* My Progress - Consolidated Elite Features */}
+              <Card className="bg-gradient-to-br from-accent/10 to-accent/5 border-accent/20">
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-accent" />
+                    My Progress
+                  </CardTitle>
+                  <CardDescription>AI-powered progress tracking</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="grid grid-cols-2 gap-3 mb-4">
+                    <div className="text-center p-3 bg-background rounded-lg">
+                      <Camera className="h-5 w-5 mx-auto mb-1 text-muted-foreground" />
+                      <p className="text-lg font-bold">{progressPhotos}</p>
+                      <p className="text-xs text-muted-foreground">Photos</p>
+                    </div>
+                    <div className="text-center p-3 bg-background rounded-lg">
+                      <TrendingUp className="h-5 w-5 mx-auto mb-1 text-muted-foreground" />
+                      <p className="text-lg font-bold">{subscription.subscribed ? 'Active' : 'Locked'}</p>
+                      <p className="text-xs text-muted-foreground">AI Analysis</p>
+                    </div>
+                  </div>
+                  
+                  {subscription.subscribed ? (
+                    <Button asChild className="w-full">
+                      <Link to="/my-progress">
+                        <Sparkles className="h-4 w-4 mr-2" />
+                        View My Progress
+                      </Link>
+                    </Button>
+                  ) : (
+                    <div className="space-y-2">
+                      <p className="text-xs text-muted-foreground text-center">
+                        AI Plans, Body Analysis & Photo Tracking
+                      </p>
+                      <Button asChild className="w-full">
+                        <a href="/#pricing">
+                          <Lock className="h-4 w-4 mr-2" />
+                          Upgrade to Unlock
+                        </a>
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
               {/* AI Coaching - Premium Feature */}
               <Card className={!subscription.subscribed ? 'relative overflow-hidden' : ''}>
                 {!subscription.subscribed && (
@@ -758,34 +806,6 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
 
-              {/* AI Body Analysis - Premium Feature */}
-              <Card className={!subscription.subscribed ? 'relative overflow-hidden' : ''}>
-                {!subscription.subscribed && (
-                  <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
-                    <Lock className="h-6 w-6 text-muted-foreground mb-2" />
-                    <p className="text-sm text-muted-foreground mb-2">Elite Feature</p>
-                    <Button size="sm" asChild>
-                      <a href="/#pricing">Upgrade</a>
-                    </Button>
-                  </div>
-                )}
-                <CardHeader>
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <TrendingUp className="h-4 w-4" />
-                    AI Body Analysis
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center">
-                    <Camera className="h-8 w-8 mx-auto mb-2 text-primary/50" />
-                    <p className="text-sm text-muted-foreground mb-2">Get your body composition analysis</p>
-                    <Button size="sm" asChild className="w-full">
-                      <Link to="/body-analysis">Analyze Now</Link>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-
               {/* Calorie Tracker - Premium Feature */}
               <Card className={!subscription.subscribed ? 'relative overflow-hidden' : ''}>
                 {!subscription.subscribed && (
@@ -809,34 +829,6 @@ export default function Dashboard() {
                     <p className="text-sm text-muted-foreground mb-2">Track meals & macros</p>
                     <Button size="sm" asChild className="w-full">
                       <Link to="/calories">Track Calories</Link>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Progress Photos - Premium Feature */}
-              <Card className={!subscription.subscribed ? 'relative overflow-hidden' : ''}>
-                {!subscription.subscribed && (
-                  <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
-                    <Lock className="h-6 w-6 text-muted-foreground mb-2" />
-                    <p className="text-sm text-muted-foreground mb-2">Elite Feature</p>
-                    <Button size="sm" asChild>
-                      <a href="/#pricing">Upgrade</a>
-                    </Button>
-                  </div>
-                )}
-                <CardHeader>
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <Camera className="h-4 w-4" />
-                    Progress Photos
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center">
-                    <p className="text-3xl font-bold text-primary">{progressPhotos}</p>
-                    <p className="text-sm text-muted-foreground mb-3">Photos uploaded</p>
-                    <Button variant="outline" size="sm" asChild className="w-full">
-                      <Link to="/progress">View Gallery</Link>
                     </Button>
                   </div>
                 </CardContent>

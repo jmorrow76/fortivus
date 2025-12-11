@@ -42,6 +42,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import NotFound from "./pages/NotFound";
 import Recommendations from "./pages/Recommendations";
+import MyProgress from "./pages/MyProgress";
 import SupportButton from "./components/SupportButton";
 import ReferralButton from "./components/ReferralButton";
 import BackToTopButton from "./components/BackToTopButton";
@@ -99,6 +100,7 @@ const App = () => (
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />
             <Route path="/recommendations" element={<Recommendations />} />
+            <Route path="/my-progress" element={<MyProgress />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
