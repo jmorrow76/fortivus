@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ExternalLink, Star, Filter } from "lucide-react";
+import { ExternalLink, Star, Filter, Heart, Church } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
@@ -83,13 +83,22 @@ const Recommendations = () => {
           <h1 className="text-4xl md:text-5xl font-serif font-bold mb-4">
             My Daily Essentials
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-4">
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-6">
             These are the exact products I use every single day to support my health, training, and recovery. 
             I only recommend what I personally trust and have tested.
           </p>
-          <p className="text-sm text-muted-foreground">
-            As an Amazon Associate, we earn from qualifying purchases. 10% goes to local churches and ministries.
-          </p>
+          
+          {/* Church Donation Badge */}
+          <div className="inline-flex items-center gap-3 bg-primary/10 border border-primary/20 rounded-full px-6 py-3">
+            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/20">
+              <Church className="h-5 w-5 text-primary" />
+            </div>
+            <div className="text-left">
+              <p className="text-sm font-semibold text-foreground">10% to Churches & Ministries</p>
+              <p className="text-xs text-muted-foreground">Every purchase supports the Kingdom</p>
+            </div>
+            <Heart className="h-4 w-4 text-primary fill-primary" />
+          </div>
         </div>
 
         {/* Category Filter */}
