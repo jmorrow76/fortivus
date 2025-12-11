@@ -1,19 +1,61 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { ArrowLeft, Sparkles, Camera, TrendingUp, FileText, Lock, Crown } from "lucide-react";
+import { useOnboardingQuery } from "@/hooks/queries";
+import { ArrowLeft, Sparkles, Camera, TrendingUp, Lock, Crown, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import BodyAnalysisComponent from "@/components/BodyAnalysis";
+import PersonalizedRecommendations from "@/components/dashboard/PersonalizedRecommendations";
+import { getPersonalizedRecommendations } from "@/lib/onboardingUtils";
+
+// Import Progress Photos components
+import PhotoComparison from "@/components/PhotoComparison";
+import WeightChart from "@/components/WeightChart";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Plus, Loader2, Trash2, Calendar, Scale, LayoutGrid, Columns, LineChart } from "lucide-react";
+import { format } from "date-fns";
+
+interface ProgressPhoto {
+  id: string;
+  photo_url: string;
+  photo_date: string;
+  weight: number | null;
+  notes: string | null;
+  created_at: string;
+}
 
 const MyProgress = () => {
   const navigate = useNavigate();
   const { user, loading, subscription } = useAuth();
   const [searchParams] = useSearchParams();
-  const defaultTab = searchParams.get('tab') || 'plan';
+  const defaultTab = searchParams.get('tab') || 'guide';
+  const { toast } = useToast();
+
+  // Onboarding data for Quick Start Guide
+  const { data: onboardingData, isLoading: onboardingLoading } = useOnboardingQuery();
+  const recommendations = useMemo(() => getPersonalizedRecommendations(onboardingData), [onboardingData]);
+
+  // Progress Photos state
+  const [photos, setPhotos] = useState<ProgressPhoto[]>([]);
+  const [photosLoading, setPhotosLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [deleting, setDeleting] = useState<string | null>(null);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoDate, setPhotoDate] = useState(format(new Date(), "yyyy-MM-dd"));
+  const [weight, setWeight] = useState("");
+  const [notes, setNotes] = useState("");
+  const [photosTab, setPhotosTab] = useState("grid");
 
   useEffect(() => {
     if (!loading && !user) {
@@ -21,7 +63,97 @@ const MyProgress = () => {
     }
   }, [user, loading, navigate]);
 
-  if (loading) {
+  useEffect(() => {
+    if (user && subscription.subscribed) {
+      fetchPhotos();
+    }
+  }, [user, subscription.subscribed]);
+
+  const fetchPhotos = async () => {
+    if (!user) return;
+    try {
+      const { data, error } = await supabase
+        .from("progress_photos")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("photo_date", { ascending: false });
+
+      if (error) throw error;
+      setPhotos(data || []);
+    } catch (error) {
+      console.error("Error fetching photos:", error);
+    } finally {
+      setPhotosLoading(false);
+    }
+  };
+
+  const handleUpload = async () => {
+    if (!photoFile || !user) return;
+
+    setUploading(true);
+    try {
+      const fileExt = photoFile.name.split(".").pop();
+      const filePath = `${user.id}/${crypto.randomUUID()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("progress-photos")
+        .upload(filePath, photoFile);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from("progress-photos")
+        .getPublicUrl(filePath);
+
+      const { error: insertError } = await supabase
+        .from("progress_photos")
+        .insert({
+          user_id: user.id,
+          photo_url: publicUrl,
+          photo_date: photoDate,
+          weight: weight ? parseFloat(weight) : null,
+          notes: notes || null,
+        });
+
+      if (insertError) throw insertError;
+
+      toast({ title: "Photo uploaded!", description: "Your progress photo has been saved." });
+      setDialogOpen(false);
+      setPhotoFile(null);
+      setWeight("");
+      setNotes("");
+      fetchPhotos();
+    } catch (error: any) {
+      console.error("Upload error:", error);
+      toast({ title: "Upload failed", description: error.message, variant: "destructive" });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDelete = async (photoId: string, photoUrl: string) => {
+    if (!user) return;
+    setDeleting(photoId);
+    try {
+      const urlParts = photoUrl.split("/");
+      const fileName = urlParts.slice(-2).join("/");
+
+      await supabase.storage.from("progress-photos").remove([fileName]);
+      const { error } = await supabase.from("progress_photos").delete().eq("id", photoId);
+
+      if (error) throw error;
+
+      toast({ title: "Photo deleted" });
+      setPhotos(photos.filter(p => p.id !== photoId));
+    } catch (error: any) {
+      console.error("Delete error:", error);
+      toast({ title: "Delete failed", description: error.message, variant: "destructive" });
+    } finally {
+      setDeleting(null);
+    }
+  };
+
+  if (loading || onboardingLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full" />
@@ -65,6 +197,10 @@ const MyProgress = () => {
                 <div className="mt-10 pt-8 border-t border-border">
                   <h3 className="font-medium mb-4">What you'll unlock:</h3>
                   <ul className="text-sm text-muted-foreground space-y-2 text-left max-w-sm mx-auto">
+                    <li className="flex items-start gap-2">
+                      <span className="text-accent">✓</span>
+                      Quick Start Guide with personalized recommendations
+                    </li>
                     <li className="flex items-start gap-2">
                       <span className="text-accent">✓</span>
                       AI Personal Plan - custom diet, workout & supplements
@@ -114,7 +250,12 @@ const MyProgress = () => {
           </div>
 
           <Tabs defaultValue={defaultTab} className="w-full">
-            <TabsList className="mb-6 grid w-full max-w-lg grid-cols-3">
+            <TabsList className="mb-6 grid w-full max-w-2xl grid-cols-4">
+              <TabsTrigger value="guide" className="gap-2">
+                <Lightbulb className="h-4 w-4" />
+                <span className="hidden sm:inline">Quick Start</span>
+                <span className="sm:hidden">Guide</span>
+              </TabsTrigger>
               <TabsTrigger value="plan" className="gap-2">
                 <Sparkles className="h-4 w-4" />
                 <span className="hidden sm:inline">AI Plan</span>
@@ -127,75 +268,214 @@ const MyProgress = () => {
               </TabsTrigger>
               <TabsTrigger value="photos" className="gap-2">
                 <Camera className="h-4 w-4" />
-                <span className="hidden sm:inline">Progress Photos</span>
+                <span className="hidden sm:inline">Photos</span>
                 <span className="sm:hidden">Photos</span>
               </TabsTrigger>
             </TabsList>
 
+            {/* Quick Start Guide Tab */}
+            <TabsContent value="guide">
+              {recommendations && onboardingData ? (
+                <PersonalizedRecommendations 
+                  recommendations={recommendations} 
+                  onboardingData={onboardingData} 
+                />
+              ) : (
+                <Card>
+                  <CardContent className="py-12 text-center">
+                    <Lightbulb className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                    <h3 className="font-semibold text-lg mb-2">Complete Your Assessment</h3>
+                    <p className="text-muted-foreground mb-4">
+                      Take the quick assessment to get personalized recommendations
+                    </p>
+                    <Button asChild>
+                      <Link to="/onboarding">Start Assessment</Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
+            </TabsContent>
+
+            {/* AI Plan Tab - Navigate to full plan page */}
             <TabsContent value="plan">
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Sparkles className="h-5 w-5 text-accent" />
-                    AI Personal Plan
-                  </CardTitle>
-                  <CardDescription>
-                    Get a custom diet, workout, and supplement protocol designed specifically for your goals
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <p className="text-muted-foreground">
-                      Create a comprehensive, personalized fitness plan tailored to your goals, current stats, and preferences.
+                <CardContent className="py-8">
+                  <div className="text-center mb-6">
+                    <Sparkles className="h-12 w-12 mx-auto text-accent mb-4" />
+                    <h3 className="font-semibold text-xl mb-2">AI Personal Plan</h3>
+                    <p className="text-muted-foreground max-w-md mx-auto">
+                      Generate a comprehensive diet, workout, and supplement protocol tailored to your goals. 
+                      Plans integrate with your body analysis results for maximum effectiveness.
                     </p>
-                    <div className="flex flex-wrap gap-3">
-                      <Button asChild>
-                        <Link to="/personal-plan">
-                          <Sparkles className="h-4 w-4 mr-2" />
-                          Create New Plan
-                        </Link>
-                      </Button>
-                      <Button variant="outline" asChild>
-                        <Link to="/personal-plan?tab=saved">
-                          <FileText className="h-4 w-4 mr-2" />
-                          View Saved Plans
-                        </Link>
-                      </Button>
-                    </div>
+                  </div>
+                  <div className="flex flex-wrap justify-center gap-3">
+                    <Button size="lg" asChild>
+                      <Link to="/personal-plan">
+                        <Sparkles className="h-4 w-4 mr-2" />
+                        Create or View Plans
+                      </Link>
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
             </TabsContent>
 
+            {/* Body Analysis Tab */}
             <TabsContent value="analysis">
               <div className="-mx-4 sm:mx-0">
                 <BodyAnalysisComponent />
               </div>
             </TabsContent>
 
+            {/* Progress Photos Tab - Full embedded functionality */}
             <TabsContent value="photos">
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Camera className="h-5 w-5 text-accent" />
-                    Progress Photos
-                  </CardTitle>
-                  <CardDescription>
-                    Track your transformation journey with photo comparisons and weight charts
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <p className="text-muted-foreground">
-                      Upload progress photos, compare side-by-side transformations, and track your weight over time.
-                    </p>
-                    <Button asChild>
-                      <Link to="/progress">
-                        <Camera className="h-4 w-4 mr-2" />
-                        View Progress Photos
-                      </Link>
-                    </Button>
+                <CardContent className="pt-6">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                    <div>
+                      <h3 className="font-semibold text-lg flex items-center gap-2">
+                        <Camera className="h-5 w-5 text-accent" />
+                        Progress Photos
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        Track your transformation journey
+                      </p>
+                    </div>
+                    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                      <DialogTrigger asChild>
+                        <Button>
+                          <Plus className="h-4 w-4 mr-2" />
+                          Add Photo
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Upload Progress Photo</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4 py-4">
+                          <div className="space-y-2">
+                            <Label>Photo</Label>
+                            <Input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => setPhotoFile(e.target.files?.[0] || null)}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Date</Label>
+                            <Input
+                              type="date"
+                              value={photoDate}
+                              onChange={(e) => setPhotoDate(e.target.value)}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Weight (optional)</Label>
+                            <Input
+                              type="number"
+                              placeholder="Enter weight"
+                              value={weight}
+                              onChange={(e) => setWeight(e.target.value)}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Notes (optional)</Label>
+                            <Textarea
+                              placeholder="Any notes about this photo..."
+                              value={notes}
+                              onChange={(e) => setNotes(e.target.value)}
+                            />
+                          </div>
+                          <Button 
+                            onClick={handleUpload} 
+                            disabled={!photoFile || uploading}
+                            className="w-full"
+                          >
+                            {uploading ? (
+                              <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Uploading...</>
+                            ) : (
+                              "Upload Photo"
+                            )}
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   </div>
+
+                  <Tabs value={photosTab} onValueChange={setPhotosTab}>
+                    <TabsList className="mb-4">
+                      <TabsTrigger value="grid" className="gap-2">
+                        <LayoutGrid className="h-4 w-4" />
+                        Gallery
+                      </TabsTrigger>
+                      <TabsTrigger value="compare" className="gap-2">
+                        <Columns className="h-4 w-4" />
+                        Compare
+                      </TabsTrigger>
+                      <TabsTrigger value="chart" className="gap-2">
+                        <LineChart className="h-4 w-4" />
+                        Weight
+                      </TabsTrigger>
+                    </TabsList>
+
+                    <TabsContent value="grid">
+                      {photosLoading ? (
+                        <div className="flex justify-center py-12">
+                          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                        </div>
+                      ) : photos.length === 0 ? (
+                        <div className="text-center py-12 text-muted-foreground">
+                          <Camera className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                          <p>No progress photos yet. Add your first one!</p>
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                          {photos.map((photo) => (
+                            <div key={photo.id} className="relative group">
+                              <img
+                                src={photo.photo_url}
+                                alt={`Progress from ${photo.photo_date}`}
+                                className="w-full aspect-square object-cover rounded-lg"
+                              />
+                              <div className="absolute inset-0 bg-background/80 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex flex-col items-center justify-center p-2">
+                                <p className="text-sm font-medium flex items-center gap-1">
+                                  <Calendar className="h-3 w-3" />
+                                  {format(new Date(photo.photo_date), "MMM d, yyyy")}
+                                </p>
+                                {photo.weight && (
+                                  <p className="text-sm text-muted-foreground flex items-center gap-1">
+                                    <Scale className="h-3 w-3" />
+                                    {photo.weight} lbs
+                                  </p>
+                                )}
+                                <Button
+                                  variant="destructive"
+                                  size="sm"
+                                  className="mt-2"
+                                  onClick={() => handleDelete(photo.id, photo.photo_url)}
+                                  disabled={deleting === photo.id}
+                                >
+                                  {deleting === photo.id ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                  ) : (
+                                    <Trash2 className="h-4 w-4" />
+                                  )}
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </TabsContent>
+
+                    <TabsContent value="compare">
+                      <PhotoComparison photos={photos} />
+                    </TabsContent>
+
+                    <TabsContent value="chart">
+                      <WeightChart photos={photos} />
+                    </TabsContent>
+                  </Tabs>
                 </CardContent>
               </Card>
             </TabsContent>
