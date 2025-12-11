@@ -10,13 +10,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Camera, Loader2, User, Crown, Settings, Calendar, Sparkles, Flame, RefreshCw, LayoutDashboard, Home } from "lucide-react";
+import { ArrowLeft, Camera, Loader2, User, Crown, Settings, Calendar, Sparkles, Flame, RefreshCw, LayoutDashboard, Home, HelpCircle } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Navbar from "@/components/Navbar";
 import HealthDashboard from "@/components/HealthDashboard";
 import { NotificationSettings } from "@/components/NotificationSettings";
 import { SocialConnections } from "@/components/SocialConnections";
 import PromoCodeRedemption from "@/components/PromoCodeRedemption";
+import WelcomeTour from "@/components/WelcomeTour";
 import { format } from "date-fns";
 
 const Profile = () => {
@@ -43,6 +44,7 @@ const Profile = () => {
   const [uploading, setUploading] = useState(false);
   const [managingSubscription, setManagingSubscription] = useState(false);
   const [resettingAssessment, setResettingAssessment] = useState(false);
+  const [showWelcomeTour, setShowWelcomeTour] = useState(false);
 
   const handleRetakeAssessment = async () => {
     setResettingAssessment(true);
@@ -460,9 +462,20 @@ const Profile = () => {
 
               {/* Landing Page Preference Section */}
               <div className="space-y-4 pt-4 border-t">
-                <div className="flex items-center gap-2">
-                  <Home className="h-5 w-5 text-accent" />
-                  <h3 className="font-semibold">Default Landing Page</h3>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Home className="h-5 w-5 text-accent" />
+                    <h3 className="font-semibold">Default Landing Page</h3>
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => setShowWelcomeTour(true)}
+                    className="text-muted-foreground hover:text-foreground"
+                  >
+                    <HelpCircle className="h-4 w-4 mr-1" />
+                    Replay Tour
+                  </Button>
                 </div>
                 <p className="text-sm text-muted-foreground">
                   Choose which page to show after you sign in
@@ -561,6 +574,12 @@ const Profile = () => {
           </div>
         </div>
       </main>
+      
+      <WelcomeTour
+        open={showWelcomeTour}
+        onComplete={() => setShowWelcomeTour(false)}
+        landingPage={landingPagePreference}
+      />
     </div>
   );
 };

@@ -12,6 +12,7 @@ import { z } from 'zod';
 import { supabase } from '@/integrations/supabase/client';
 import PasswordStrengthIndicator from '@/components/PasswordStrengthIndicator';
 import LandingPagePreferenceModal from '@/components/LandingPagePreferenceModal';
+import WelcomeTour from '@/components/WelcomeTour';
 
 const emailSchema = z.string().email('Please enter a valid email address');
 const passwordSchema = z.string().min(6, 'Password must be at least 6 characters');
@@ -32,6 +33,8 @@ const Auth = () => {
   const [isResending, setIsResending] = useState(false);
   const [passwordUpdated, setPasswordUpdated] = useState(false);
   const [showLandingPreferenceModal, setShowLandingPreferenceModal] = useState(false);
+  const [showWelcomeTour, setShowWelcomeTour] = useState(false);
+  const [selectedLandingPage, setSelectedLandingPage] = useState<"dashboard" | "fitness-journey">("dashboard");
   const [isNewUser, setIsNewUser] = useState(false);
   
   const { user, loading, signIn, signUp, resendVerificationEmail, resetPassword, updatePassword } = useAuth();
@@ -199,7 +202,22 @@ const Auth = () => {
         .eq('user_id', user.id);
       
       setShowLandingPreferenceModal(false);
-      const targetPage = preference === 'fitness-journey' ? '/my-progress' : '/dashboard';
+      setSelectedLandingPage(preference);
+      // Show tour after preference selection for new users
+      setShowWelcomeTour(true);
+    }
+  };
+
+  const handleTourComplete = async () => {
+    if (user) {
+      // Mark tour as seen
+      await supabase
+        .from('profiles')
+        .update({ has_seen_tour: true })
+        .eq('user_id', user.id);
+      
+      setShowWelcomeTour(false);
+      const targetPage = selectedLandingPage === 'fitness-journey' ? '/my-progress' : '/dashboard';
       navigate(targetPage);
     }
   };
@@ -513,6 +531,12 @@ const Auth = () => {
       <LandingPagePreferenceModal 
         open={showLandingPreferenceModal} 
         onSelect={handleLandingPreferenceSelect}
+      />
+      
+      <WelcomeTour
+        open={showWelcomeTour}
+        onComplete={handleTourComplete}
+        landingPage={selectedLandingPage}
       />
     </div>
   );
