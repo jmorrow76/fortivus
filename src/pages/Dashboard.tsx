@@ -323,14 +323,8 @@ export default function Dashboard() {
 
           {/* Quick Actions */}
           <div className="flex flex-wrap gap-3 mb-8">
-            <Button asChild size="lg" className="flex-1 sm:flex-none">
-              <Link to="/workouts">
-                <Dumbbell className="h-5 w-5 mr-2" />
-                Log Workout
-              </Link>
-            </Button>
             {subscription.subscribed && (
-              <Button variant="outline" asChild size="lg" className="flex-1 sm:flex-none">
+              <Button asChild size="lg" className="flex-1 sm:flex-none">
                 <Link to="/my-progress">
                   <Sparkles className="h-5 w-5 mr-2" />
                   Fitness Journey
