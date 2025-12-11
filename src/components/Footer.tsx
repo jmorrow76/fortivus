@@ -101,9 +101,14 @@ const Footer = () => {
 
         {/* Bottom */}
         <div className="pt-8 border-t border-background/10 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-xs text-background/50 tracking-wide">
-            © {new Date().getFullYear()} Fortivus. All rights reserved.
-          </p>
+          <div className="text-center md:text-left">
+            <p className="text-xs text-background/50 tracking-wide">
+              © {new Date().getFullYear()} Fortivus LLC. All rights reserved.
+            </p>
+            <p className="text-xs text-background/40 mt-1">
+              Fortivus is a registered trademark of Fortivus LLC.
+            </p>
+          </div>
           <p className="text-xs text-background/40">
             Affiliate Disclosure: We may earn commissions from qualifying purchases.
           </p>
