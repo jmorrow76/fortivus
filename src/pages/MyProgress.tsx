@@ -59,6 +59,9 @@ const MyProgress = () => {
   const [weight, setWeight] = useState("");
   const [notes, setNotes] = useState("");
   const [photosTab, setPhotosTab] = useState("grid");
+  
+  // Today's Status state
+  const [latestCheckin, setLatestCheckin] = useState<{ mood_level: number; energy_level: number; check_in_date: string } | null>(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -69,8 +72,26 @@ const MyProgress = () => {
   useEffect(() => {
     if (user && subscription.subscribed) {
       fetchPhotos();
+      fetchTodayStatus();
     }
   }, [user, subscription.subscribed]);
+
+  const fetchTodayStatus = async () => {
+    if (!user) return;
+    try {
+      const { data } = await supabase
+        .from("mood_checkins")
+        .select("mood_level, energy_level, check_in_date")
+        .eq("user_id", user.id)
+        .order("check_in_date", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      
+      if (data) setLatestCheckin(data);
+    } catch (error) {
+      console.error("Error fetching check-in:", error);
+    }
+  };
 
   const fetchPhotos = async () => {
     if (!user) return;
@@ -240,20 +261,62 @@ const MyProgress = () => {
       <Navbar />
       <main className="pt-40 md:pt-28 pb-16 px-4">
         <div className="container max-w-6xl mx-auto">
-          <div className="flex items-center gap-4 mb-8">
-            <Button variant="ghost" onClick={() => navigate("/dashboard")}>
-              <ArrowLeft className="h-4 w-4 mr-2" /> Back
-            </Button>
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <Crown className="h-4 w-4 text-accent" />
-                <span className="text-xs font-medium tracking-wider uppercase text-accent">Elite Feature</span>
+          <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-8">
+            <div className="flex items-center gap-4">
+              <Button variant="ghost" onClick={() => navigate("/dashboard")}>
+                <ArrowLeft className="h-4 w-4 mr-2" /> Back
+              </Button>
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <Crown className="h-4 w-4 text-accent" />
+                  <span className="text-xs font-medium tracking-wider uppercase text-accent">Elite Feature</span>
+                </div>
+                <h1 className="font-heading text-2xl md:text-3xl font-bold">Fitness Journey</h1>
+                <p className="text-muted-foreground text-sm">
+                  Your complete AI-powered progress hub
+                </p>
               </div>
-              <h1 className="font-heading text-2xl md:text-3xl font-bold">Fitness Journey</h1>
-              <p className="text-muted-foreground text-sm">
-                Your complete AI-powered progress hub
-              </p>
             </div>
+
+            {/* Today's Status Card */}
+            <Card className="md:min-w-[200px]">
+              <CardHeader className="py-3 px-4">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  Today's Status
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="py-3 px-4">
+                {(() => {
+                  const today = new Date();
+                  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+                  const hasCheckedInToday = latestCheckin?.check_in_date === todayStr;
+                  
+                  return hasCheckedInToday && latestCheckin ? (
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Mood</span>
+                        <span className="font-medium">{latestCheckin.mood_level}/5</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Energy</span>
+                        <span className="font-medium">{latestCheckin.energy_level}/5</span>
+                      </div>
+                      <div className="text-xs text-center text-muted-foreground mt-2 pt-2 border-t">
+                        ✓ Checked in today
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center">
+                      <p className="text-sm text-muted-foreground mb-2">Not checked in yet</p>
+                      <Button size="sm" asChild>
+                        <Link to="/checkin">Check In</Link>
+                      </Button>
+                    </div>
+                  );
+                })()}
+              </CardContent>
+            </Card>
           </div>
 
           <Tabs defaultValue={defaultTab} className="w-full">
