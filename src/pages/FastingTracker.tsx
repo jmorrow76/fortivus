@@ -282,11 +282,14 @@ const FastingTracker = () => {
                         <Input
                           type="number"
                           value={targetHours}
-                          onChange={(e) => setTargetHours(parseInt(e.target.value) || 12)}
+                          onChange={(e) => setTargetHours(Math.max(1, parseInt(e.target.value) || 12))}
                           min={1}
-                          max={168}
+                          max={744}
                           className="mt-1"
                         />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Max 31 days (744 hours)
+                        </p>
                       </div>
 
                       <div>
