@@ -88,7 +88,7 @@ const Recommendations = () => {
             I only recommend what I personally trust and have tested.
           </p>
           <p className="text-sm text-muted-foreground">
-            As an Amazon Associate, we earn from qualifying purchases.
+            As an Amazon Associate, we earn from qualifying purchases. 10% goes to local churches and ministries.
           </p>
         </div>
 
@@ -169,8 +169,8 @@ const Recommendations = () => {
         <div className="mt-16 p-6 bg-muted/50 rounded-lg text-center">
           <p className="text-sm text-muted-foreground">
             <strong>Affiliate Disclosure:</strong> As an Amazon Associate, Fortivus earns from qualifying purchases. 
-            This helps support our mission to help Christian men steward their strength. 
-            We only recommend products we genuinely believe in.
+            10% of all proceeds go to support local churches and Christian ministries. 
+            We only recommend products we genuinely believe in and use daily.
           </p>
         </div>
       </main>
