@@ -694,36 +694,6 @@ export default function Dashboard() {
 
             {/* Sidebar Column */}
             <div className="space-y-6">
-              {/* Today's Check-in */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
-                    Today's Status
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {hasCheckedInToday && latestCheckin ? (
-                    <div className="space-y-3">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Mood</span>
-                        <span className="font-medium">{latestCheckin.mood_level}/5</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Energy</span>
-                        <span className="font-medium">{latestCheckin.energy_level}/5</span>
-                      </div>
-                      <Badge variant="secondary" className="w-full justify-center">
-                        ✓ Checked in today
-                      </Badge>
-                    </div>
-                  ) : (
-                    <div className="text-center">
-                      <p className="text-muted-foreground">You haven't checked in today</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
 
 
               {/* Fitness Journey Quick Access */}
