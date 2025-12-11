@@ -36,6 +36,8 @@ serve(async (req) => {
 
     // Fetch the user's latest body analysis results
     let bodyAnalysisContext = '';
+    let fastingContext = '';
+    
     if (userId) {
       const { data: latestAnalysis, error: analysisError } = await supabase
         .from("body_analysis_results")
@@ -67,6 +69,59 @@ BODY COMPOSITION ANALYSIS (from AI body scan):
 - Estimated Timeframe for Goals: ${latestAnalysis.estimated_timeframe || 'Not specified'}
 
 IMPORTANT: Use this body analysis data to create a more personalized plan. The body composition data should directly inform calorie targets, macro ratios, workout intensity, and priority areas for training.
+`;
+      }
+
+      // Fetch active fasting data
+      const { data: activeFast, error: fastingError } = await supabase
+        .from("fasting_logs")
+        .select("*")
+        .eq("user_id", userId)
+        .is("ended_at", null)
+        .order("started_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (fastingError) {
+        console.error("[GENERATE-PLAN] Error fetching fasting data:", fastingError);
+      } else if (activeFast) {
+        console.log("[GENERATE-PLAN] User is currently fasting:", activeFast.fasting_type);
+        
+        const fastingIntensityMap: Record<string, number> = {
+          'sunrise_sunset': 0.6,
+          'daniel_fast': 0.8,
+          'water_fast': 0.4,
+          'partial_fast': 0.75,
+          'esther_fast': 0.2,
+        };
+        
+        const intensityModifier = fastingIntensityMap[activeFast.fasting_type] || 0.6;
+        
+        fastingContext = `
+ACTIVE FASTING STATUS:
+The user is currently on a biblical fast. CRITICAL: Adjust all recommendations accordingly.
+- Fast Type: ${activeFast.fasting_type.replace('_', ' ')}
+- Started: ${activeFast.started_at}
+- Target Duration: ${activeFast.target_duration_hours} hours
+- Prayer Intentions: ${activeFast.prayer_intentions || 'Not specified'}
+
+FASTING ADJUSTMENTS REQUIRED:
+1. WORKOUT: Reduce intensity to ${Math.round(intensityModifier * 100)}% of normal. Focus on:
+   - Lower volume (fewer sets, shorter sessions)
+   - Lighter weights with controlled movements
+   - Prioritize mobility, stretching, and light cardio
+   - Avoid high-intensity or heavy compound lifts
+   - Schedule workouts during energy peaks (typically morning or early afternoon)
+   
+2. NUTRITION (for when breaking fast): 
+   - Start with easily digestible foods
+   - Emphasize hydration and electrolytes
+   - Gradually increase portion sizes
+   - Prioritize protein and nutrient-dense foods
+   
+3. RECOVERY: Prioritize rest, sleep, and prayer time during this spiritual discipline.
+
+Mark any workout days during the fast as "Modified for Fasting" and clearly note the reduced intensity.
 `;
       }
     }
@@ -110,6 +165,8 @@ Your approach integrates:
 - Practical guidance that fits busy lives with family and ministry commitments
 
 ${bodyAnalysisContext}
+
+${fastingContext}
 
 ${productContext}
 

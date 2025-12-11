@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import {
   Dialog,
   DialogContent,
@@ -18,7 +19,8 @@ import {
   Lightbulb, Target, Dumbbell, Utensils, Battery, 
   Calendar, ChevronRight, Pill, Clock, Flame,
   Check, Sparkles, ArrowRight, Loader2, Crown,
-  Save, ChevronDown, ChevronUp, FileText, Plus, MapPin
+  Save, ChevronDown, ChevronUp, FileText, Plus, MapPin,
+  AlertTriangle, BookOpen
 } from 'lucide-react';
 import { OnboardingData } from '@/hooks/queries/useOnboardingQuery';
 import { PersonalizedRecommendations as Recommendations } from '@/lib/onboardingUtils';
@@ -26,6 +28,7 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useFasting, FASTING_TYPES } from '@/hooks/useFasting';
 
 interface PersonalizedRecommendationsProps {
   recommendations: Recommendations;
@@ -59,6 +62,9 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
   const { subscription, session, user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  
+  // Fasting integration
+  const { activeFast, getWorkoutRecommendation, getNutritionGuidance } = useFasting();
 
   // AI Plan state
   const [aiPlan, setAiPlan] = useState<AIPlan | null>(null);
@@ -584,6 +590,51 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
         </CardHeader>
 
         <CardContent>
+          {/* Active Fasting Alert */}
+          {activeFast && (() => {
+            const workoutRec = getWorkoutRecommendation();
+            const nutritionRec = getNutritionGuidance();
+            return (
+              <Alert className="mb-6 border-orange-500/50 bg-orange-500/10">
+                <Flame className="h-4 w-4 text-orange-500" />
+                <AlertTitle className="text-orange-600 flex items-center gap-2">
+                  Active Fast - Recommendations Adjusted
+                </AlertTitle>
+                <AlertDescription className="mt-2 space-y-2">
+                  <p className="text-sm text-muted-foreground">
+                    You're currently on a <strong>{FASTING_TYPES.find(t => t.id === activeFast.fasting_type)?.name || activeFast.fasting_type}</strong> fast. 
+                    Your workout and nutrition recommendations are automatically adjusted.
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                    <div className="p-3 bg-background/50 rounded-lg">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Dumbbell className="h-4 w-4 text-orange-500" />
+                        <span className="text-sm font-medium">Workout Guidance</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">{workoutRec.message}</p>
+                    </div>
+                    <div className="p-3 bg-background/50 rounded-lg">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Utensils className="h-4 w-4 text-orange-500" />
+                        <span className="text-sm font-medium">Nutrition Guidance</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {nutritionRec?.duringFast?.[0] || 'Stay hydrated and listen to your body'}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 mt-2">
+                    <Button variant="outline" size="sm" asChild>
+                      <Link to="/fasting">
+                        <BookOpen className="h-3 w-3 mr-1" />
+                        View Fasting Tracker
+                      </Link>
+                    </Button>
+                  </div>
+                </AlertDescription>
+              </Alert>
+            );
+          })()}
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className={cn("grid w-full mb-6", aiPlan ? "grid-cols-5" : "grid-cols-4")}>
               <TabsTrigger value="overview">Overview</TabsTrigger>
