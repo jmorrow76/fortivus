@@ -832,6 +832,93 @@ export type Database = {
         }
         Relationships: []
       }
+      fasting_goals: {
+        Row: {
+          created_at: string
+          current_streak: number | null
+          id: string
+          last_fast_date: string | null
+          longest_streak: number | null
+          preferred_fast_type: string | null
+          total_fasts_completed: number | null
+          total_hours_fasted: number | null
+          updated_at: string
+          user_id: string
+          weekly_fasts_goal: number | null
+        }
+        Insert: {
+          created_at?: string
+          current_streak?: number | null
+          id?: string
+          last_fast_date?: string | null
+          longest_streak?: number | null
+          preferred_fast_type?: string | null
+          total_fasts_completed?: number | null
+          total_hours_fasted?: number | null
+          updated_at?: string
+          user_id: string
+          weekly_fasts_goal?: number | null
+        }
+        Update: {
+          created_at?: string
+          current_streak?: number | null
+          id?: string
+          last_fast_date?: string | null
+          longest_streak?: number | null
+          preferred_fast_type?: string | null
+          total_fasts_completed?: number | null
+          total_hours_fasted?: number | null
+          updated_at?: string
+          user_id?: string
+          weekly_fasts_goal?: number | null
+        }
+        Relationships: []
+      }
+      fasting_logs: {
+        Row: {
+          actual_duration_minutes: number | null
+          completed: boolean | null
+          created_at: string
+          ended_at: string | null
+          fasting_type: string
+          id: string
+          notes: string | null
+          prayer_intentions: string | null
+          scripture_focus: string | null
+          started_at: string
+          target_duration_hours: number | null
+          user_id: string
+        }
+        Insert: {
+          actual_duration_minutes?: number | null
+          completed?: boolean | null
+          created_at?: string
+          ended_at?: string | null
+          fasting_type: string
+          id?: string
+          notes?: string | null
+          prayer_intentions?: string | null
+          scripture_focus?: string | null
+          started_at?: string
+          target_duration_hours?: number | null
+          user_id: string
+        }
+        Update: {
+          actual_duration_minutes?: number | null
+          completed?: boolean | null
+          created_at?: string
+          ended_at?: string | null
+          fasting_type?: string
+          id?: string
+          notes?: string | null
+          prayer_intentions?: string | null
+          scripture_focus?: string | null
+          started_at?: string
+          target_duration_hours?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       foods: {
         Row: {
           brand: string | null
