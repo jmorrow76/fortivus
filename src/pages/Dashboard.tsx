@@ -401,6 +401,9 @@ export default function Dashboard() {
           </div>
 
           <div className="space-y-6">
+              {/* Your Trends */}
+              <TrendsDashboard />
+
               {/* Weekly Workout Stats */}
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
@@ -490,9 +493,6 @@ export default function Dashboard() {
                   )}
                 </CardContent>
               </Card>
-
-              {/* Your Trends */}
-              <TrendsDashboard />
 
               {/* Exercise Progress Chart Preview */}
               {exerciseChart && (
