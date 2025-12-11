@@ -243,7 +243,13 @@ const Navbar = () => {
                     <Button variant="default" className="justify-start" asChild>
                       <Link to="/dashboard" onClick={() => setIsOpen(false)}>
                         <LayoutDashboard className="h-4 w-4 mr-2" />
-                        Member Dashboard
+                        Dashboard
+                      </Link>
+                    </Button>
+                    <Button variant="outline" className="justify-start" asChild>
+                      <Link to="/my-progress" onClick={() => setIsOpen(false)}>
+                        <Crown className="h-4 w-4 mr-2 text-amber-500" />
+                        Fitness Journey
                       </Link>
                     </Button>
                     {isAdmin && (
