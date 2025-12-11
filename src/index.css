@@ -7,7 +7,24 @@
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 5rem;
+  scroll-padding-top: 10rem; /* Mobile: accounts for navbar + safe area */
+}
+
+@media (min-width: 768px) {
+  html {
+    scroll-padding-top: 7rem; /* Desktop: smaller navbar */
+  }
+}
+
+/* Anchor link scroll margin for sections and headings */
+[id] {
+  scroll-margin-top: 10rem;
+}
+
+@media (min-width: 768px) {
+  [id] {
+    scroll-margin-top: 7rem;
+  }
 }
 
 @layer base {
