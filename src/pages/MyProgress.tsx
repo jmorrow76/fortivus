@@ -367,142 +367,141 @@ const MyProgress = () => {
             )}
           </div>
 
-          {/* Feature Navigation */}
+          {/* Quick Actions Grid */}
           <div className="mb-8" data-tour="feature-nav">
-            <div className="overflow-x-auto pb-2 -mx-4 px-4">
-              <nav className="flex items-center gap-1 min-w-max">
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  className="flex items-center gap-2"
-                  asChild
-                >
-                  <Link to="/coaching">
-                    <MessageCircle className="h-4 w-4" />
-                    <span>AI Coach</span>
-                  </Link>
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  className="flex items-center gap-2"
-                  asChild
-                >
-                  <Link to="/calories">
-                    <Utensils className="h-4 w-4" />
-                    <span>Calories</span>
-                  </Link>
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  className="flex items-center gap-2"
-                  asChild
-                >
-                  <Link to="/workouts">
-                    <Dumbbell className="h-4 w-4" />
-                    <span>Workouts</span>
-                  </Link>
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  className="flex items-center gap-2"
-                  onClick={() => {
-                    setActiveMainTab('photos');
-                    setDialogOpen(true);
-                  }}
-                >
-                  <ImagePlus className="h-4 w-4" />
-                  <span>Photos</span>
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  className="flex items-center gap-2"
-                  onClick={() => setActiveMainTab('analysis')}
-                >
-                  <ScanFace className="h-4 w-4" />
-                  <span>Analysis</span>
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  className="flex items-center gap-2"
-                  asChild
-                >
-                  <Link to="/running">
-                    <TrendingUp className="h-4 w-4" />
-                    <span>Running</span>
-                  </Link>
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  className="flex items-center gap-2"
-                  asChild
-                >
-                  <Link to="/checkin">
-                    <Sparkles className="h-4 w-4" />
-                    <span>Check-in</span>
-                  </Link>
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  className="flex items-center gap-2"
-                  asChild
-                >
-                  <Link to="/hormonal">
-                    <Activity className="h-4 w-4" />
-                    <span>Hormonal</span>
-                  </Link>
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  className="flex items-center gap-2"
-                  asChild
-                >
-                  <Link to="/sleep-adaptive">
-                    <Moon className="h-4 w-4" />
-                    <span>Sleep</span>
-                  </Link>
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  className="flex items-center gap-2"
-                  asChild
-                >
-                  <Link to="/joint-health">
-                    <Shield className="h-4 w-4" />
-                    <span>Joints</span>
-                  </Link>
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  className="flex items-center gap-2"
-                  asChild
-                >
-                  <Link to="/comeback">
-                    <RotateCcw className="h-4 w-4" />
-                    <span>Comeback</span>
-                  </Link>
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  className="flex items-center gap-2"
-                  asChild
-                >
-                  <Link to="/executive">
-                    <Briefcase className="h-4 w-4" />
-                    <span>Executive</span>
-                  </Link>
-                </Button>
-              </nav>
+            <h2 className="font-heading text-lg font-semibold mb-4">Quick Actions</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+              <Link to="/coaching" className="group">
+                <Card className="h-full transition-all hover:shadow-md hover:border-primary/30">
+                  <CardContent className="p-4 flex flex-col items-center text-center gap-2">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                      <MessageCircle className="h-5 w-5 text-primary" />
+                    </div>
+                    <span className="text-sm font-medium">AI Coach</span>
+                  </CardContent>
+                </Card>
+              </Link>
+              
+              <Link to="/calories" className="group">
+                <Card className="h-full transition-all hover:shadow-md hover:border-primary/30">
+                  <CardContent className="p-4 flex flex-col items-center text-center gap-2">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                      <Utensils className="h-5 w-5 text-primary" />
+                    </div>
+                    <span className="text-sm font-medium">Food Log</span>
+                  </CardContent>
+                </Card>
+              </Link>
+              
+              <Link to="/workouts" className="group">
+                <Card className="h-full transition-all hover:shadow-md hover:border-primary/30">
+                  <CardContent className="p-4 flex flex-col items-center text-center gap-2">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                      <Dumbbell className="h-5 w-5 text-primary" />
+                    </div>
+                    <span className="text-sm font-medium">Workouts</span>
+                  </CardContent>
+                </Card>
+              </Link>
+              
+              <button onClick={() => setDialogOpen(true)} className="group text-left">
+                <Card className="h-full transition-all hover:shadow-md hover:border-primary/30">
+                  <CardContent className="p-4 flex flex-col items-center text-center gap-2">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                      <ImagePlus className="h-5 w-5 text-primary" />
+                    </div>
+                    <span className="text-sm font-medium">Progress Photos</span>
+                  </CardContent>
+                </Card>
+              </button>
+              
+              <Link to="/body-analysis" className="group">
+                <Card className="h-full transition-all hover:shadow-md hover:border-primary/30">
+                  <CardContent className="p-4 flex flex-col items-center text-center gap-2">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                      <ScanFace className="h-5 w-5 text-primary" />
+                    </div>
+                    <span className="text-sm font-medium">Body Analysis</span>
+                  </CardContent>
+                </Card>
+              </Link>
+              
+              <Link to="/running" className="group">
+                <Card className="h-full transition-all hover:shadow-md hover:border-primary/30">
+                  <CardContent className="p-4 flex flex-col items-center text-center gap-2">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                      <TrendingUp className="h-5 w-5 text-primary" />
+                    </div>
+                    <span className="text-sm font-medium">Run Tracker</span>
+                  </CardContent>
+                </Card>
+              </Link>
+              
+              <Link to="/checkin" className="group">
+                <Card className="h-full transition-all hover:shadow-md hover:border-primary/30">
+                  <CardContent className="p-4 flex flex-col items-center text-center gap-2">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                      <Sparkles className="h-5 w-5 text-primary" />
+                    </div>
+                    <span className="text-sm font-medium">Daily Check-in</span>
+                  </CardContent>
+                </Card>
+              </Link>
+              
+              <Link to="/hormonal" className="group">
+                <Card className="h-full transition-all hover:shadow-md hover:border-primary/30">
+                  <CardContent className="p-4 flex flex-col items-center text-center gap-2">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                      <Activity className="h-5 w-5 text-primary" />
+                    </div>
+                    <span className="text-sm font-medium">Hormonal</span>
+                  </CardContent>
+                </Card>
+              </Link>
+              
+              <Link to="/sleep-adaptive" className="group">
+                <Card className="h-full transition-all hover:shadow-md hover:border-primary/30">
+                  <CardContent className="p-4 flex flex-col items-center text-center gap-2">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                      <Moon className="h-5 w-5 text-primary" />
+                    </div>
+                    <span className="text-sm font-medium">Sleep Adaptive</span>
+                  </CardContent>
+                </Card>
+              </Link>
+              
+              <Link to="/joint-health" className="group">
+                <Card className="h-full transition-all hover:shadow-md hover:border-primary/30">
+                  <CardContent className="p-4 flex flex-col items-center text-center gap-2">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                      <Shield className="h-5 w-5 text-primary" />
+                    </div>
+                    <span className="text-sm font-medium">Joint Health</span>
+                  </CardContent>
+                </Card>
+              </Link>
+              
+              <Link to="/comeback" className="group">
+                <Card className="h-full transition-all hover:shadow-md hover:border-primary/30">
+                  <CardContent className="p-4 flex flex-col items-center text-center gap-2">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                      <RotateCcw className="h-5 w-5 text-primary" />
+                    </div>
+                    <span className="text-sm font-medium">Comeback</span>
+                  </CardContent>
+                </Card>
+              </Link>
+              
+              <Link to="/executive" className="group">
+                <Card className="h-full transition-all hover:shadow-md hover:border-primary/30">
+                  <CardContent className="p-4 flex flex-col items-center text-center gap-2">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                      <Briefcase className="h-5 w-5 text-primary" />
+                    </div>
+                    <span className="text-sm font-medium">Executive Mode</span>
+                  </CardContent>
+                </Card>
+              </Link>
             </div>
           </div>
 
