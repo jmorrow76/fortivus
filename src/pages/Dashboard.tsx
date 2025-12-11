@@ -20,6 +20,7 @@ import {
 
 import ScriptureOfDay from '@/components/dashboard/ScriptureOfDay';
 import CommunityPreview from '@/components/dashboard/CommunityPreview';
+import { TrendsDashboard } from '@/components/TrendsDashboard';
 import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
 import QuickStartFAB from '@/components/QuickStartFAB';
@@ -489,6 +490,9 @@ export default function Dashboard() {
                   )}
                 </CardContent>
               </Card>
+
+              {/* Your Trends */}
+              <TrendsDashboard />
 
               {/* Exercise Progress Chart Preview */}
               {exerciseChart && (
