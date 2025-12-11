@@ -14,6 +14,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import BodyAnalysisComponent from "@/components/BodyAnalysis";
 import PersonalizedRecommendations from "@/components/dashboard/PersonalizedRecommendations";
+import ScriptureOfDay from "@/components/dashboard/ScriptureOfDay";
 
 import { getPersonalizedRecommendations } from "@/lib/onboardingUtils";
 
@@ -428,7 +429,10 @@ const MyProgress = () => {
             </div>
           </div>
 
-
+          {/* Scripture of the Day */}
+          <div className="mb-8">
+            <ScriptureOfDay />
+          </div>
         </div>
       </main>
       <Footer />
