@@ -1029,68 +1029,70 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
             )}
           </Tabs>
 
-          {/* Generate AI Plan Button / Upsell */}
-          <div className="mt-6 p-4 rounded-lg bg-gradient-to-r from-accent/10 via-accent/5 to-transparent border border-accent/20">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div className="flex items-start gap-3">
-                <div className="p-2 rounded-lg bg-accent/10 shrink-0">
-                  <Sparkles className="h-5 w-5 text-accent" />
+          {/* Generate AI Plan Button / Upsell - only show if no plan exists yet OR for non-subscribed users */}
+          {(!subscription.subscribed || !aiPlan) && (
+            <div className="mt-6 p-4 rounded-lg bg-gradient-to-r from-accent/10 via-accent/5 to-transparent border border-accent/20">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 rounded-lg bg-accent/10 shrink-0">
+                    <Sparkles className="h-5 w-5 text-accent" />
+                  </div>
+                  <div>
+                    {subscription.subscribed ? (
+                      <>
+                        <h4 className="font-semibold text-sm mb-1 flex items-center gap-2">
+                          <Crown className="h-4 w-4 text-amber-500" />
+                          Generate Full AI Personal Plan
+                        </h4>
+                        <p className="text-xs text-muted-foreground">
+                          Create a comprehensive AI-powered plan with detailed meal plans, custom macros, 
+                          workout programming with exercises, and supplement protocols with dosages.
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <h4 className="font-semibold text-sm mb-1">Want a deeper, AI-powered plan?</h4>
+                        <p className="text-xs text-muted-foreground">
+                          Elite members get custom AI Personal Plans with full meal plans, detailed macros, 
+                          saveable workout templates, supplement protocols with dosages, and more.
+                        </p>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {['Full meal plans', 'Custom macros', 'Saveable plans', 'Workout templates'].map((feature) => (
+                            <Badge key={feature} variant="secondary" className="text-xs">
+                              <Check className="h-3 w-3 mr-1" />
+                              {feature}
+                            </Badge>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
-                <div>
-                  {subscription.subscribed ? (
+                <Button 
+                  onClick={handleGenerateAIPlan} 
+                  disabled={isGenerating}
+                  className="shrink-0"
+                >
+                  {isGenerating ? (
                     <>
-                      <h4 className="font-semibold text-sm mb-1 flex items-center gap-2">
-                        <Crown className="h-4 w-4 text-amber-500" />
-                        Generate Full AI Personal Plan
-                      </h4>
-                      <p className="text-xs text-muted-foreground">
-                        Create a comprehensive AI-powered plan with detailed meal plans, custom macros, 
-                        workout programming with exercises, and supplement protocols with dosages.
-                      </p>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Generating...
+                    </>
+                  ) : subscription.subscribed ? (
+                    <>
+                      <Sparkles className="h-4 w-4 mr-2" />
+                      Generate AI Plan
                     </>
                   ) : (
                     <>
-                      <h4 className="font-semibold text-sm mb-1">Want a deeper, AI-powered plan?</h4>
-                      <p className="text-xs text-muted-foreground">
-                        Elite members get custom AI Personal Plans with full meal plans, detailed macros, 
-                        saveable workout templates, supplement protocols with dosages, and more.
-                      </p>
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        {['Full meal plans', 'Custom macros', 'Saveable plans', 'Workout templates'].map((feature) => (
-                          <Badge key={feature} variant="secondary" className="text-xs">
-                            <Check className="h-3 w-3 mr-1" />
-                            {feature}
-                          </Badge>
-                        ))}
-                      </div>
+                      Upgrade to Elite
+                      <ArrowRight className="h-4 w-4 ml-2" />
                     </>
                   )}
-                </div>
+                </Button>
               </div>
-              <Button 
-                onClick={handleGenerateAIPlan} 
-                disabled={isGenerating}
-                className="shrink-0"
-              >
-                {isGenerating ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Generating...
-                  </>
-                ) : subscription.subscribed ? (
-                  <>
-                    <Sparkles className="h-4 w-4 mr-2" />
-                    {aiPlan ? 'Regenerate AI Plan' : 'Generate AI Plan'}
-                  </>
-                ) : (
-                  <>
-                    Upgrade to Elite
-                    <ArrowRight className="h-4 w-4 ml-2" />
-                  </>
-                )}
-              </Button>
             </div>
-          </div>
+          )}
         </CardContent>
       </Card>
 
