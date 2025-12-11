@@ -722,40 +722,27 @@ export default function Dashboard() {
               </Card>
 
 
-              {/* My Progress - Consolidated Elite Features */}
+              {/* Fitness Journey Quick Access */}
               <Card className="bg-gradient-to-br from-accent/10 to-accent/5 border-accent/20">
                 <CardHeader>
                   <CardTitle className="text-base flex items-center gap-2">
                     <Sparkles className="h-4 w-4 text-accent" />
-                    My Progress
+                    Fitness Journey
                   </CardTitle>
-                  <CardDescription>AI-powered progress tracking</CardDescription>
+                  <CardDescription>Your progress hub</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="grid grid-cols-2 gap-3 mb-4">
-                    <div className="text-center p-3 bg-background rounded-lg">
-                      <Camera className="h-5 w-5 mx-auto mb-1 text-muted-foreground" />
-                      <p className="text-lg font-bold">{progressPhotos}</p>
-                      <p className="text-xs text-muted-foreground">Photos</p>
-                    </div>
-                    <div className="text-center p-3 bg-background rounded-lg">
-                      <TrendingUp className="h-5 w-5 mx-auto mb-1 text-muted-foreground" />
-                      <p className="text-lg font-bold">{subscription.subscribed ? 'Active' : 'Locked'}</p>
-                      <p className="text-xs text-muted-foreground">AI Analysis</p>
-                    </div>
-                  </div>
-                  
+                <CardContent>
                   {subscription.subscribed ? (
                     <Button asChild className="w-full">
                       <Link to="/my-progress">
                         <Sparkles className="h-4 w-4 mr-2" />
-                        View My Progress
+                        Open Fitness Journey
                       </Link>
                     </Button>
                   ) : (
                     <div className="space-y-2">
                       <p className="text-xs text-muted-foreground text-center">
-                        AI Plans, Body Analysis & Photo Tracking
+                        AI Plans, Coaching, Body Analysis & more
                       </p>
                       <Button asChild className="w-full">
                         <a href="/#pricing">
@@ -764,138 +751,6 @@ export default function Dashboard() {
                         </a>
                       </Button>
                     </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* AI Coaching - Premium Feature */}
-              <Card className={!subscription.subscribed ? 'relative overflow-hidden' : ''}>
-                {!subscription.subscribed && (
-                  <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
-                    <Lock className="h-6 w-6 text-muted-foreground mb-2" />
-                    <p className="text-sm text-muted-foreground mb-2">Elite Feature</p>
-                    <Button size="sm" asChild>
-                      <a href="/#pricing">Upgrade</a>
-                    </Button>
-                  </div>
-                )}
-                <CardHeader>
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <MessageCircle className="h-4 w-4" />
-                    1-on-1 AI Coach
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center">
-                    <MessageCircle className="h-8 w-8 mx-auto mb-2 text-primary/50" />
-                    <p className="text-sm text-muted-foreground mb-2">Get personalized coaching advice</p>
-                    <Button size="sm" asChild className="w-full">
-                      <Link to="/coaching">Chat Now</Link>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Calorie Tracker - Premium Feature */}
-              <Card className={!subscription.subscribed ? 'relative overflow-hidden' : ''}>
-                {!subscription.subscribed && (
-                  <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
-                    <Lock className="h-6 w-6 text-muted-foreground mb-2" />
-                    <p className="text-sm text-muted-foreground mb-2">Elite Feature</p>
-                    <Button size="sm" asChild>
-                      <a href="/#pricing">Upgrade</a>
-                    </Button>
-                  </div>
-                )}
-                <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                    <Utensils className="h-4 w-4" />
-                    Calorie Tracker
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center">
-                    <Flame className="h-8 w-8 mx-auto mb-2 text-orange-500/50" />
-                    <p className="text-sm text-muted-foreground mb-2">Track meals & macros</p>
-                    <Button size="sm" asChild className="w-full">
-                      <Link to="/calories">Track Calories</Link>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Advanced Elite Features - Men 40+ */}
-              <Card className="bg-gradient-to-br from-accent/5 to-transparent">
-                <CardHeader>
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <Crown className="h-4 w-4 text-amber-500" />
-                    Advanced AI Features
-                  </CardTitle>
-                  <CardDescription>Designed for men over 40</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {/* Hormonal Optimization */}
-                  <div className={`relative ${!subscription.subscribed ? 'opacity-60' : ''}`}>
-                    <Button variant="outline" size="sm" asChild className="w-full justify-start">
-                      <Link to="/hormonal">
-                        <Battery className="h-4 w-4 mr-2 text-accent" />
-                        Hormonal Optimization
-                        {!subscription.subscribed && <Lock className="h-3 w-3 ml-auto" />}
-                      </Link>
-                    </Button>
-                  </div>
-                  
-                  {/* Joint Health */}
-                  <div className={`relative ${!subscription.subscribed ? 'opacity-60' : ''}`}>
-                    <Button variant="outline" size="sm" asChild className="w-full justify-start">
-                      <Link to="/joint-health">
-                        <Shield className="h-4 w-4 mr-2 text-accent" />
-                        Joint Health Analytics
-                        {!subscription.subscribed && <Lock className="h-3 w-3 ml-auto" />}
-                      </Link>
-                    </Button>
-                  </div>
-                  
-                  {/* Sleep-Adaptive */}
-                  <div className={`relative ${!subscription.subscribed ? 'opacity-60' : ''}`}>
-                    <Button variant="outline" size="sm" asChild className="w-full justify-start">
-                      <Link to="/sleep-adaptive">
-                        <Moon className="h-4 w-4 mr-2 text-accent" />
-                        Sleep-Adaptive Workouts
-                        {!subscription.subscribed && <Lock className="h-3 w-3 ml-auto" />}
-                      </Link>
-                    </Button>
-                  </div>
-                  
-                  {/* Comeback Protocol */}
-                  <div className={`relative ${!subscription.subscribed ? 'opacity-60' : ''}`}>
-                    <Button variant="outline" size="sm" asChild className="w-full justify-start">
-                      <Link to="/comeback">
-                        <RotateCcw className="h-4 w-4 mr-2 text-accent" />
-                        Comeback Protocol
-                        {!subscription.subscribed && <Lock className="h-3 w-3 ml-auto" />}
-                      </Link>
-                    </Button>
-                  </div>
-                  
-                  {/* Executive Mode */}
-                  <div className={`relative ${!subscription.subscribed ? 'opacity-60' : ''}`}>
-                    <Button variant="outline" size="sm" asChild className="w-full justify-start">
-                      <Link to="/executive-mode">
-                        <Briefcase className="h-4 w-4 mr-2 text-accent" />
-                        Executive Performance
-                        {!subscription.subscribed && <Lock className="h-3 w-3 ml-auto" />}
-                      </Link>
-                    </Button>
-                  </div>
-                  
-                  {!subscription.subscribed && (
-                    <Button size="sm" asChild className="w-full mt-2">
-                      <a href="/#pricing">
-                        <Crown className="h-4 w-4 mr-2" />
-                        Unlock All Features
-                      </a>
-                    </Button>
                   )}
                 </CardContent>
               </Card>

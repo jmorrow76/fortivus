@@ -2,9 +2,12 @@ import { useEffect, useMemo } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useOnboardingQuery } from "@/hooks/queries";
-import { ArrowLeft, Sparkles, Camera, TrendingUp, Lock, Crown, Lightbulb } from "lucide-react";
+import { 
+  ArrowLeft, Sparkles, Camera, TrendingUp, Lock, Crown, Lightbulb,
+  MessageCircle, Utensils, Battery, Shield, Moon, RotateCcw, Briefcase, Flame
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -181,8 +184,8 @@ const MyProgress = () => {
                   Elite Members Only
                 </h1>
                 <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-                  My Progress features are available exclusively to Fortivus Elite members. 
-                  Upgrade to unlock AI-powered body analysis, personalized plans, and progress tracking.
+                  Fitness Journey features are available exclusively to Fortivus Elite members. 
+                  Upgrade to unlock AI coaching, body analysis, personalized plans, and more.
                 </p>
                 
                 <div className="space-y-4">
@@ -199,7 +202,7 @@ const MyProgress = () => {
                   <ul className="text-sm text-muted-foreground space-y-2 text-left max-w-sm mx-auto">
                     <li className="flex items-start gap-2">
                       <span className="text-accent">✓</span>
-                      Quick Start Guide with personalized recommendations
+                      1-on-1 AI Coaching for personalized guidance
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-accent">✓</span>
@@ -211,11 +214,15 @@ const MyProgress = () => {
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-accent">✓</span>
+                      Calorie & Macro Tracking
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-accent">✓</span>
                       Progress Photo Tracking & Comparisons
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-accent">✓</span>
-                      Weight tracking charts
+                      Advanced AI features for men 40+
                     </li>
                   </ul>
                 </div>
@@ -242,34 +249,42 @@ const MyProgress = () => {
                 <Crown className="h-4 w-4 text-accent" />
                 <span className="text-xs font-medium tracking-wider uppercase text-accent">Elite Feature</span>
               </div>
-              <h1 className="font-heading text-2xl md:text-3xl font-bold">My Progress</h1>
+              <h1 className="font-heading text-2xl md:text-3xl font-bold">Fitness Journey</h1>
               <p className="text-muted-foreground text-sm">
-                Track your transformation with AI-powered tools
+                Your complete AI-powered progress hub
               </p>
             </div>
           </div>
 
           <Tabs defaultValue={defaultTab} className="w-full">
-            <TabsList className="mb-6 grid w-full max-w-2xl grid-cols-4">
+            <TabsList className="mb-6 flex flex-wrap gap-1 h-auto p-1">
               <TabsTrigger value="guide" className="gap-2">
                 <Lightbulb className="h-4 w-4" />
                 <span className="hidden sm:inline">Quick Start</span>
-                <span className="sm:hidden">Guide</span>
+              </TabsTrigger>
+              <TabsTrigger value="coach" className="gap-2">
+                <MessageCircle className="h-4 w-4" />
+                <span className="hidden sm:inline">AI Coach</span>
               </TabsTrigger>
               <TabsTrigger value="plan" className="gap-2">
                 <Sparkles className="h-4 w-4" />
                 <span className="hidden sm:inline">AI Plan</span>
-                <span className="sm:hidden">Plan</span>
+              </TabsTrigger>
+              <TabsTrigger value="calories" className="gap-2">
+                <Utensils className="h-4 w-4" />
+                <span className="hidden sm:inline">Calories</span>
               </TabsTrigger>
               <TabsTrigger value="analysis" className="gap-2">
                 <TrendingUp className="h-4 w-4" />
-                <span className="hidden sm:inline">Body Analysis</span>
-                <span className="sm:hidden">Analysis</span>
+                <span className="hidden sm:inline">Analysis</span>
               </TabsTrigger>
               <TabsTrigger value="photos" className="gap-2">
                 <Camera className="h-4 w-4" />
                 <span className="hidden sm:inline">Photos</span>
-                <span className="sm:hidden">Photos</span>
+              </TabsTrigger>
+              <TabsTrigger value="advanced" className="gap-2">
+                <Crown className="h-4 w-4" />
+                <span className="hidden sm:inline">Advanced</span>
               </TabsTrigger>
             </TabsList>
 
@@ -296,7 +311,31 @@ const MyProgress = () => {
               )}
             </TabsContent>
 
-            {/* AI Plan Tab - Navigate to full plan page */}
+            {/* AI Coach Tab */}
+            <TabsContent value="coach">
+              <Card>
+                <CardContent className="py-8">
+                  <div className="text-center mb-6">
+                    <MessageCircle className="h-12 w-12 mx-auto text-accent mb-4" />
+                    <h3 className="font-semibold text-xl mb-2">1-on-1 AI Coach</h3>
+                    <p className="text-muted-foreground max-w-md mx-auto">
+                      Get personalized coaching advice anytime. Your AI coach understands your goals, 
+                      fitness level, and preferences to provide tailored guidance.
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap justify-center gap-3">
+                    <Button size="lg" asChild>
+                      <Link to="/coaching">
+                        <MessageCircle className="h-4 w-4 mr-2" />
+                        Start Coaching Session
+                      </Link>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* AI Plan Tab */}
             <TabsContent value="plan">
               <Card>
                 <CardContent className="py-8">
@@ -313,6 +352,30 @@ const MyProgress = () => {
                       <Link to="/personal-plan">
                         <Sparkles className="h-4 w-4 mr-2" />
                         Create or View Plans
+                      </Link>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Calorie Tracker Tab */}
+            <TabsContent value="calories">
+              <Card>
+                <CardContent className="py-8">
+                  <div className="text-center mb-6">
+                    <Flame className="h-12 w-12 mx-auto text-orange-500 mb-4" />
+                    <h3 className="font-semibold text-xl mb-2">Calorie & Macro Tracker</h3>
+                    <p className="text-muted-foreground max-w-md mx-auto">
+                      Track your daily meals and macros. Log food, set calorie goals, 
+                      and monitor your nutrition to stay on track with your fitness goals.
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap justify-center gap-3">
+                    <Button size="lg" asChild>
+                      <Link to="/calories">
+                        <Utensils className="h-4 w-4 mr-2" />
+                        Open Calorie Tracker
                       </Link>
                     </Button>
                   </div>
@@ -476,6 +539,92 @@ const MyProgress = () => {
                       <WeightChart photos={photos} />
                     </TabsContent>
                   </Tabs>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Advanced AI Features Tab */}
+            <TabsContent value="advanced">
+              <Card className="bg-gradient-to-br from-accent/5 to-transparent">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Crown className="h-5 w-5 text-amber-500" />
+                    Advanced AI Features
+                  </CardTitle>
+                  <CardDescription>
+                    Specialized tools designed for men over 40
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {/* Hormonal Optimization */}
+                  <Card className="border-border/50">
+                    <CardContent className="pt-6">
+                      <Battery className="h-8 w-8 text-accent mb-3" />
+                      <h4 className="font-semibold mb-2">Hormonal Optimization</h4>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Optimize training and nutrition around natural testosterone fluctuations.
+                      </p>
+                      <Button variant="outline" size="sm" asChild className="w-full">
+                        <Link to="/hormonal">Open Tool</Link>
+                      </Button>
+                    </CardContent>
+                  </Card>
+
+                  {/* Joint Health */}
+                  <Card className="border-border/50">
+                    <CardContent className="pt-6">
+                      <Shield className="h-8 w-8 text-accent mb-3" />
+                      <h4 className="font-semibold mb-2">Joint Health Analytics</h4>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        AI-driven injury risk prediction and prevention protocols.
+                      </p>
+                      <Button variant="outline" size="sm" asChild className="w-full">
+                        <Link to="/joint-health">Open Tool</Link>
+                      </Button>
+                    </CardContent>
+                  </Card>
+
+                  {/* Sleep-Adaptive */}
+                  <Card className="border-border/50">
+                    <CardContent className="pt-6">
+                      <Moon className="h-8 w-8 text-accent mb-3" />
+                      <h4 className="font-semibold mb-2">Sleep-Adaptive Workouts</h4>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Modify workouts based on your sleep quality and recovery data.
+                      </p>
+                      <Button variant="outline" size="sm" asChild className="w-full">
+                        <Link to="/sleep-adaptive">Open Tool</Link>
+                      </Button>
+                    </CardContent>
+                  </Card>
+
+                  {/* Comeback Protocol */}
+                  <Card className="border-border/50">
+                    <CardContent className="pt-6">
+                      <RotateCcw className="h-8 w-8 text-accent mb-3" />
+                      <h4 className="font-semibold mb-2">Comeback Protocol</h4>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Smart return-to-fitness guidance after breaks or injuries.
+                      </p>
+                      <Button variant="outline" size="sm" asChild className="w-full">
+                        <Link to="/comeback">Open Tool</Link>
+                      </Button>
+                    </CardContent>
+                  </Card>
+
+                  {/* Executive Mode */}
+                  <Card className="border-border/50">
+                    <CardContent className="pt-6">
+                      <Briefcase className="h-8 w-8 text-accent mb-3" />
+                      <h4 className="font-semibold mb-2">Executive Performance</h4>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Cognitive and performance optimization for busy professionals.
+                      </p>
+                      <Button variant="outline" size="sm" asChild className="w-full">
+                        <Link to="/executive-mode">Open Tool</Link>
+                      </Button>
+                    </CardContent>
+                  </Card>
                 </CardContent>
               </Card>
             </TabsContent>
