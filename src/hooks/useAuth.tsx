@@ -173,7 +173,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signInWithSocial = async (provider: SocialProvider) => {
-    const redirectUrl = `${window.location.origin}/dashboard`;
+    // Redirect to auth page first, which will then redirect based on preference
+    const redirectUrl = `${window.location.origin}/auth`;
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {

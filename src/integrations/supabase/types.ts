@@ -1481,6 +1481,7 @@ export type Database = {
           fat_goal: number | null
           id: string
           is_simulated: boolean | null
+          landing_page_preference: string | null
           protein_goal: number | null
           updated_at: string
           user_id: string
@@ -1495,6 +1496,7 @@ export type Database = {
           fat_goal?: number | null
           id?: string
           is_simulated?: boolean | null
+          landing_page_preference?: string | null
           protein_goal?: number | null
           updated_at?: string
           user_id: string
@@ -1509,6 +1511,7 @@ export type Database = {
           fat_goal?: number | null
           id?: string
           is_simulated?: boolean | null
+          landing_page_preference?: string | null
           protein_goal?: number | null
           updated_at?: string
           user_id?: string
