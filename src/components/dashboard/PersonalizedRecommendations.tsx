@@ -20,7 +20,8 @@ import {
   Check, Sparkles, ArrowRight, Loader2, Crown,
   Save, ChevronDown, ChevronUp, FileText, Plus
 } from 'lucide-react';
-import { OnboardingData, PersonalizedRecommendations as Recommendations } from '@/hooks/useOnboarding';
+import { OnboardingData } from '@/hooks/queries/useOnboardingQuery';
+import { PersonalizedRecommendations as Recommendations } from '@/lib/onboardingUtils';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';

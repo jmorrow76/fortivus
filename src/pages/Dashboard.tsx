@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { 
   Loader2, Trophy, Flame, Target, Dumbbell, Calendar, 
@@ -8,9 +8,15 @@ import {
   Battery, Shield, Moon, RotateCcw, Briefcase, Lightbulb
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { useGamification } from '@/hooks/useGamification';
 import { useWorkoutLog } from '@/hooks/useWorkoutLog';
-import { useOnboarding } from '@/hooks/useOnboarding';
+import { 
+  useStreakQuery, 
+  useBadgesQuery, 
+  useUserBadgesQuery,
+  useChallengesQuery,
+  useUserChallengesQuery,
+  useOnboardingQuery,
+} from '@/hooks/queries';
 import PersonalizedRecommendations from '@/components/dashboard/PersonalizedRecommendations';
 import ScriptureOfDay from '@/components/dashboard/ScriptureOfDay';
 import { supabase } from '@/integrations/supabase/client';
@@ -23,6 +29,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
+import { getPersonalizedRecommendations } from '@/lib/onboardingUtils';
 
 interface Profile {
   display_name: string | null;
@@ -66,9 +73,16 @@ interface RecentPR {
 export default function Dashboard() {
   const navigate = useNavigate();
   const { user, loading: authLoading, subscription } = useAuth();
-  const { badges, userBadges, challenges, userChallenges, streak, loading: gamificationLoading } = useGamification();
+  
+  // React Query hooks for gamification data
+  const { data: streak, isLoading: streakLoading } = useStreakQuery();
+  const { data: badges = [], isLoading: badgesLoading } = useBadgesQuery();
+  const { data: userBadges = [], isLoading: userBadgesLoading } = useUserBadgesQuery();
+  const { data: challenges = [], isLoading: challengesLoading } = useChallengesQuery();
+  const { data: userChallenges = [], isLoading: userChallengesLoading } = useUserChallengesQuery();
+  const { data: onboardingData, isLoading: onboardingLoading } = useOnboardingQuery();
+  
   const { workouts, getWeeklyStats, loading: workoutsLoading } = useWorkoutLog();
-  const { hasCompletedOnboarding, isLoading: onboardingLoading, onboardingData, getPersonalizedRecommendations } = useOnboarding();
   
   const [profile, setProfile] = useState<Profile | null>(null);
   const [leaderboardPos, setLeaderboardPos] = useState<LeaderboardPosition | null>(null);
@@ -80,6 +94,9 @@ export default function Dashboard() {
   const [recentPRs, setRecentPRs] = useState<RecentPR[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Compute hasCompletedOnboarding from query data
+  const hasCompletedOnboarding = onboardingData !== null && onboardingData !== undefined;
+
   useEffect(() => {
     if (!authLoading && !user) {
       navigate('/auth');
@@ -88,10 +105,10 @@ export default function Dashboard() {
 
   // Redirect to onboarding if not completed
   useEffect(() => {
-    if (!authLoading && !onboardingLoading && user && hasCompletedOnboarding === false) {
+    if (!authLoading && !onboardingLoading && user && onboardingData === null) {
       navigate('/onboarding');
     }
-  }, [user, authLoading, onboardingLoading, hasCompletedOnboarding, navigate]);
+  }, [user, authLoading, onboardingLoading, onboardingData, navigate]);
 
   useEffect(() => {
     if (user) {
@@ -224,8 +241,9 @@ export default function Dashboard() {
   };
 
   const weeklyStats = getWeeklyStats();
+  const gamificationLoading = streakLoading || badgesLoading || userBadgesLoading || challengesLoading || userChallengesLoading;
   const isLoading = authLoading || gamificationLoading || workoutsLoading || onboardingLoading || loading;
-  const recommendations = getPersonalizedRecommendations();
+  const recommendations = useMemo(() => getPersonalizedRecommendations(onboardingData), [onboardingData]);
 
   if (isLoading) {
     return (
