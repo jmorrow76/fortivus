@@ -43,6 +43,7 @@ import TermsOfService from "./pages/TermsOfService";
 import NotFound from "./pages/NotFound";
 import SupportButton from "./components/SupportButton";
 import ReferralButton from "./components/ReferralButton";
+import BackToTopButton from "./components/BackToTopButton";
 import ScrollToTop from "./components/ScrollToTop";
 import { CookieConsent } from "./components/CookieConsent";
 
@@ -56,6 +57,7 @@ const App = () => (
         <Sonner />
         <SupportButton />
         <ReferralButton />
+        <BackToTopButton />
         <BrowserRouter>
           <ScrollToTop />
           <Routes>
