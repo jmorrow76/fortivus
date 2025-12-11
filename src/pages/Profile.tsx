@@ -10,7 +10,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Camera, Loader2, User, Crown, Settings, Calendar, Sparkles, Flame, RefreshCw } from "lucide-react";
+import { ArrowLeft, Camera, Loader2, User, Crown, Settings, Calendar, Sparkles, Flame, RefreshCw, LayoutDashboard, Home } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Navbar from "@/components/Navbar";
 import HealthDashboard from "@/components/HealthDashboard";
 import { NotificationSettings } from "@/components/NotificationSettings";
@@ -36,6 +37,7 @@ const Profile = () => {
   const [proteinGoal, setProteinGoal] = useState(150);
   const [carbsGoal, setCarbsGoal] = useState(200);
   const [fatGoal, setFatGoal] = useState(65);
+  const [landingPagePreference, setLandingPagePreference] = useState<"dashboard" | "fitness-journey">("dashboard");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -104,7 +106,7 @@ const Profile = () => {
     try {
       const { data, error } = await supabase
         .from("profiles")
-        .select("display_name, avatar_url, calorie_goal, protein_goal, carbs_goal, fat_goal")
+        .select("display_name, avatar_url, calorie_goal, protein_goal, carbs_goal, fat_goal, landing_page_preference")
         .eq("user_id", user!.id)
         .maybeSingle();
 
@@ -117,6 +119,7 @@ const Profile = () => {
         setProteinGoal(data.protein_goal || 150);
         setCarbsGoal(data.carbs_goal || 200);
         setFatGoal(data.fat_goal || 65);
+        setLandingPagePreference((data.landing_page_preference as "dashboard" | "fitness-journey") || "dashboard");
       }
     } catch (error) {
       console.error("Error fetching profile:", error);
@@ -180,7 +183,8 @@ const Profile = () => {
           calorie_goal: calorieGoal,
           protein_goal: proteinGoal,
           carbs_goal: carbsGoal,
-          fat_goal: fatGoal
+          fat_goal: fatGoal,
+          landing_page_preference: landingPagePreference
         })
         .eq("user_id", user.id);
 
@@ -453,6 +457,37 @@ const Profile = () => {
                   </p>
                 </div>
               )}
+
+              {/* Landing Page Preference Section */}
+              <div className="space-y-4 pt-4 border-t">
+                <div className="flex items-center gap-2">
+                  <Home className="h-5 w-5 text-accent" />
+                  <h3 className="font-semibold">Default Landing Page</h3>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Choose which page to show after you sign in
+                </p>
+                <RadioGroup 
+                  value={landingPagePreference} 
+                  onValueChange={(value) => setLandingPagePreference(value as "dashboard" | "fitness-journey")}
+                  className="space-y-3"
+                >
+                  <div className="flex items-center space-x-3">
+                    <RadioGroupItem value="dashboard" id="landing-dashboard" />
+                    <Label htmlFor="landing-dashboard" className="flex items-center gap-2 cursor-pointer">
+                      <LayoutDashboard className="h-4 w-4 text-primary" />
+                      Member Dashboard
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <RadioGroupItem value="fitness-journey" id="landing-fitness" />
+                    <Label htmlFor="landing-fitness" className="flex items-center gap-2 cursor-pointer">
+                      <Flame className="h-4 w-4 text-orange-500" />
+                      Fitness Journey
+                    </Label>
+                  </div>
+                </RadioGroup>
+              </div>
 
               {/* Save Button */}
               <Button

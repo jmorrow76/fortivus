@@ -11,6 +11,7 @@ import { Loader2, ArrowLeft, Mail, CheckCircle2, RefreshCw, KeyRound } from 'luc
 import { z } from 'zod';
 import { supabase } from '@/integrations/supabase/client';
 import PasswordStrengthIndicator from '@/components/PasswordStrengthIndicator';
+import LandingPagePreferenceModal from '@/components/LandingPagePreferenceModal';
 
 const emailSchema = z.string().email('Please enter a valid email address');
 const passwordSchema = z.string().min(6, 'Password must be at least 6 characters');
@@ -30,6 +31,8 @@ const Auth = () => {
   const [resendCooldown, setResendCooldown] = useState(0);
   const [isResending, setIsResending] = useState(false);
   const [passwordUpdated, setPasswordUpdated] = useState(false);
+  const [showLandingPreferenceModal, setShowLandingPreferenceModal] = useState(false);
+  const [isNewUser, setIsNewUser] = useState(false);
   
   const { user, loading, signIn, signUp, resendVerificationEmail, resetPassword, updatePassword } = useAuth();
   const navigate = useNavigate();
@@ -48,9 +51,28 @@ const Auth = () => {
   }, []);
 
   useEffect(() => {
-    if (user && !loading && mode !== 'update-password') {
-      navigate('/dashboard');
-    }
+    const checkUserAndRedirect = async () => {
+      if (user && !loading && mode !== 'update-password') {
+        // Check if this is a new user (no landing_page_preference set yet)
+        const { data } = await supabase
+          .from('profiles')
+          .select('landing_page_preference')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        
+        // If no preference set, show the modal for new users
+        if (!data?.landing_page_preference) {
+          setIsNewUser(true);
+          setShowLandingPreferenceModal(true);
+        } else {
+          // Redirect based on preference
+          const targetPage = data.landing_page_preference === 'fitness-journey' ? '/my-progress' : '/dashboard';
+          navigate(targetPage);
+        }
+      }
+    };
+    
+    checkUserAndRedirect();
   }, [user, loading, navigate, mode]);
 
   // Cooldown timer effect
@@ -166,6 +188,19 @@ const Auth = () => {
       }
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleLandingPreferenceSelect = async (preference: "dashboard" | "fitness-journey") => {
+    if (user) {
+      await supabase
+        .from('profiles')
+        .update({ landing_page_preference: preference })
+        .eq('user_id', user.id);
+      
+      setShowLandingPreferenceModal(false);
+      const targetPage = preference === 'fitness-journey' ? '/my-progress' : '/dashboard';
+      navigate(targetPage);
     }
   };
 
@@ -474,6 +509,11 @@ const Auth = () => {
           )}
         </CardContent>
       </Card>
+      
+      <LandingPagePreferenceModal 
+        open={showLandingPreferenceModal} 
+        onSelect={handleLandingPreferenceSelect}
+      />
     </div>
   );
 };
