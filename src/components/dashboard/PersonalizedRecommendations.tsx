@@ -566,10 +566,10 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
             <div>
               <CardTitle className="flex items-center gap-2">
                 <Lightbulb className="h-5 w-5 text-primary" />
-                Quick Start Guide
+                Mission Control
               </CardTitle>
               <CardDescription className="mt-1">
-                Based on your assessment • Personalized recommendations for you
+                Based on your assessment • Your personalized fitness command center
               </CardDescription>
             </div>
             <div className="flex flex-wrap gap-2">
