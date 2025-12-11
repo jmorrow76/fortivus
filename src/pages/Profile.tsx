@@ -15,6 +15,7 @@ import Navbar from "@/components/Navbar";
 import HealthDashboard from "@/components/HealthDashboard";
 import { NotificationSettings } from "@/components/NotificationSettings";
 import { SocialConnections } from "@/components/SocialConnections";
+import PromoCodeRedemption from "@/components/PromoCodeRedemption";
 import { format } from "date-fns";
 
 const Profile = () => {
@@ -287,6 +288,13 @@ const Profile = () => {
               )}
             </CardContent>
           </Card>
+
+          {/* Promo Code Redemption - only show if not already elite */}
+          {!isElite && (
+            <div className="mb-6">
+              <PromoCodeRedemption />
+            </div>
+          )}
 
           {/* Profile Settings Card */}
           <Card className="shadow-card">

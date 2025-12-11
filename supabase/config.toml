@@ -77,3 +77,6 @@ verify_jwt = false
 
 [functions.notify-featured-testimony]
 verify_jwt = false
+
+[functions.redeem-promo-code]
+verify_jwt = false
