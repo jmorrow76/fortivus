@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { 
   Loader2, Trophy, Flame, Target, Dumbbell, Calendar, 
@@ -17,7 +17,7 @@ import {
   useUserChallengesQuery,
   useOnboardingQuery,
 } from '@/hooks/queries';
-import PersonalizedRecommendations from '@/components/dashboard/PersonalizedRecommendations';
+
 import ScriptureOfDay from '@/components/dashboard/ScriptureOfDay';
 import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
@@ -29,7 +29,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
-import { getPersonalizedRecommendations } from '@/lib/onboardingUtils';
+
 
 interface Profile {
   display_name: string | null;
@@ -243,7 +243,7 @@ export default function Dashboard() {
   const weeklyStats = getWeeklyStats();
   const gamificationLoading = streakLoading || badgesLoading || userBadgesLoading || challengesLoading || userChallengesLoading;
   const isLoading = authLoading || gamificationLoading || workoutsLoading || onboardingLoading || loading;
-  const recommendations = useMemo(() => getPersonalizedRecommendations(onboardingData), [onboardingData]);
+  
 
   if (isLoading) {
     return (
@@ -342,14 +342,31 @@ export default function Dashboard() {
             <ScriptureOfDay />
           </div>
 
-          {/* Personalized Recommendations - Show if onboarding completed */}
-          {recommendations && onboardingData && (
-            <div className="mb-8">
-              <PersonalizedRecommendations 
-                recommendations={recommendations} 
-                onboardingData={onboardingData} 
-              />
-            </div>
+          {/* My Progress Quick Access for Elite Users */}
+          {subscription.subscribed && (
+            <Card className="mb-8 bg-gradient-to-br from-accent/5 to-accent/10 border-accent/20">
+              <CardContent className="py-6">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 rounded-full bg-accent/20">
+                      <Sparkles className="h-6 w-6 text-accent" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-lg">My Progress Hub</h3>
+                      <p className="text-sm text-muted-foreground">
+                        AI Plans, Body Analysis & Progress Photos
+                      </p>
+                    </div>
+                  </div>
+                  <Button asChild>
+                    <Link to="/my-progress">
+                      <Sparkles className="h-4 w-4 mr-2" />
+                      Open My Progress
+                    </Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           )}
 
           {/* Quick Stats Row */}
