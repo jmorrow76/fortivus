@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -16,8 +17,43 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
     const { goals, currentStats, preferences } = await req.json();
     console.log("[GENERATE-PLAN] Request received:", { goals, currentStats, preferences });
+
+    // Fetch recommended products from database to incorporate into the plan
+    const { data: products, error: productsError } = await supabase
+      .from("recommended_products")
+      .select("id, title, description, amazon_url, category, price, is_featured")
+      .order("is_featured", { ascending: false })
+      .order("sort_order", { ascending: true });
+
+    if (productsError) {
+      console.error("[GENERATE-PLAN] Error fetching products:", productsError);
+    }
+
+    const productsByCategory = products?.reduce((acc: Record<string, any[]>, product) => {
+      if (!acc[product.category]) {
+        acc[product.category] = [];
+      }
+      acc[product.category].push(product);
+      return acc;
+    }, {}) || {};
+
+    console.log("[GENERATE-PLAN] Found products by category:", Object.keys(productsByCategory));
+
+    // Build product context for AI
+    const productContext = products?.length 
+      ? `
+AVAILABLE RECOMMENDED PRODUCTS TO REFERENCE:
+${products.map(p => `- ${p.title} (Category: ${p.category}, Price: ${p.price || 'N/A'}) - ID: ${p.id}`).join('\n')}
+
+When recommending supplements or equipment, try to match with these product IDs when relevant. Include the product_id in your supplement recommendations if there's a matching product.
+`
+      : '';
 
     const systemPrompt = `You are a faith-based fitness coach and nutritionist specializing in Christian men over 40. Generate a comprehensive, personalized fitness plan that helps men steward their bodies as temples of the Holy Spirit.
 
@@ -25,6 +61,8 @@ Your approach integrates:
 - Evidence-based fitness science optimized for men over 40
 - Biblical wisdom about physical stewardship and discipline
 - Practical guidance that fits busy lives with family and ministry commitments
+
+${productContext}
 
 Return a JSON object with this exact structure:
 {
@@ -68,7 +106,15 @@ Return a JSON object with this exact structure:
       "name": "supplement name",
       "dosage": "recommended dosage",
       "timing": "when to take",
-      "benefit": "why it helps for their goals"
+      "benefit": "why it helps for their goals",
+      "product_id": "matching product ID from recommended products if available, or null"
+    }
+  ],
+  "recommendedGear": [
+    {
+      "name": "equipment name",
+      "reason": "why this helps their training",
+      "product_id": "matching product ID from recommended products if available, or null"
     }
   ],
   "timeline": "realistic timeframe to see results",
@@ -78,7 +124,7 @@ Return a JSON object with this exact structure:
 Be specific, practical, and tailor everything to Christian men over 40. Focus on:
 - Joint-friendly exercises that build sustainable strength
 - Nutrition that fuels energy for family and ministry
-- Evidence-based supplements
+- Evidence-based supplements with product recommendations when available
 - Training as an act of stewardship, not vanity
 - Building habits that honor God with the body He gave them`;
 
@@ -99,7 +145,7 @@ PREFERENCES:
 - Time available: ${preferences?.timeAvailable || '45-60 minutes per session'}
 - Equipment access: ${preferences?.equipment || 'Full gym access'}
 
-Generate a complete, actionable plan optimized for their specific situation. Remember: this man wants to steward his body well to serve God, his family, and his community with strength and vitality.`;
+Generate a complete, actionable plan optimized for their specific situation. When recommending supplements or gear, match with the available recommended products by including their product_id. Remember: this man wants to steward his body well to serve God, his family, and his community with strength and vitality.`;
 
     console.log("[GENERATE-PLAN] Calling Lovable AI...");
 
@@ -156,7 +202,52 @@ Generate a complete, actionable plan optimized for their specific situation. Rem
       throw new Error("Failed to parse AI response");
     }
 
-    console.log("[GENERATE-PLAN] Plan generated successfully");
+    // Enrich supplements and gear with full product details
+    if (products?.length) {
+      const productMap = new Map(products.map(p => [p.id, p]));
+      
+      if (plan.supplements) {
+        plan.supplements = plan.supplements.map((supp: any) => {
+          if (supp.product_id) {
+            const product = productMap.get(supp.product_id);
+            if (product) {
+              return {
+                ...supp,
+                product: {
+                  id: product.id,
+                  title: product.title,
+                  amazon_url: product.amazon_url,
+                  price: product.price,
+                }
+              };
+            }
+          }
+          return supp;
+        });
+      }
+
+      if (plan.recommendedGear) {
+        plan.recommendedGear = plan.recommendedGear.map((gear: any) => {
+          if (gear.product_id) {
+            const product = productMap.get(gear.product_id);
+            if (product) {
+              return {
+                ...gear,
+                product: {
+                  id: product.id,
+                  title: product.title,
+                  amazon_url: product.amazon_url,
+                  price: product.price,
+                }
+              };
+            }
+          }
+          return gear;
+        });
+      }
+    }
+
+    console.log("[GENERATE-PLAN] Plan generated successfully with product integrations");
 
     return new Response(JSON.stringify({ plan }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
