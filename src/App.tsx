@@ -43,6 +43,7 @@ import TermsOfService from "./pages/TermsOfService";
 import NotFound from "./pages/NotFound";
 import Recommendations from "./pages/Recommendations";
 import MyProgress from "./pages/MyProgress";
+import InstagramPosts from "./pages/InstagramPosts";
 import SupportButton from "./components/SupportButton";
 import ReferralButton from "./components/ReferralButton";
 import BackToTopButton from "./components/BackToTopButton";
@@ -101,6 +102,7 @@ const App = () => (
             <Route path="/terms-of-service" element={<TermsOfService />} />
             <Route path="/recommendations" element={<Recommendations />} />
             <Route path="/my-progress" element={<MyProgress />} />
+            <Route path="/instagram-posts" element={<InstagramPosts />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
