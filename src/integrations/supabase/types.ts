@@ -1530,6 +1530,48 @@ export type Database = {
         }
         Relationships: []
       }
+      recommended_products: {
+        Row: {
+          amazon_url: string
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          is_featured: boolean
+          price: string | null
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          amazon_url: string
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_featured?: boolean
+          price?: string | null
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          amazon_url?: string
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_featured?: boolean
+          price?: string | null
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       running_goals: {
         Row: {
           created_at: string

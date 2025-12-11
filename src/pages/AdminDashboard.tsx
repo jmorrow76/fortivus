@@ -13,8 +13,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { Shield, Users, Crown, TrendingUp, Calendar, Trash2, Plus, Loader2, Bot, Play, UserPlus, FileText, Mail, Send, Eye, Ban, UserX, CheckSquare, Square, ChevronLeft, ChevronRight, Gift } from 'lucide-react';
+import { Shield, Users, Crown, TrendingUp, Calendar, Trash2, Plus, Loader2, Bot, Play, UserPlus, FileText, Mail, Send, Eye, Ban, UserX, CheckSquare, Square, ChevronLeft, ChevronRight, Gift, ShoppingBag } from 'lucide-react';
 import PromoCodeManager from '@/components/admin/PromoCodeManager';
+import ProductManager from '@/components/admin/ProductManager';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
@@ -618,6 +619,10 @@ const AdminDashboard = () => {
             <TabsTrigger value="promo-codes" className="gap-2">
               <Gift className="h-4 w-4" />
               Promo Codes
+            </TabsTrigger>
+            <TabsTrigger value="products" className="gap-2">
+              <ShoppingBag className="h-4 w-4" />
+              Products
             </TabsTrigger>
           </TabsList>
 
@@ -1497,6 +1502,11 @@ const AdminDashboard = () => {
           {/* Promo Codes Tab */}
           <TabsContent value="promo-codes" className="space-y-6">
             <PromoCodeManager />
+          </TabsContent>
+
+          {/* Products Tab */}
+          <TabsContent value="products" className="space-y-6">
+            <ProductManager />
           </TabsContent>
         </Tabs>
       </main>
