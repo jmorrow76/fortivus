@@ -247,28 +247,28 @@ const TooltipTour = ({ steps, isOpen, onComplete, onSkip }: TooltipTourProps) =>
 // Pre-defined tour configurations
 export const dashboardTourSteps: TourStep[] = [
   {
-    target: '[data-tour="streak-stats"]',
-    title: "Track Your Streak",
-    description: "See your current streak, XP, leaderboard position, and badges at a glance. Keep checking in daily to maintain your streak!",
+    target: '[data-tour="elite-dropdown"]',
+    title: "Elite Features",
+    description: "Access all premium features including AI Coach, Workouts, Run Tracker, and advanced health tools designed for men over 40.",
     placement: "bottom",
   },
   {
-    target: '[data-tour="scripture"]',
-    title: "Daily Scripture",
-    description: "Start each day with biblical wisdom. A new verse appears daily to inspire your fitness journey and spiritual growth.",
+    target: '[data-tour="nav-knowledge-hub"]',
+    title: "Knowledge Hub",
+    description: "Expert articles on fitness, nutrition, recovery, and faith-based wellness. New content added weekly.",
     placement: "bottom",
   },
   {
-    target: '[data-tour="weekly-training"]',
-    title: "Weekly Training Stats",
-    description: "Track your workout progress throughout the week. See total workouts, minutes trained, and XP earned.",
-    placement: "top",
+    target: '[data-tour="nav-forum"]',
+    title: "Community Forum",
+    description: "Connect with fellow brothers, share prayer requests, ask questions, and encourage one another.",
+    placement: "bottom",
   },
   {
-    target: '[data-tour="community"]',
-    title: "Community & Challenges",
-    description: "Connect with fellow brothers, join challenges, and celebrate achievements together. Iron sharpens iron!",
-    placement: "top",
+    target: '[data-tour="nav-actions"]',
+    title: "Quick Actions",
+    description: "Notifications, messages, settings, and quick access to your Member Dashboard are always available here.",
+    placement: "bottom",
   },
 ];
 
