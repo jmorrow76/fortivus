@@ -76,29 +76,6 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-6" data-tour="nav-links">
-            {/* Elite Features Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger data-tour="elite-dropdown" className="text-xs font-medium tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-200 flex items-center gap-1 outline-none">
-                <Crown className="h-3 w-3 text-amber-500" />
-                Elite Features
-                <ChevronDown className="h-3 w-3" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-56 bg-background border-border">
-                <DropdownMenuLabel className="text-xs tracking-wider uppercase text-muted-foreground">
-                  Premium Features
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {eliteFeatures.map((feature) => (
-                  <DropdownMenuItem key={feature.name} asChild>
-                    <Link to={feature.href} className="flex items-center gap-2 cursor-pointer">
-                      <feature.icon className="h-4 w-4 text-accent" />
-                      {feature.name}
-                    </Link>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-
             {navLinks.map((link) => (
               <Link
                 key={link.name}
