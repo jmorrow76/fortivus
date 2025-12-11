@@ -81,10 +81,13 @@ const Recommendations = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-serif font-bold mb-4">
-            Recommended Products
+            My Daily Essentials
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Curated products we trust and recommend for your fitness journey. 
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-4">
+            These are the exact products I use every single day to support my health, training, and recovery. 
+            I only recommend what I personally trust and have tested.
+          </p>
+          <p className="text-sm text-muted-foreground">
             As an Amazon Associate, we earn from qualifying purchases.
           </p>
         </div>
