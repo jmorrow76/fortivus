@@ -19,6 +19,7 @@ import {
 } from '@/hooks/queries';
 
 import ScriptureOfDay from '@/components/dashboard/ScriptureOfDay';
+import CommunityPreview from '@/components/dashboard/CommunityPreview';
 import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
 import QuickStartFAB from '@/components/QuickStartFAB';
@@ -686,6 +687,9 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
 
+              {/* Community Preview */}
+              <CommunityPreview />
+
             </div>
 
             {/* Sidebar Column */}
@@ -755,34 +759,6 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <Users className="h-4 w-4" />
-                    Community
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <Button variant="outline" size="sm" asChild className="w-full justify-start">
-                    <Link to="/leaderboard">
-                      <Trophy className="h-4 w-4 mr-2" />
-                      Leaderboard
-                    </Link>
-                  </Button>
-                  <Button variant="outline" size="sm" asChild className="w-full justify-start">
-                    <Link to="/community">
-                      <Users className="h-4 w-4 mr-2" />
-                      Activity Feed
-                    </Link>
-                  </Button>
-                  <Button variant="outline" size="sm" asChild className="w-full justify-start">
-                    <Link to="/forum">
-                      <TrendingUp className="h-4 w-4 mr-2" />
-                      Forum
-                    </Link>
-                  </Button>
-                </CardContent>
-              </Card>
 
             </div>
           </div>
