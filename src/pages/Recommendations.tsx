@@ -34,6 +34,7 @@ const CATEGORIES = [
   { value: "apparel", label: "Apparel" },
   { value: "recovery", label: "Recovery" },
   { value: "nutrition", label: "Nutrition" },
+  { value: "skincare", label: "Skincare" },
   { value: "books", label: "Books" },
   { value: "general", label: "General" },
 ];
