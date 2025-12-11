@@ -128,7 +128,13 @@ const Navbar = () => {
                 <Button variant="default" size="sm" asChild data-tour="nav-dashboard">
                   <Link to="/dashboard" className="flex items-center gap-2">
                     <LayoutDashboard className="h-4 w-4" />
-                    Member Dashboard
+                    Dashboard
+                  </Link>
+                </Button>
+                <Button variant="outline" size="sm" asChild data-tour="nav-fitness-journey">
+                  <Link to="/my-progress" className="flex items-center gap-2">
+                    <Crown className="h-4 w-4 text-amber-500" />
+                    Fitness Journey
                   </Link>
                 </Button>
                 {isAdmin && (

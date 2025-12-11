@@ -265,9 +265,15 @@ export const dashboardTourSteps: TourStep[] = [
     placement: "bottom",
   },
   {
-    target: '[data-tour="nav-actions"]',
-    title: "Quick Actions",
-    description: "Notifications, messages, settings, and quick access to your Member Dashboard are always available here.",
+    target: '[data-tour="nav-dashboard"]',
+    title: "Member Dashboard",
+    description: "Your central hub for streaks, XP, badges, challenges, and community activity at a glance.",
+    placement: "bottom",
+  },
+  {
+    target: '[data-tour="nav-fitness-journey"]',
+    title: "Fitness Journey",
+    description: "Access your personalized AI coaching, body analysis, calorie tracking, and all premium Elite features.",
     placement: "bottom",
   },
 ];
