@@ -18,7 +18,7 @@ import {
   Lightbulb, Target, Dumbbell, Utensils, Battery, 
   Calendar, ChevronRight, Pill, Clock, Flame,
   Check, Sparkles, ArrowRight, Loader2, Crown,
-  Save, ChevronDown, ChevronUp, FileText, Plus
+  Save, ChevronDown, ChevronUp, FileText, Plus, MapPin
 } from 'lucide-react';
 import { OnboardingData } from '@/hooks/queries/useOnboardingQuery';
 import { PersonalizedRecommendations as Recommendations } from '@/lib/onboardingUtils';
@@ -645,6 +645,27 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
                   </div>
                 </div>
               )}
+
+              {/* Run Tracker Section */}
+              <div className="p-4 bg-background rounded-lg border">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <MapPin className="h-4 w-4 text-primary" />
+                      <span className="text-sm font-medium">Run Tracker</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Track your runs with GPS, monitor pace, and earn running badges
+                    </p>
+                  </div>
+                  <Button size="sm" asChild>
+                    <Link to="/running">
+                      <MapPin className="h-4 w-4 mr-2" />
+                      Start Run
+                    </Link>
+                  </Button>
+                </div>
+              </div>
 
               <div className="flex flex-wrap gap-3 pt-2">
                 <Button asChild>
