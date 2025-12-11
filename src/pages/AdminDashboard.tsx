@@ -1152,10 +1152,10 @@ const AdminDashboard = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Plus className="h-5 w-5" />
-                  Grant Elite Access
+                  Grant Lifetime Elite Access
                 </CardTitle>
                 <CardDescription>
-                  Manually grant elite subscription access to a user by email
+                  Manually grant lifetime elite subscription access to a user by email
                 </CardDescription>
               </CardHeader>
               <CardContent>
