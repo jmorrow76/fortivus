@@ -223,7 +223,7 @@ export default function Testimonies() {
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       
-      <main className="flex-1 container pt-32 md:pt-28 pb-8">
+      <main className="flex-1 container pt-40 md:pt-28 pb-8">
         {/* Header */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center justify-center gap-2 mb-4">
