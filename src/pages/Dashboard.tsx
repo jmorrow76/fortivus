@@ -331,7 +331,7 @@ export default function Dashboard() {
               <Button variant="outline" asChild size="lg" className="flex-1 sm:flex-none">
                 <Link to="/my-progress">
                   <Sparkles className="h-5 w-5 mr-2" />
-                  My Progress
+                  Fitness Journey
                 </Link>
               </Button>
             )}
@@ -341,33 +341,6 @@ export default function Dashboard() {
           <div className="mb-8">
             <ScriptureOfDay />
           </div>
-
-          {/* My Progress Quick Access for Elite Users */}
-          {subscription.subscribed && (
-            <Card className="mb-8 bg-gradient-to-br from-accent/5 to-accent/10 border-accent/20">
-              <CardContent className="py-6">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 rounded-full bg-accent/20">
-                      <Sparkles className="h-6 w-6 text-accent" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-lg">My Progress Hub</h3>
-                      <p className="text-sm text-muted-foreground">
-                        AI Plans, Body Analysis & Progress Photos
-                      </p>
-                    </div>
-                  </div>
-                  <Button asChild>
-                    <Link to="/my-progress">
-                      <Sparkles className="h-4 w-4 mr-2" />
-                      Open My Progress
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
 
           {/* Quick Stats Row */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
