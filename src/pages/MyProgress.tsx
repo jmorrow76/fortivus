@@ -367,89 +367,142 @@ const MyProgress = () => {
             )}
           </div>
 
-          {/* Quick Actions */}
-          <div className="mb-8" data-tour="quick-actions">
-            <h3 className="text-sm font-medium text-muted-foreground mb-4 uppercase tracking-wider">Quick Actions</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3" data-tour="main-features">
-              <Button variant="outline" className="h-auto py-4 flex flex-col gap-2" asChild>
-                <Link to="/coaching">
-                  <MessageCircle className="h-5 w-5 text-primary" />
-                  <span className="text-xs">Start Coaching</span>
-                </Link>
-              </Button>
-              <Button variant="outline" className="h-auto py-4 flex flex-col gap-2" asChild>
-                <Link to="/calories">
-                  <Utensils className="h-5 w-5 text-orange-500" />
-                  <span className="text-xs">Log Food</span>
-                </Link>
-              </Button>
-              <Button variant="outline" className="h-auto py-4 flex flex-col gap-2" asChild>
-                <Link to="/workouts">
-                  <Dumbbell className="h-5 w-5 text-primary" />
-                  <span className="text-xs">Log Workout</span>
-                </Link>
-              </Button>
-              <Button 
-                variant="outline" 
-                className="h-auto py-4 flex flex-col gap-2"
-                onClick={() => {
-                  setActiveMainTab('photos');
-                  setDialogOpen(true);
-                }}
-              >
-                <ImagePlus className="h-5 w-5 text-emerald-500" />
-                <span className="text-xs">Progress Photo</span>
-              </Button>
-              <Button 
-                variant="outline" 
-                className="h-auto py-4 flex flex-col gap-2"
-                onClick={() => setActiveMainTab('analysis')}
-              >
-                <ScanFace className="h-5 w-5 text-purple-500" />
-                <span className="text-xs">Body Analysis</span>
-              </Button>
-              <Button variant="outline" className="h-auto py-4 flex flex-col gap-2" asChild>
-                <Link to="/hormonal">
-                  <Activity className="h-5 w-5 text-amber-500" />
-                  <span className="text-xs">Hormonal</span>
-                </Link>
-              </Button>
-              <Button variant="outline" className="h-auto py-4 flex flex-col gap-2" asChild>
-                <Link to="/sleep-adaptive">
-                  <Moon className="h-5 w-5 text-indigo-500" />
-                  <span className="text-xs">Sleep Adaptive</span>
-                </Link>
-              </Button>
-              <Button variant="outline" className="h-auto py-4 flex flex-col gap-2" asChild>
-                <Link to="/joint-health">
-                  <Shield className="h-5 w-5 text-teal-500" />
-                  <span className="text-xs">Joint Health</span>
-                </Link>
-              </Button>
-              <Button variant="outline" className="h-auto py-4 flex flex-col gap-2" asChild>
-                <Link to="/comeback">
-                  <RotateCcw className="h-5 w-5 text-rose-500" />
-                  <span className="text-xs">Comeback</span>
-                </Link>
-              </Button>
-              <Button variant="outline" className="h-auto py-4 flex flex-col gap-2" asChild>
-                <Link to="/executive">
-                  <Briefcase className="h-5 w-5 text-slate-500" />
-                  <span className="text-xs">Executive</span>
-                </Link>
-              </Button>
-              <Button variant="outline" className="h-auto py-4 flex flex-col gap-2" asChild>
-                <Link to="/checkin">
-                  <Sparkles className="h-5 w-5 text-accent" />
-                  <span className="text-xs">Daily Check-in</span>
-                </Link>
-              </Button>
-              <Button variant="outline" className="h-auto py-4 flex flex-col gap-2" asChild>
-                <Link to="/running">
-                  <TrendingUp className="h-5 w-5 text-green-500" />
-                  <span className="text-xs">Run Tracker</span>
-                </Link>
-              </Button>
+          {/* Feature Navigation */}
+          <div className="mb-8" data-tour="feature-nav">
+            <div className="overflow-x-auto pb-2 -mx-4 px-4">
+              <nav className="flex items-center gap-1 min-w-max">
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="flex items-center gap-2"
+                  asChild
+                >
+                  <Link to="/coaching">
+                    <MessageCircle className="h-4 w-4" />
+                    <span>AI Coach</span>
+                  </Link>
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="flex items-center gap-2"
+                  asChild
+                >
+                  <Link to="/calories">
+                    <Utensils className="h-4 w-4" />
+                    <span>Calories</span>
+                  </Link>
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="flex items-center gap-2"
+                  asChild
+                >
+                  <Link to="/workouts">
+                    <Dumbbell className="h-4 w-4" />
+                    <span>Workouts</span>
+                  </Link>
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="flex items-center gap-2"
+                  onClick={() => {
+                    setActiveMainTab('photos');
+                    setDialogOpen(true);
+                  }}
+                >
+                  <ImagePlus className="h-4 w-4" />
+                  <span>Photos</span>
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="flex items-center gap-2"
+                  onClick={() => setActiveMainTab('analysis')}
+                >
+                  <ScanFace className="h-4 w-4" />
+                  <span>Analysis</span>
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="flex items-center gap-2"
+                  asChild
+                >
+                  <Link to="/running">
+                    <TrendingUp className="h-4 w-4" />
+                    <span>Running</span>
+                  </Link>
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="flex items-center gap-2"
+                  asChild
+                >
+                  <Link to="/checkin">
+                    <Sparkles className="h-4 w-4" />
+                    <span>Check-in</span>
+                  </Link>
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="flex items-center gap-2"
+                  asChild
+                >
+                  <Link to="/hormonal">
+                    <Activity className="h-4 w-4" />
+                    <span>Hormonal</span>
+                  </Link>
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="flex items-center gap-2"
+                  asChild
+                >
+                  <Link to="/sleep-adaptive">
+                    <Moon className="h-4 w-4" />
+                    <span>Sleep</span>
+                  </Link>
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="flex items-center gap-2"
+                  asChild
+                >
+                  <Link to="/joint-health">
+                    <Shield className="h-4 w-4" />
+                    <span>Joints</span>
+                  </Link>
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="flex items-center gap-2"
+                  asChild
+                >
+                  <Link to="/comeback">
+                    <RotateCcw className="h-4 w-4" />
+                    <span>Comeback</span>
+                  </Link>
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="flex items-center gap-2"
+                  asChild
+                >
+                  <Link to="/executive">
+                    <Briefcase className="h-4 w-4" />
+                    <span>Executive</span>
+                  </Link>
+                </Button>
+              </nav>
             </div>
           </div>
 
