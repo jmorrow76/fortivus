@@ -587,15 +587,15 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className={cn("grid w-full mb-6", aiPlan ? "grid-cols-5" : "grid-cols-4")}>
               <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="workouts">Workouts</TabsTrigger>
-              <TabsTrigger value="nutrition">Nutrition</TabsTrigger>
-              <TabsTrigger value="schedule">Schedule</TabsTrigger>
               {aiPlan && (
                 <TabsTrigger value="ai-plan" className="flex items-center gap-1">
                   <Sparkles className="h-3 w-3" />
                   AI Plan
                 </TabsTrigger>
               )}
+              <TabsTrigger value="workouts">Workouts</TabsTrigger>
+              <TabsTrigger value="nutrition">Nutrition</TabsTrigger>
+              <TabsTrigger value="schedule">Schedule</TabsTrigger>
             </TabsList>
 
             {/* Overview Tab */}
