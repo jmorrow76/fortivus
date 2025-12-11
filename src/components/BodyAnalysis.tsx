@@ -1,10 +1,12 @@
 import { useState, useRef } from 'react';
-import { Upload, Camera, Loader2, TrendingUp, Apple, Dumbbell, Moon, AlertCircle, CheckCircle, Target, Lightbulb, User, Sun, Save } from 'lucide-react';
+import { Upload, Camera, Loader2, TrendingUp, Apple, Dumbbell, Moon, AlertCircle, CheckCircle, Target, Lightbulb, User, Sun, Save, History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import BodyAnalysisHistory from './BodyAnalysisHistory';
 
 interface AnalysisResult {
   bodyFatPercentage: number;
@@ -169,7 +171,20 @@ const BodyAnalysis = () => {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
+        <Tabs defaultValue="analyze" className="w-full">
+          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
+            <TabsTrigger value="analyze" className="gap-2">
+              <Camera className="w-4 h-4" />
+              New Analysis
+            </TabsTrigger>
+            <TabsTrigger value="history" className="gap-2">
+              <History className="w-4 h-4" />
+              History & Trends
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="analyze">
+            <div className="grid lg:grid-cols-2 gap-8">
           {/* Upload Section */}
           <Card variant="default" className="overflow-hidden">
             <CardHeader>
@@ -428,6 +443,12 @@ const BodyAnalysis = () => {
             )}
           </div>
         </div>
+          </TabsContent>
+
+          <TabsContent value="history">
+            <BodyAnalysisHistory />
+          </TabsContent>
+        </Tabs>
       </div>
     </section>
   );
