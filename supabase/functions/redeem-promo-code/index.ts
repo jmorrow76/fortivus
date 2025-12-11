@@ -1,5 +1,8 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { Resend } from "https://esm.sh/resend@2.0.0";
+
+const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -124,6 +127,62 @@ serve(async (req) => {
     }
 
     logStep("Membership granted successfully");
+
+    // Send email notification to the admin who created the code
+    if (promoCode.created_by) {
+      try {
+        // Get admin's email
+        const { data: adminUser } = await supabaseClient.auth.admin.getUserById(promoCode.created_by);
+        
+        if (adminUser?.user?.email) {
+          const { data: redeemerProfile } = await supabaseClient
+            .from("profiles")
+            .select("display_name")
+            .eq("user_id", user.id)
+            .maybeSingle();
+
+          const redeemerName = redeemerProfile?.display_name || user.email;
+
+          await resend.emails.send({
+            from: "Fortivus <onboarding@resend.dev>",
+            to: [adminUser.user.email],
+            subject: `Promo Code Redeemed: ${trimmedCode}`,
+            html: `
+              <div style="font-family: 'Source Sans 3', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <h1 style="color: #1a1a2e; font-family: 'Cormorant Garamond', serif;">Promo Code Redeemed</h1>
+                <p style="color: #333; font-size: 16px; line-height: 1.6;">
+                  A promo code you created has been successfully redeemed.
+                </p>
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                  <p style="margin: 0 0 10px 0;"><strong>Code:</strong> ${trimmedCode}</p>
+                  <p style="margin: 0 0 10px 0;"><strong>Redeemed by:</strong> ${redeemerName}</p>
+                  <p style="margin: 0 0 10px 0;"><strong>Email:</strong> ${user.email}</p>
+                  <p style="margin: 0;"><strong>Date:</strong> ${new Date().toLocaleDateString('en-US', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}</p>
+                </div>
+                <p style="color: #666; font-size: 14px;">
+                  The user has been granted lifetime Elite membership.
+                </p>
+                <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;" />
+                <p style="color: #999; font-size: 12px; text-align: center;">
+                  Fortivus - Steward Your Strength
+                </p>
+              </div>
+            `,
+          });
+          logStep("Email notification sent to admin", { adminEmail: adminUser.user.email });
+        }
+      } catch (emailError) {
+        // Don't fail the redemption if email fails
+        logStep("Failed to send email notification", { error: emailError instanceof Error ? emailError.message : String(emailError) });
+      }
+    }
 
     return new Response(
       JSON.stringify({ 
