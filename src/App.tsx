@@ -44,6 +44,7 @@ import NotFound from "./pages/NotFound";
 import Recommendations from "./pages/Recommendations";
 import MyProgress from "./pages/MyProgress";
 import InstagramPosts from "./pages/InstagramPosts";
+import FastingTracker from "./pages/FastingTracker";
 import SupportButton from "./components/SupportButton";
 import ReferralButton from "./components/ReferralButton";
 import BackToTopButton from "./components/BackToTopButton";
@@ -108,6 +109,7 @@ const App = () => (
             <Route path="/recommendations" element={<Recommendations />} />
             <Route path="/my-progress" element={<MyProgress />} />
             <Route path="/instagram-posts" element={<InstagramPosts />} />
+            <Route path="/fasting" element={<FastingTracker />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

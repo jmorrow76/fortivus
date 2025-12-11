@@ -5,7 +5,7 @@ import { useOnboardingQuery } from "@/hooks/queries";
 import { 
   ArrowLeft, Sparkles, Camera, TrendingUp, Lock, Crown, Lightbulb,
   MessageCircle, Utensils, Battery, Shield, Moon, RotateCcw, Briefcase, Flame,
-  Dumbbell, ScanFace, ImagePlus, Activity
+  Dumbbell, ScanFace, ImagePlus, Activity, Clock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -486,13 +486,24 @@ const MyProgress = () => {
                 </Card>
               </Link>
               
-              <Link to="/executive" className="group">
+              <Link to="/executive-mode" className="group">
                 <Card className="h-full transition-all hover:shadow-md hover:border-primary/30">
                   <CardContent className="p-4 flex flex-col items-center text-center gap-2">
                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                       <Briefcase className="h-5 w-5 text-primary" />
                     </div>
                     <span className="text-sm font-medium">Executive Performance</span>
+                  </CardContent>
+                </Card>
+              </Link>
+              
+              <Link to="/fasting" className="group">
+                <Card className="h-full transition-all hover:shadow-md hover:border-primary/30">
+                  <CardContent className="p-4 flex flex-col items-center text-center gap-2">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                      <Clock className="h-5 w-5 text-primary" />
+                    </div>
+                    <span className="text-sm font-medium">Biblical Fasting</span>
                   </CardContent>
                 </Card>
               </Link>
