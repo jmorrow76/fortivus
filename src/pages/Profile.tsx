@@ -223,10 +223,10 @@ const Profile = () => {
           <Button
             variant="ghost"
             className="mb-6"
-            onClick={() => navigate("/")}
+            onClick={() => navigate(-1)}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Home
+            Back
           </Button>
 
           {/* Membership Card */}

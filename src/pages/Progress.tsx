@@ -227,7 +227,7 @@ const Progress = () => {
             <div className="flex items-center gap-4">
               <Button
                 variant="ghost"
-                onClick={() => navigate("/dashboard")}
+                onClick={() => navigate(-1)}
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back

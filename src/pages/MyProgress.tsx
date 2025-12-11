@@ -212,9 +212,6 @@ const MyProgress = () => {
         <Navbar />
         <main className="pt-40 md:pt-28 pb-16 px-4">
           <div className="container max-w-2xl mx-auto">
-            <Button variant="ghost" onClick={() => navigate("/dashboard")} className="mb-6">
-              <ArrowLeft className="h-4 w-4 mr-2" /> Back to Dashboard
-            </Button>
 
             <Card className="text-center">
               <CardContent className="py-12 px-8">
@@ -283,9 +280,6 @@ const MyProgress = () => {
         <div className="container max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-8">
             <div className="flex items-center gap-4">
-              <Button variant="ghost" onClick={() => navigate("/dashboard")}>
-                <ArrowLeft className="h-4 w-4 mr-2" /> Back
-              </Button>
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <Crown className="h-4 w-4 text-accent" />
