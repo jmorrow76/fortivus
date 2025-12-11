@@ -31,7 +31,7 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const eliteFeatures = [
-    { name: "My Progress", href: "/my-progress", icon: Crown, highlight: true },
+    { name: "Fitness Journey", href: "/my-progress", icon: Crown, highlight: true },
     { name: "AI Coach", href: "/coaching", icon: MessageCircle },
     { name: "Workouts", href: "/workouts", icon: Dumbbell },
     { name: "Run Tracker", href: "/running", icon: MapPin },
