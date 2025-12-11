@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useFasting, FASTING_TYPES, FASTING_SCRIPTURES } from '@/hooks/useFasting';
@@ -107,7 +107,16 @@ const FastingTracker = () => {
 
   const workoutRec = getWorkoutRecommendation();
   const nutritionGuidance = getNutritionGuidance();
-  const randomScripture = FASTING_SCRIPTURES[Math.floor(Math.random() * FASTING_SCRIPTURES.length)];
+  
+  // Stable scripture selection based on day of year
+  const dailyScripture = useMemo(() => {
+    const today = new Date();
+    const dayOfYear = Math.floor(
+      (today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24)
+    );
+    const index = dayOfYear % FASTING_SCRIPTURES.length;
+    return FASTING_SCRIPTURES[index];
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -131,8 +140,8 @@ const FastingTracker = () => {
               <div className="flex items-start gap-3">
                 <BookOpen className="h-5 w-5 text-accent mt-1" />
                 <div>
-                  <p className="text-sm italic text-foreground/80">"{randomScripture.text}"</p>
-                  <p className="text-xs text-muted-foreground mt-1">— {randomScripture.verse}</p>
+                  <p className="text-sm italic text-foreground/80">"{dailyScripture.text}"</p>
+                  <p className="text-xs text-muted-foreground mt-1">— {dailyScripture.verse}</p>
                 </div>
               </div>
             </CardContent>
