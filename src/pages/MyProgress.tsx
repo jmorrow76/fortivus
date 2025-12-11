@@ -13,7 +13,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import BodyAnalysisComponent from "@/components/BodyAnalysis";
 import PersonalizedRecommendations from "@/components/dashboard/PersonalizedRecommendations";
-import AIPlanPreview from "@/components/dashboard/AIPlanPreview";
+
 import { getPersonalizedRecommendations } from "@/lib/onboardingUtils";
 
 // Import Progress Photos components
@@ -341,10 +341,6 @@ const MyProgress = () => {
             )}
           </div>
 
-          {/* AI Plan Preview - Always visible */}
-          <div className="mb-8">
-            <AIPlanPreview />
-          </div>
 
           <Tabs defaultValue="coach" className="w-full">
             <TabsList className="mb-6 flex flex-wrap gap-1 h-auto p-1">
