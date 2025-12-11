@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react";
-import { useNavigate, Link, useSearchParams } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useOnboardingQuery } from "@/hooks/queries";
 import { 
@@ -41,8 +41,6 @@ interface ProgressPhoto {
 const MyProgress = () => {
   const navigate = useNavigate();
   const { user, loading, subscription } = useAuth();
-  const [searchParams] = useSearchParams();
-  const defaultTab = searchParams.get('tab') || 'guide';
   const { toast } = useToast();
 
   // Onboarding data for Quick Start Guide
@@ -320,17 +318,36 @@ const MyProgress = () => {
             </Card>
           </div>
 
+          {/* Quick Start Guide - Always visible */}
+          <div className="mb-8">
+            {recommendations && onboardingData ? (
+              <PersonalizedRecommendations 
+                recommendations={recommendations} 
+                onboardingData={onboardingData} 
+              />
+            ) : (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <Lightbulb className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <h3 className="font-semibold text-lg mb-2">Complete Your Assessment</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Take the quick assessment to get personalized recommendations
+                  </p>
+                  <Button asChild>
+                    <Link to="/onboarding">Start Assessment</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+
           {/* AI Plan Preview - Always visible */}
           <div className="mb-8">
             <AIPlanPreview />
           </div>
 
-          <Tabs defaultValue={defaultTab} className="w-full">
+          <Tabs defaultValue="coach" className="w-full">
             <TabsList className="mb-6 flex flex-wrap gap-1 h-auto p-1">
-              <TabsTrigger value="guide" className="gap-2">
-                <Lightbulb className="h-4 w-4" />
-                <span className="hidden sm:inline">Quick Start</span>
-              </TabsTrigger>
               <TabsTrigger value="coach" className="gap-2">
                 <MessageCircle className="h-4 w-4" />
                 <span className="hidden sm:inline">AI Coach</span>
@@ -352,29 +369,6 @@ const MyProgress = () => {
                 <span className="hidden sm:inline">Advanced</span>
               </TabsTrigger>
             </TabsList>
-
-            {/* Quick Start Guide Tab */}
-            <TabsContent value="guide">
-              {recommendations && onboardingData ? (
-                <PersonalizedRecommendations 
-                  recommendations={recommendations} 
-                  onboardingData={onboardingData} 
-                />
-              ) : (
-                <Card>
-                  <CardContent className="py-12 text-center">
-                    <Lightbulb className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                    <h3 className="font-semibold text-lg mb-2">Complete Your Assessment</h3>
-                    <p className="text-muted-foreground mb-4">
-                      Take the quick assessment to get personalized recommendations
-                    </p>
-                    <Button asChild>
-                      <Link to="/onboarding">Start Assessment</Link>
-                    </Button>
-                  </CardContent>
-                </Card>
-              )}
-            </TabsContent>
 
             {/* AI Coach Tab */}
             <TabsContent value="coach">
