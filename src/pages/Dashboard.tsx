@@ -399,9 +399,7 @@ export default function Dashboard() {
             </Card>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Main Content Column */}
-            <div className="lg:col-span-2 space-y-6">
+          <div className="space-y-6">
               {/* Weekly Workout Stats */}
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
@@ -689,15 +687,6 @@ export default function Dashboard() {
 
               {/* Community Preview */}
               <CommunityPreview />
-
-            </div>
-
-            {/* Sidebar Column */}
-            <div className="space-y-6">
-
-
-
-            </div>
           </div>
         </div>
       </main>
