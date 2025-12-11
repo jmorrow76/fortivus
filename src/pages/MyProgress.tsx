@@ -320,6 +320,11 @@ const MyProgress = () => {
             </Card>
           </div>
 
+          {/* Scripture of the Day */}
+          <div className="mb-8">
+            <ScriptureOfDay />
+          </div>
+
           {/* Quick Start Guide - Always visible */}
           <div className="mb-8">
             {recommendations && onboardingData ? (
@@ -429,10 +434,6 @@ const MyProgress = () => {
             </div>
           </div>
 
-          {/* Scripture of the Day */}
-          <div className="mb-8">
-            <ScriptureOfDay />
-          </div>
         </div>
       </main>
       <Footer />
