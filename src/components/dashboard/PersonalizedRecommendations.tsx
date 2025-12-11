@@ -647,18 +647,6 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
               )}
 
               <div className="flex flex-wrap gap-3 pt-2">
-                <Button asChild>
-                  <Link to="/workouts">
-                    <Dumbbell className="h-4 w-4 mr-2" />
-                    Start Workout
-                  </Link>
-                </Button>
-                <Button asChild>
-                  <Link to="/running">
-                    <MapPin className="h-4 w-4 mr-2" />
-                    Start Run
-                  </Link>
-                </Button>
                 <Button variant="outline" asChild>
                   <Link to="/profile">
                     Retake Assessment
