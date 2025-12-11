@@ -696,39 +696,6 @@ export default function Dashboard() {
             <div className="space-y-6">
 
 
-              {/* Fitness Journey Quick Access */}
-              <Card className="bg-gradient-to-br from-accent/10 to-accent/5 border-accent/20">
-                <CardHeader>
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-accent" />
-                    Fitness Journey
-                  </CardTitle>
-                  <CardDescription>Your progress hub</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {subscription.subscribed ? (
-                    <Button asChild className="w-full">
-                      <Link to="/my-progress">
-                        <Sparkles className="h-4 w-4 mr-2" />
-                        Open Fitness Journey
-                      </Link>
-                    </Button>
-                  ) : (
-                    <div className="space-y-2">
-                      <p className="text-xs text-muted-foreground text-center">
-                        AI Plans, Coaching, Body Analysis & more
-                      </p>
-                      <Button asChild className="w-full">
-                        <a href="/#pricing">
-                          <Lock className="h-4 w-4 mr-2" />
-                          Upgrade to Unlock
-                        </a>
-                      </Button>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
 
             </div>
           </div>
