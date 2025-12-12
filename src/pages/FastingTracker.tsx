@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useFasting, FASTING_TYPES, FASTING_SCRIPTURES } from '@/hooks/useFasting';
 import Navbar from '@/components/Navbar';
@@ -105,8 +105,8 @@ const FastingTracker = () => {
       title: "Fast Started",
       description: "Regenerate your AI Plan for fasting-adjusted recommendations.",
       action: (
-        <Button variant="outline" size="sm" asChild>
-          <Link to="/fitness-journey">Regenerate Plan</Link>
+        <Button variant="outline" size="sm" onClick={() => navigate('/fitness-journey')}>
+          Regenerate Plan
         </Button>
       ),
       duration: 10000,
