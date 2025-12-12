@@ -87,11 +87,12 @@ const Auth = () => {
   }, [resendCooldown]);
 
   const handleResendVerification = useCallback(async () => {
-    if (resendCooldown > 0 || !signupEmail) return;
+    const emailToUse = signupEmail || email;
+    if (resendCooldown > 0 || !emailToUse) return;
     
     setIsResending(true);
     try {
-      const { error } = await resendVerificationEmail(signupEmail);
+      const { error } = await resendVerificationEmail(emailToUse);
       if (error) {
         toast({ 
           title: 'Failed to Resend', 
@@ -108,7 +109,7 @@ const Auth = () => {
     } finally {
       setIsResending(false);
     }
-  }, [resendCooldown, signupEmail, resendVerificationEmail, toast]);
+  }, [resendCooldown, signupEmail, email, resendVerificationEmail, toast]);
 
   const validateForm = () => {
     const newErrors: { email?: string; password?: string; confirmPassword?: string } = {};
@@ -347,9 +348,20 @@ const Auth = () => {
               </div>
               <div className="space-y-2">
                 <p className="text-sm text-muted-foreground">
-                  We've sent a verification link to
+                  {signupEmail ? "We've sent a verification link to" : "Enter your email to resend verification"}
                 </p>
-                <p className="font-medium text-foreground">{signupEmail}</p>
+                {signupEmail ? (
+                  <p className="font-medium text-foreground">{signupEmail}</p>
+                ) : (
+                  <div className="space-y-2 text-left">
+                    <Input
+                      type="email"
+                      placeholder="your@email.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
+                )}
               </div>
               <div className="bg-muted/50 rounded-lg p-4 space-y-2">
                 <div className="flex items-start gap-2 text-left">
@@ -370,7 +382,7 @@ const Auth = () => {
                   variant="default"
                   className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
                   onClick={handleResendVerification}
-                  disabled={resendCooldown > 0 || isResending}
+                  disabled={resendCooldown > 0 || isResending || (!signupEmail && !email)}
                 >
                   {isResending ? (
                     <>
