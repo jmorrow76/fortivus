@@ -13,14 +13,17 @@ const Onboarding = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
+    // Wait for both auth and onboarding loading to complete
+    if (authLoading || isLoading) return;
+
     // Redirect if not authenticated
-    if (!authLoading && !user) {
+    if (!user) {
       navigate('/auth');
       return;
     }
 
     // Redirect if already completed onboarding
-    if (!isLoading && hasCompletedOnboarding) {
+    if (hasCompletedOnboarding === true) {
       navigate('/dashboard');
     }
   }, [user, authLoading, hasCompletedOnboarding, isLoading, navigate]);
