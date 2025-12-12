@@ -151,7 +151,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const resetPassword = async (email: string) => {
-    const redirectUrl = `${window.location.origin}/auth`;
+    // Always use the web URL to ensure it works if app isn't installed
+    const webUrl = 'https://58ff6705-30d4-4109-adf5-14b868fb935a.lovable.app';
+    const redirectUrl = `${webUrl}/auth`;
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: redirectUrl,
     });
@@ -173,8 +175,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signInWithSocial = async (provider: SocialProvider) => {
-    // Redirect to auth page first, which will then redirect based on preference
-    const redirectUrl = `${window.location.origin}/auth`;
+    // Always use the web URL to ensure it works if app isn't installed
+    const webUrl = 'https://58ff6705-30d4-4109-adf5-14b868fb935a.lovable.app';
+    const redirectUrl = `${webUrl}/auth`;
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
