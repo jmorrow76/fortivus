@@ -105,7 +105,7 @@ const FastingTracker = () => {
       title: "Fast Started",
       description: "Regenerate your AI Plan for fasting-adjusted recommendations.",
       action: (
-        <Button variant="outline" size="sm" onClick={() => navigate('/fitness-journey')}>
+        <Button variant="outline" size="sm" onClick={() => navigate('/my-progress')}>
           Regenerate Plan
         </Button>
       ),
