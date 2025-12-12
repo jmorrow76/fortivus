@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -18,6 +19,51 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Get user ID from auth header
+    const authHeader = req.headers.get('Authorization');
+    let planContext = '';
+    let fastingContext = '';
+    let hormonalContext = '';
+    
+    if (authHeader) {
+      const token = authHeader.replace('Bearer ', '');
+      const { data: { user } } = await supabase.auth.getUser(token);
+      
+      if (user?.id) {
+        // Fetch related data in parallel
+        const [planResult, fastingResult, hormonalResult] = await Promise.all([
+          supabase.from("personal_plans").select("plan_data, goals").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1).maybeSingle(),
+          supabase.from("fasting_logs").select("*").eq("user_id", user.id).is("ended_at", null).limit(1).maybeSingle(),
+          supabase.from("hormonal_profiles").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1).maybeSingle()
+        ]);
+
+        if (planResult.data) {
+          console.log("[ANALYZE-SLEEP] Found user's AI plan");
+          const todayWorkout = plannedWorkout || planResult.data.plan_data?.workout?.weeklySchedule?.[0];
+          planContext = `
+CURRENT AI FITNESS PLAN:
+Goals: ${planResult.data.goals}
+Today's Planned Workout: ${JSON.stringify(todayWorkout, null, 2)}
+
+Adapt the workout from this plan based on sleep data.`;
+        }
+
+        if (fastingResult.data) {
+          fastingContext = `
+ACTIVE FAST: ${fastingResult.data.fasting_type.replace('_', ' ')} - Already requires reduced intensity. Compound this with sleep-based adjustments.`;
+        }
+
+        if (hormonalResult.data) {
+          hormonalContext = `
+HORMONAL PROFILE: Energy pattern Morning ${hormonalResult.data.energy_morning}/10, Recovery ${hormonalResult.data.recovery_quality}/10. Consider hormonal state when adapting workout.`;
+        }
+      }
+    }
+
     const prompt = `You are an expert in sleep science and exercise physiology for men over 40. Analyze sleep data and adapt the planned workout accordingly.
 
 Sleep Data:
@@ -27,6 +73,9 @@ Sleep Data:
 - HRV Reading: ${hrvReading || 'Not available'}
 - Resting Heart Rate: ${restingHeartRate || 'Not available'} bpm
 - Age: ${age || '40+'}
+${planContext}
+${fastingContext}
+${hormonalContext}
 
 Planned Workout:
 ${JSON.stringify(plannedWorkout, null, 2)}
@@ -37,6 +86,8 @@ Based on sleep quality and recovery indicators:
 3. Suggest exercise swaps if needed (replace high-intensity with recovery-focused)
 4. Add recovery additions if necessary
 5. Provide clear reasoning
+
+If user has an active fast or hormonal concerns, factor those into your adaptation.
 
 Respond in this exact JSON format:
 {

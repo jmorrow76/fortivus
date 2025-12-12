@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -18,6 +19,52 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Get user ID from auth header
+    const authHeader = req.headers.get('Authorization');
+    let planContext = '';
+    let fastingContext = '';
+    let sleepContext = '';
+    
+    if (authHeader) {
+      const token = authHeader.replace('Bearer ', '');
+      const { data: { user } } = await supabase.auth.getUser(token);
+      
+      if (user?.id) {
+        // Fetch related data in parallel
+        const [planResult, fastingResult, sleepResult] = await Promise.all([
+          supabase.from("personal_plans").select("plan_data, goals").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1).maybeSingle(),
+          supabase.from("fasting_logs").select("*").eq("user_id", user.id).is("ended_at", null).limit(1).maybeSingle(),
+          supabase.from("sleep_workout_adaptations").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1).maybeSingle()
+        ]);
+
+        if (planResult.data) {
+          console.log("[ANALYZE-HORMONAL] Found user's AI plan");
+          planContext = `
+CURRENT AI FITNESS PLAN:
+Goals: ${planResult.data.goals}
+Workout Days: ${planResult.data.plan_data?.workout?.daysPerWeek || 'Not specified'}
+Focus Areas: ${planResult.data.plan_data?.workout?.focusAreas?.join(', ') || 'Not specified'}
+Daily Calories: ${planResult.data.plan_data?.diet?.dailyCalories || 'Not specified'}
+
+Consider this existing plan when making hormonal optimization recommendations.`;
+        }
+
+        if (fastingResult.data) {
+          fastingContext = `
+ACTIVE FAST: ${fastingResult.data.fasting_type.replace('_', ' ')} - Adjust recommendations to account for reduced caloric intake and energy levels.`;
+        }
+
+        if (sleepResult.data) {
+          sleepContext = `
+RECENT SLEEP DATA: Readiness ${sleepResult.data.readiness_score}/100, Sleep Quality ${sleepResult.data.sleep_quality}/10. Factor this into hormonal assessment.`;
+        }
+      }
+    }
+
     const prompt = `You are an expert in male hormonal health optimization for men over 40. Analyze the following data and provide personalized recommendations.
 
 User Profile:
@@ -29,6 +76,9 @@ User Profile:
 - Evening Energy: ${energyEvening}/10
 - Libido Level: ${libidoLevel}/10
 - Recovery Quality: ${recoveryQuality}/10
+${planContext}
+${fastingContext}
+${sleepContext}
 
 Based on this data, provide:
 
@@ -37,7 +87,7 @@ Based on this data, provide:
 3. SUPPLEMENT_RECOMMENDATIONS: A JSON array of 3-5 evidence-based supplement recommendations with dosages
 4. AI_INSIGHTS: A comprehensive paragraph analyzing their hormonal health patterns and actionable advice
 
-Consider testosterone optimization, cortisol management, sleep quality impact, and age-related hormonal changes.
+Consider testosterone optimization, cortisol management, sleep quality impact, and age-related hormonal changes. If there's an active AI plan, ensure recommendations align with it.
 
 Respond in this exact JSON format:
 {

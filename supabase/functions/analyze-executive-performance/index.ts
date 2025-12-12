@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -18,6 +19,58 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Get user ID from auth header
+    const authHeader = req.headers.get('Authorization');
+    let planContext = '';
+    let fastingContext = '';
+    let sleepContext = '';
+    let hormonalContext = '';
+    
+    if (authHeader) {
+      const token = authHeader.replace('Bearer ', '');
+      const { data: { user } } = await supabase.auth.getUser(token);
+      
+      if (user?.id) {
+        // Fetch related data in parallel
+        const [planResult, fastingResult, sleepResult, hormonalResult] = await Promise.all([
+          supabase.from("personal_plans").select("plan_data, goals").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1).maybeSingle(),
+          supabase.from("fasting_logs").select("*").eq("user_id", user.id).is("ended_at", null).limit(1).maybeSingle(),
+          supabase.from("sleep_workout_adaptations").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1).maybeSingle(),
+          supabase.from("hormonal_profiles").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1).maybeSingle()
+        ]);
+
+        if (planResult.data) {
+          console.log("[ANALYZE-EXECUTIVE] Found user's AI plan");
+          planContext = `
+CURRENT AI FITNESS PLAN:
+Goals: ${planResult.data.goals}
+Workout Days: ${planResult.data.plan_data?.workout?.daysPerWeek || 'Not specified'}
+Session Duration: ${planResult.data.plan_data?.preferences?.timeAvailable || '45-60 minutes'}
+
+Optimize workout timing and intensity around work schedule while respecting this plan.`;
+        }
+
+        if (fastingResult.data) {
+          fastingContext = `
+ACTIVE FAST: ${fastingResult.data.fasting_type.replace('_', ' ')} - Account for reduced energy and cognitive effects of fasting.`;
+        }
+
+        if (sleepResult.data) {
+          sleepContext = `
+SLEEP STATUS: Readiness ${sleepResult.data.readiness_score}/100. Consider recovery state when recommending cognitive strategies.`;
+        }
+
+        if (hormonalResult.data) {
+          hormonalContext = `
+HORMONAL PROFILE: Energy pattern Morning ${hormonalResult.data.energy_morning}/10, Afternoon ${hormonalResult.data.energy_afternoon}/10. Align workout windows with hormonal energy peaks.`;
+        }
+      }
+    }
+
     const prompt = `You are an expert in executive performance optimization, cognitive health, and fitness integration for busy professional men over 40. Analyze the following data and provide comprehensive recommendations.
 
 Daily Metrics:
@@ -29,13 +82,19 @@ Daily Metrics:
 - Caffeine Intake: ${caffeineIntake} mg
 - Screen Time: ${screenTimeHours} hours
 - Age: ${age || '40+'}
+${planContext}
+${fastingContext}
+${sleepContext}
+${hormonalContext}
 
 Provide a comprehensive executive performance analysis including:
 1. Cognitive load score and assessment
-2. Optimal workout timing for today
+2. Optimal workout timing for today (considering all factors)
 3. Productivity and focus recommendations
 4. Stress management protocols
 5. How to optimize fitness around demanding schedule
+
+If user has fasting, sleep, or hormonal data, integrate those insights into your recommendations.
 
 Respond in this exact JSON format:
 {

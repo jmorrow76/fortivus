@@ -11,6 +11,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Zap, Moon, Battery, Heart, TrendingUp, Pill, Utensils, Lock } from "lucide-react";
+import { PlanUpdateBanner } from "@/components/PlanUpdateBanner";
+import { toast as sonnerToast } from "sonner";
 
 const HormonalOptimization = () => {
   const { user, subscription } = useAuth();
@@ -19,6 +21,7 @@ const HormonalOptimization = () => {
   const isElite = subscription?.subscribed;
 
   const [loading, setLoading] = useState(false);
+  const [showPlanBanner, setShowPlanBanner] = useState(false);
   const [formData, setFormData] = useState({
     age: 45,
     sleepHours: 7,
@@ -75,6 +78,17 @@ const HormonalOptimization = () => {
       toast({
         title: "Analysis Complete",
         description: "Your hormonal optimization plan is ready.",
+      });
+
+      // Show plan update prompt
+      setShowPlanBanner(true);
+      sonnerToast.info("Hormonal profile updated", {
+        description: "Consider regenerating your AI Plan to incorporate these insights.",
+        action: {
+          label: "Update Plan",
+          onClick: () => navigate("/my-progress"),
+        },
+        duration: 8000,
       });
     } catch (error: any) {
       console.error("Error:", error);
@@ -159,6 +173,8 @@ const HormonalOptimization = () => {
                 Optimize your training, nutrition, and recovery based on your natural testosterone patterns
               </p>
             </div>
+
+            <PlanUpdateBanner featureName="Hormonal Optimization" show={showPlanBanner} />
 
             <div className="grid md:grid-cols-2 gap-6">
               {/* Input Form */}

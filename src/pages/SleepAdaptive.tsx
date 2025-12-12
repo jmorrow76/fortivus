@@ -13,6 +13,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Moon, Zap, Activity, Lock, RefreshCw, Heart, ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { PlanUpdateBanner } from "@/components/PlanUpdateBanner";
+import { toast as sonnerToast } from "sonner";
 
 const SleepAdaptive = () => {
   const { user, subscription } = useAuth();
@@ -21,7 +23,7 @@ const SleepAdaptive = () => {
   const isElite = subscription?.subscribed;
 
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
+  const [showPlanBanner, setShowPlanBanner] = useState(false);
     sleepHours: 7,
     sleepQuality: 6,
     sleepDisruptions: 1,
@@ -87,6 +89,13 @@ const SleepAdaptive = () => {
       toast({
         title: "Workout Adapted",
         description: "Your workout has been optimized based on your sleep data.",
+      });
+      
+      setShowPlanBanner(true);
+      sonnerToast.info("Sleep data updated", {
+        description: "Consider regenerating your AI Plan to incorporate these insights.",
+        action: { label: "Update Plan", onClick: () => navigate("/my-progress") },
+        duration: 8000,
       });
     } catch (error: any) {
       console.error("Error:", error);
@@ -178,6 +187,8 @@ const SleepAdaptive = () => {
                 Let AI optimize your workout based on how well you slept
               </p>
             </div>
+
+            <PlanUpdateBanner featureName="Sleep Adaptation" show={showPlanBanner} />
 
             <div className="grid lg:grid-cols-2 gap-6">
               {/* Input Form */}
