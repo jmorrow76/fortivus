@@ -35,13 +35,14 @@ const About = () => {
               </h2>
               <div className="prose prose-lg max-w-none text-muted-foreground space-y-6">
                 <p>
-                  In 2020, our founder hit a wall. At 45, despite years of fitness experience, 
-                  he found that the programs designed for younger men no longer worked. 
-                  Recovery took longer. Energy fluctuated. The generic advice felt hollow.
+                  At 38, our founder made a decision that would change the trajectory of his life. 
+                  It wasn't about chasing aesthetics or proving something to the world. It was 
+                  simpler and more profound: he wanted to honor what was given to him—to steward 
+                  his body well and be healthy for his family.
                 </p>
                 <p>
                   But more than that, he realized something deeper was missing: purpose. 
-                  Why was he training? For vanity? For ego? He began studying Scripture's 
+                  Why do we train? For vanity? For ego? He began studying Scripture's 
                   perspective on the body—and everything changed.
                 </p>
                 <p>
@@ -51,9 +52,11 @@ const About = () => {
                   for ministry. To be strong enough to help others.
                 </p>
                 <p>
-                  Working with Christian fitness experts, nutritionists, and coaches who 
-                  specialize in men's health after 40, Fortivus emerged as the platform 
-                  for men who understand that honoring God includes honoring the body He gave us.
+                  What followed was years of trial and error, countless books, deep research, 
+                  and relentless experimentation to discover what truly works for men over 40. 
+                  No expensive trainers or celebrity coaches—just disciplined pursuit of knowledge 
+                  and the wisdom that comes from doing the work. Fortivus emerged from that journey 
+                  as a platform for men who understand that honoring God includes honoring the body He gave us.
                 </p>
               </div>
             </div>
