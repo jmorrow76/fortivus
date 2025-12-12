@@ -128,18 +128,25 @@ const MoodCheckin = () => {
     }
   };
 
-  const generateWorkoutRecommendation = async (): Promise<WorkoutRecommendation | null> => {
+  const generateWorkoutRecommendation = async (overrideData?: {
+    moodLevel: number;
+    stressLevel: number;
+    energyLevel: number;
+    sleepQuality: number | null;
+    notes: string | null;
+  }): Promise<WorkoutRecommendation | null> => {
     setGeneratingWorkout(true);
     try {
       const { data, error } = await supabase.functions.invoke(
         "generate-workout-recommendation",
         {
           body: {
-            moodLevel,
-            stressLevel,
-            energyLevel,
-            sleepQuality,
-            notes,
+            moodLevel: overrideData?.moodLevel ?? moodLevel,
+            stressLevel: overrideData?.stressLevel ?? stressLevel,
+            energyLevel: overrideData?.energyLevel ?? energyLevel,
+            sleepQuality: overrideData?.sleepQuality ?? sleepQuality,
+            notes: overrideData?.notes ?? notes,
+            userId: user?.id,
           },
         }
       );
@@ -231,7 +238,14 @@ const MoodCheckin = () => {
 
     setGeneratingWorkout(true);
     try {
-      const recommendation = await generateWorkoutRecommendation();
+      // Use the stored check-in values when regenerating
+      const recommendation = await generateWorkoutRecommendation({
+        moodLevel: todayCheckin.mood_level,
+        stressLevel: todayCheckin.stress_level,
+        energyLevel: todayCheckin.energy_level,
+        sleepQuality: todayCheckin.sleep_quality,
+        notes: todayCheckin.notes,
+      });
 
       const { error } = await supabase
         .from("mood_checkins")
@@ -246,7 +260,7 @@ const MoodCheckin = () => {
 
       toast({
         title: "Workout regenerated!",
-        description: "Here's a fresh recommendation for you.",
+        description: "Updated based on your plan and fasting status.",
       });
     } catch (error: any) {
       toast({
