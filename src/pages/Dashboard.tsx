@@ -108,9 +108,14 @@ export default function Dashboard() {
     }
   }, [user, authLoading, navigate]);
 
-  // Redirect to onboarding if not completed
+  // Redirect to onboarding if not completed (only after query has finished)
   useEffect(() => {
-    if (!authLoading && !onboardingLoading && user && onboardingData === null) {
+    // Wait for all loading to complete before making redirect decision
+    if (authLoading || onboardingLoading) return;
+    if (!user) return;
+    
+    // Only redirect if query completed and returned null (no onboarding record)
+    if (onboardingData === null) {
       navigate('/onboarding');
     }
   }, [user, authLoading, onboardingLoading, onboardingData, navigate]);
