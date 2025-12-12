@@ -14,6 +14,8 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, RotateCcw, Calendar, AlertTriangle, CheckCircle, Lock, Dumbbell, Utensils } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { PlanUpdateBanner } from "@/components/PlanUpdateBanner";
+import { toast as sonnerToast } from "sonner";
 
 const ComebackProtocol = () => {
   const { user, subscription } = useAuth();
@@ -22,6 +24,7 @@ const ComebackProtocol = () => {
   const isElite = subscription?.subscribed;
 
   const [loading, setLoading] = useState(false);
+  const [showPlanBanner, setShowPlanBanner] = useState(false);
   const [formData, setFormData] = useState({
     daysOff: 14,
     reasonForBreak: "",
@@ -80,6 +83,13 @@ const ComebackProtocol = () => {
       toast({
         title: "Protocol Generated",
         description: "Your 4-week comeback plan is ready.",
+      });
+      
+      setShowPlanBanner(true);
+      sonnerToast.info("Comeback protocol created", {
+        description: "Consider regenerating your AI Plan to incorporate this protocol.",
+        action: { label: "Update Plan", onClick: () => navigate("/my-progress") },
+        duration: 8000,
       });
     } catch (error: any) {
       console.error("Error:", error);
@@ -164,6 +174,8 @@ const ComebackProtocol = () => {
                 Intelligent return-to-training programs after any break
               </p>
             </div>
+
+            <PlanUpdateBanner featureName="Comeback Protocol" show={showPlanBanner} />
 
             {!protocol ? (
               <Card className="max-w-2xl mx-auto">

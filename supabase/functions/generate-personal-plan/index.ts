@@ -37,24 +37,33 @@ serve(async (req) => {
     // Fetch the user's latest body analysis results
     let bodyAnalysisContext = '';
     let fastingContext = '';
+    let hormonalContext = '';
+    let sleepContext = '';
+    let executiveContext = '';
+    let comebackContext = '';
     
     if (userId) {
-      const { data: latestAnalysis, error: analysisError } = await supabase
-        .from("body_analysis_results")
-        .select("*")
-        .eq("user_id", userId)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
+      // Fetch all relevant data in parallel for efficiency
+      const [
+        bodyAnalysisResult,
+        fastingResult,
+        hormonalResult,
+        sleepResult,
+        executiveResult,
+        comebackResult
+      ] = await Promise.all([
+        supabase.from("body_analysis_results").select("*").eq("user_id", userId).order("created_at", { ascending: false }).limit(1).maybeSingle(),
+        supabase.from("fasting_logs").select("*").eq("user_id", userId).is("ended_at", null).order("started_at", { ascending: false }).limit(1).maybeSingle(),
+        supabase.from("hormonal_profiles").select("*").eq("user_id", userId).order("created_at", { ascending: false }).limit(1).maybeSingle(),
+        supabase.from("sleep_workout_adaptations").select("*").eq("user_id", userId).order("created_at", { ascending: false }).limit(1).maybeSingle(),
+        supabase.from("cognitive_metrics").select("*").eq("user_id", userId).order("created_at", { ascending: false }).limit(1).maybeSingle(),
+        supabase.from("comeback_protocols").select("*").eq("user_id", userId).eq("is_active", true).order("created_at", { ascending: false }).limit(1).maybeSingle()
+      ]);
 
-      if (analysisError) {
-        console.error("[GENERATE-PLAN] Error fetching body analysis:", analysisError);
-      } else if (latestAnalysis) {
-        console.log("[GENERATE-PLAN] Found body analysis data:", {
-          bodyFatPercentage: latestAnalysis.body_fat_percentage,
-          category: latestAnalysis.body_fat_category,
-        });
-        
+      // Body Analysis Context
+      if (bodyAnalysisResult.data) {
+        const latestAnalysis = bodyAnalysisResult.data;
+        console.log("[GENERATE-PLAN] Found body analysis data");
         bodyAnalysisContext = `
 BODY COMPOSITION ANALYSIS (from AI body scan):
 - Body Fat Percentage: ${latestAnalysis.body_fat_percentage}%
@@ -62,66 +71,93 @@ BODY COMPOSITION ANALYSIS (from AI body scan):
 - Muscle Assessment: ${latestAnalysis.muscle_assessment}
 - Strengths: ${latestAnalysis.strengths?.join(', ') || 'Not assessed'}
 - Areas to Improve: ${latestAnalysis.areas_to_improve?.join(', ') || 'Not assessed'}
-- Analysis Recommendations:
-  * Nutrition: ${latestAnalysis.nutrition_recommendation || 'Not provided'}
-  * Training: ${latestAnalysis.training_recommendation || 'Not provided'}
-  * Recovery: ${latestAnalysis.recovery_recommendation || 'Not provided'}
-- Estimated Timeframe for Goals: ${latestAnalysis.estimated_timeframe || 'Not specified'}
+- Nutrition Recommendation: ${latestAnalysis.nutrition_recommendation || 'Not provided'}
+- Training Recommendation: ${latestAnalysis.training_recommendation || 'Not provided'}
+- Recovery Recommendation: ${latestAnalysis.recovery_recommendation || 'Not provided'}
 
-IMPORTANT: Use this body analysis data to create a more personalized plan. The body composition data should directly inform calorie targets, macro ratios, workout intensity, and priority areas for training.
+IMPORTANT: Use this body analysis data to inform calorie targets, macro ratios, and training focus.
 `;
       }
 
-      // Fetch active fasting data
-      const { data: activeFast, error: fastingError } = await supabase
-        .from("fasting_logs")
-        .select("*")
-        .eq("user_id", userId)
-        .is("ended_at", null)
-        .order("started_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      if (fastingError) {
-        console.error("[GENERATE-PLAN] Error fetching fasting data:", fastingError);
-      } else if (activeFast) {
+      // Fasting Context
+      if (fastingResult.data) {
+        const activeFast = fastingResult.data;
         console.log("[GENERATE-PLAN] User is currently fasting:", activeFast.fasting_type);
-        
         const fastingIntensityMap: Record<string, number> = {
-          'sunrise_sunset': 0.6,
-          'daniel_fast': 0.8,
-          'water_fast': 0.4,
-          'partial_fast': 0.75,
-          'esther_fast': 0.2,
+          'sunrise_sunset': 0.6, 'daniel_fast': 0.8, 'water_fast': 0.4, 'partial_fast': 0.75, 'esther_fast': 0.2,
         };
-        
         const intensityModifier = fastingIntensityMap[activeFast.fasting_type] || 0.6;
-        
         fastingContext = `
 ACTIVE FASTING STATUS:
-The user is currently on a biblical fast. CRITICAL: Adjust all recommendations accordingly.
 - Fast Type: ${activeFast.fasting_type.replace('_', ' ')}
-- Started: ${activeFast.started_at}
 - Target Duration: ${activeFast.target_duration_hours} hours
 - Prayer Intentions: ${activeFast.prayer_intentions || 'Not specified'}
 
-FASTING ADJUSTMENTS REQUIRED:
-1. WORKOUT: Reduce intensity to ${Math.round(intensityModifier * 100)}% of normal. Focus on:
-   - Lower volume (fewer sets, shorter sessions)
-   - Lighter weights with controlled movements
-   - Prioritize mobility, stretching, and light cardio
-   - Avoid high-intensity or heavy compound lifts
-   - Schedule workouts during energy peaks (typically morning or early afternoon)
-   
-2. NUTRITION (for when breaking fast): 
-   - Start with easily digestible foods
-   - Emphasize hydration and electrolytes
-   - Gradually increase portion sizes
-   - Prioritize protein and nutrient-dense foods
-   
-3. RECOVERY: Prioritize rest, sleep, and prayer time during this spiritual discipline.
+FASTING ADJUSTMENTS: Reduce workout intensity to ${Math.round(intensityModifier * 100)}% of normal. Focus on mobility, light cardio, and recovery. Mark workouts as "Modified for Fasting".
+`;
+      }
 
-Mark any workout days during the fast as "Modified for Fasting" and clearly note the reduced intensity.
+      // Hormonal Profile Context
+      if (hormonalResult.data) {
+        const hormonal = hormonalResult.data;
+        console.log("[GENERATE-PLAN] Found hormonal profile data");
+        hormonalContext = `
+HORMONAL OPTIMIZATION DATA:
+- Energy Pattern: Morning ${hormonal.energy_morning}/10, Afternoon ${hormonal.energy_afternoon}/10, Evening ${hormonal.energy_evening}/10
+- Sleep: ${hormonal.sleep_hours} hours | Stress Level: ${hormonal.stress_level}/10
+- Recovery Quality: ${hormonal.recovery_quality}/10 | Libido: ${hormonal.libido_level}/10
+- Recommended Training Intensity: ${hormonal.training_intensity_recommendation || 'Standard'}
+- AI Insights: ${hormonal.ai_insights || 'None'}
+
+HORMONAL ADJUSTMENTS: Schedule intense workouts during peak energy times. Prioritize sleep and stress management. Consider training intensity based on hormonal state.
+`;
+      }
+
+      // Sleep Adaptation Context
+      if (sleepResult.data) {
+        const sleep = sleepResult.data;
+        console.log("[GENERATE-PLAN] Found sleep adaptation data");
+        sleepContext = `
+SLEEP & RECOVERY DATA:
+- Recent Sleep: ${sleep.sleep_hours} hours | Quality: ${sleep.sleep_quality}/10
+- Readiness Score: ${sleep.readiness_score}/100
+- Intensity Modifier: ${sleep.intensity_modifier}x | Volume Modifier: ${sleep.volume_modifier}x
+- AI Reasoning: ${sleep.ai_reasoning || 'None'}
+
+SLEEP ADJUSTMENTS: Apply intensity/volume modifiers to training. Prioritize recovery if readiness is low (<60).
+`;
+      }
+
+      // Executive Performance Context
+      if (executiveResult.data) {
+        const exec = executiveResult.data;
+        console.log("[GENERATE-PLAN] Found executive performance data");
+        executiveContext = `
+EXECUTIVE PERFORMANCE DATA:
+- Cognitive Load: ${exec.cognitive_load_score}/100 | Focus: ${exec.focus_rating}/10
+- Mental Clarity: ${exec.mental_clarity}/10 | Decision Fatigue: ${exec.decision_fatigue}/10
+- Work Hours: ${exec.work_hours} | Meetings: ${exec.meetings_count}
+- Optimal Workout Windows: ${JSON.stringify(exec.optimal_workout_windows) || 'Not specified'}
+- AI Insights: ${exec.ai_insights || 'None'}
+
+EXECUTIVE ADJUSTMENTS: Schedule workouts during optimal windows. Keep sessions efficient for busy schedule. Consider cognitive load when planning intensity.
+`;
+      }
+
+      // Comeback Protocol Context
+      if (comebackResult.data) {
+        const comeback = comebackResult.data;
+        console.log("[GENERATE-PLAN] User has active comeback protocol");
+        comebackContext = `
+ACTIVE COMEBACK PROTOCOL:
+- Days Off Training: ${comeback.days_off}
+- Reason for Break: ${comeback.reason_for_break || 'Not specified'}
+- Current Fitness Level: ${comeback.current_fitness_level}/10
+- Previous Training Frequency: ${comeback.previous_training_frequency} days/week
+- Injury Details: ${comeback.injury_details || 'None'}
+- AI Guidance: ${comeback.ai_guidance || 'None'}
+
+COMEBACK ADJUSTMENTS: Follow progressive return protocol. Start conservatively and gradually increase intensity/volume. Prioritize injury prevention and recovery.
 `;
       }
     }
@@ -167,6 +203,14 @@ Your approach integrates:
 ${bodyAnalysisContext}
 
 ${fastingContext}
+
+${hormonalContext}
+
+${sleepContext}
+
+${executiveContext}
+
+${comebackContext}
 
 ${productContext}
 

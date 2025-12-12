@@ -13,6 +13,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Briefcase, Brain, Clock, Coffee, Monitor, Lock, Zap, Battery } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { PlanUpdateBanner } from "@/components/PlanUpdateBanner";
+import { toast as sonnerToast } from "sonner";
 
 const ExecutiveMode = () => {
   const { user, subscription } = useAuth();
@@ -21,6 +23,7 @@ const ExecutiveMode = () => {
   const isElite = subscription?.subscribed;
 
   const [loading, setLoading] = useState(false);
+  const [showPlanBanner, setShowPlanBanner] = useState(false);
   const [formData, setFormData] = useState({
     focusRating: 5,
     mentalClarity: 5,
@@ -77,6 +80,13 @@ const ExecutiveMode = () => {
       toast({
         title: "Analysis Complete",
         description: "Your executive performance plan is ready.",
+      });
+      
+      setShowPlanBanner(true);
+      sonnerToast.info("Executive metrics updated", {
+        description: "Consider regenerating your AI Plan to incorporate these insights.",
+        action: { label: "Update Plan", onClick: () => navigate("/my-progress") },
+        duration: 8000,
       });
     } catch (error: any) {
       console.error("Error:", error);
@@ -168,6 +178,8 @@ const ExecutiveMode = () => {
                 Optimize fitness around your demanding schedule
               </p>
             </div>
+
+            <PlanUpdateBanner featureName="Executive Performance" show={showPlanBanner} />
 
             <div className="grid lg:grid-cols-2 gap-6">
               {/* Input Form */}
