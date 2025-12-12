@@ -24,6 +24,7 @@ const SleepAdaptive = () => {
 
   const [loading, setLoading] = useState(false);
   const [showPlanBanner, setShowPlanBanner] = useState(false);
+  const [formData, setFormData] = useState({
     sleepHours: 7,
     sleepQuality: 6,
     sleepDisruptions: 1,
