@@ -68,6 +68,7 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
 
   // AI Plan state
   const [aiPlan, setAiPlan] = useState<AIPlan | null>(null);
+  const [aiPlanCreatedAt, setAiPlanCreatedAt] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [expandedSections, setExpandedSections] = useState({
@@ -85,6 +86,9 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
   const [savedTemplateDays, setSavedTemplateDays] = useState<Map<string, string>>(new Map());
   const [isResaving, setIsResaving] = useState(false);
   const [resaveConfirmed, setResaveConfirmed] = useState(false);
+  
+  // Check if AI plan is out of sync with active fast
+  const isPlanOutOfSync = activeFast && aiPlanCreatedAt && new Date(activeFast.started_at) > new Date(aiPlanCreatedAt);
 
   // Load existing AI plan and saved templates on mount for Elite users
   useEffect(() => {
@@ -116,7 +120,7 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
     try {
       const { data } = await supabase
         .from('personal_plans')
-        .select('plan_data')
+        .select('plan_data, created_at')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(1)
@@ -124,6 +128,7 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
       
       if (data?.plan_data) {
         setAiPlan(data.plan_data as unknown as AIPlan);
+        setAiPlanCreatedAt(data.created_at);
       }
     } catch (error) {
       console.error('Error loading plan:', error);
@@ -833,6 +838,40 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
             {/* AI Plan Tab - Only shown when plan exists */}
             {aiPlan && (
               <TabsContent value="ai-plan" className="space-y-6">
+                {/* Out of sync warning when fasting started after plan was generated */}
+                {isPlanOutOfSync && (
+                  <Alert className="border-amber-500/50 bg-amber-500/10">
+                    <AlertTriangle className="h-4 w-4 text-amber-600" />
+                    <AlertTitle className="text-amber-600">
+                      Plan Not Optimized for Your Fast
+                    </AlertTitle>
+                    <AlertDescription className="mt-1">
+                      <p className="text-sm text-muted-foreground">
+                        Your current AI Plan was generated before you started fasting. Regenerate it to get fasting-adjusted recommendations.
+                      </p>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="mt-2"
+                        onClick={handleGenerateAIPlan}
+                        disabled={isGenerating}
+                      >
+                        {isGenerating ? (
+                          <>
+                            <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                            Regenerating...
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="h-3 w-3 mr-1" />
+                            Regenerate Plan
+                          </>
+                        )}
+                      </Button>
+                    </AlertDescription>
+                  </Alert>
+                )}
+                
                 {/* Key Priorities */}
                 {aiPlan.keyPriorities && aiPlan.keyPriorities.length > 0 && (
                   <div className="p-4 bg-accent/5 rounded-lg border border-accent/20">
