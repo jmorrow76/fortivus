@@ -47,10 +47,12 @@ export const useOnboarding = () => {
 
   useEffect(() => {
     if (user) {
+      setIsLoading(true);
       checkOnboardingStatus();
     } else {
       setIsLoading(false);
       setHasCompletedOnboarding(null);
+      setOnboardingData(null);
     }
   }, [user]);
 
