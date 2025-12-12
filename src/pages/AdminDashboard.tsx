@@ -13,7 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { Shield, Users, Crown, TrendingUp, Calendar, Trash2, Plus, Loader2, Bot, Play, UserPlus, FileText, Mail, Send, Eye, Ban, UserX, CheckSquare, Square, ChevronLeft, ChevronRight, Gift, ShoppingBag } from 'lucide-react';
+import { Shield, Users, Crown, TrendingUp, Calendar, Trash2, Plus, Loader2, Bot, Play, UserPlus, FileText, Mail, Send, Eye, Ban, UserX, CheckSquare, Square, ChevronLeft, ChevronRight, Gift, ShoppingBag, Key } from 'lucide-react';
 import PromoCodeManager from '@/components/admin/PromoCodeManager';
 import ProductManager from '@/components/admin/ProductManager';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -107,6 +107,11 @@ const AdminDashboard = () => {
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
+  
+  // Password reset state
+  const [passwordResetUser, setPasswordResetUser] = useState<{ email: string; id: string } | null>(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [resettingPassword, setResettingPassword] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -359,6 +364,29 @@ const AdminDashboard = () => {
       toast.error(error.message || 'Failed to update role');
     } finally {
       setUpdatingRole(null);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (!passwordResetUser || !newPassword || !session) return;
+    setResettingPassword(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-update-password', {
+        body: { email: passwordResetUser.email, newPassword },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast.success(`Password updated for ${passwordResetUser.email}`);
+      setPasswordResetUser(null);
+      setNewPassword('');
+    } catch (error: any) {
+      console.error('Error resetting password:', error);
+      toast.error(error.message || 'Failed to reset password');
+    } finally {
+      setResettingPassword(false);
     }
   };
 
@@ -1022,6 +1050,19 @@ const AdminDashboard = () => {
                                     </AlertDialogContent>
                                   </AlertDialog>
                                 )}
+                                
+                                {/* Password Reset button */}
+                                {userData.id !== user?.id && (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="text-xs h-7"
+                                    onClick={() => setPasswordResetUser({ email: userData.email, id: userData.id })}
+                                  >
+                                    <Key className="h-3 w-3 mr-1" />
+                                    Reset PW
+                                  </Button>
+                                )}
                               </div>
                             </TableCell>
                           </TableRow>
@@ -1512,6 +1553,39 @@ const AdminDashboard = () => {
       </main>
 
       <Footer />
+
+      {/* Password Reset Dialog */}
+      <AlertDialog open={!!passwordResetUser} onOpenChange={(open) => !open && setPasswordResetUser(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reset Password</AlertDialogTitle>
+            <AlertDialogDescription>
+              Set a new password for <strong>{passwordResetUser?.email}</strong>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="py-4">
+            <Label htmlFor="newPassword">New Password</Label>
+            <Input
+              id="newPassword"
+              type="text"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="Enter new password"
+              className="mt-2"
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setNewPassword('')}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleResetPassword}
+              disabled={!newPassword || resettingPassword}
+            >
+              {resettingPassword ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Reset Password
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
