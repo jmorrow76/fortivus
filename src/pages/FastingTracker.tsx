@@ -1,11 +1,12 @@
 import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useFasting, FASTING_TYPES, FASTING_SCRIPTURES } from '@/hooks/useFasting';
 import Navbar from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
@@ -32,6 +33,7 @@ import { format, formatDistanceToNow } from 'date-fns';
 const FastingTracker = () => {
   const { user, subscription } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const {
     activeFast,
     fastingHistory,
@@ -97,6 +99,18 @@ const FastingTracker = () => {
     setShowStartDialog(false);
     setPrayerIntentions('');
     setScriptureFocus('');
+    
+    // Show toast suggesting to regenerate AI plan
+    toast({
+      title: "Fast Started",
+      description: "Regenerate your AI Plan for fasting-adjusted recommendations.",
+      action: (
+        <Button variant="outline" size="sm" asChild>
+          <Link to="/fitness-journey">Regenerate Plan</Link>
+        </Button>
+      ),
+      duration: 10000,
+    });
   };
 
   const handleEndFast = async () => {
