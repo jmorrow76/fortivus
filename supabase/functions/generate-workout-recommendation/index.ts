@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -18,13 +19,98 @@ serve(async (req) => {
   try {
     logStep("Function started");
     
-    const { moodLevel, stressLevel, energyLevel, sleepQuality, notes } = await req.json();
+    const { moodLevel, stressLevel, energyLevel, sleepQuality, notes, userId } = await req.json();
     
-    logStep("Received check-in data", { moodLevel, stressLevel, energyLevel, sleepQuality });
+    logStep("Received check-in data", { moodLevel, stressLevel, energyLevel, sleepQuality, hasUserId: !!userId });
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
+    }
+
+    // Initialize Supabase client to fetch user data
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    let activeFastingContext = "";
+    let aiPlanContext = "";
+
+    if (userId) {
+      // Fetch active fasting data
+      const { data: activeFast } = await supabase
+        .from("fasting_logs")
+        .select("*")
+        .eq("user_id", userId)
+        .is("ended_at", null)
+        .order("started_at", { ascending: false })
+        .maybeSingle();
+
+      if (activeFast) {
+        const hoursElapsed = Math.floor(
+          (Date.now() - new Date(activeFast.started_at).getTime()) / (1000 * 60 * 60)
+        );
+        activeFastingContext = `
+ACTIVE FAST STATUS:
+- Fast Type: ${activeFast.fasting_type}
+- Target Duration: ${activeFast.target_duration_hours || 'Not set'} hours
+- Hours Elapsed: ${hoursElapsed} hours
+- Prayer Intentions: ${activeFast.prayer_intentions || 'None specified'}
+- Scripture Focus: ${activeFast.scripture_focus || 'None specified'}
+
+IMPORTANT: This user is currently fasting. Adjust workout recommendations accordingly:
+- For water fasts or extended fasts (12+ hours): Recommend light activity only (walking, gentle stretching, yoga)
+- For intermittent fasting (16:8, etc.): Moderate activity is fine, but avoid high-intensity if in fasted state
+- For Daniel Fast or partial fasts: Normal activity is generally safe
+- Always prioritize hydration reminders and recovery`;
+        logStep("Found active fast", { type: activeFast.fasting_type, hoursElapsed });
+      }
+
+      // Fetch latest AI Personal Plan
+      const { data: personalPlan } = await supabase
+        .from("personal_plans")
+        .select("*")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+        .maybeSingle();
+
+      if (personalPlan?.plan_data) {
+        const plan = personalPlan.plan_data as any;
+        aiPlanContext = `
+USER'S AI PERSONAL PLAN:
+- Primary Goals: ${personalPlan.goals}
+- Current Stats: ${JSON.stringify(personalPlan.current_stats || {})}
+- Preferences: ${JSON.stringify(personalPlan.preferences || {})}
+
+WORKOUT FOCUS FROM PLAN:
+${plan.workout?.focusAreas ? `- Focus Areas: ${plan.workout.focusAreas.join(', ')}` : ''}
+${plan.workout?.weeklySchedule ? `- Weekly Schedule: ${JSON.stringify(plan.workout.weeklySchedule)}` : ''}
+${plan.workout?.intensityLevel ? `- Recommended Intensity: ${plan.workout.intensityLevel}` : ''}
+
+IMPORTANT: Align today's workout recommendation with the user's established plan and goals where appropriate, while still adapting to their current mood/energy/stress levels.`;
+        logStep("Found AI plan", { goals: personalPlan.goals });
+      }
+
+      // Also fetch onboarding data for additional context
+      const { data: onboarding } = await supabase
+        .from("user_onboarding")
+        .select("*")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      if (onboarding) {
+        aiPlanContext += `
+
+USER PROFILE (from assessment):
+- Fitness Goal: ${onboarding.fitness_goal}
+- Experience Level: ${onboarding.experience_level}
+- Age Range: ${onboarding.age_range}
+- Workout Frequency Goal: ${onboarding.workout_frequency}
+- Available Equipment: ${onboarding.available_equipment?.join(', ') || 'Not specified'}
+- Focus Areas: ${onboarding.focus_areas?.join(', ') || 'Not specified'}
+- Injuries/Limitations: ${onboarding.injuries_limitations || 'None reported'}`;
+        logStep("Found onboarding data", { goal: onboarding.fitness_goal });
+      }
     }
 
     const systemPrompt = `You are a Christian fitness coach specializing in training men over 40. Based on daily mood, stress, energy, and sleep data, you provide personalized workout recommendations that adapt to how they feel, along with scripture-based encouragement.
@@ -36,6 +122,8 @@ Your recommendations should:
 - Focus on functional fitness and longevity
 - Include a relevant Bible verse that connects physical discipline to spiritual growth
 - Be encouraging and supportive from a faith perspective
+${activeFastingContext ? '- CAREFULLY consider their active fasting status and adjust accordingly' : ''}
+${aiPlanContext ? '- Align with their established fitness plan and goals' : ''}
 
 Respond with a JSON object:
 {
@@ -68,8 +156,12 @@ Respond with a JSON object:
 - Energy: ${energyLevel}/5 (${getEnergyLabel(energyLevel)})
 - Sleep Quality: ${sleepQuality ? `${sleepQuality}/5` : 'Not reported'}
 ${notes ? `- Additional notes: ${notes}` : ''}
+${activeFastingContext}
+${aiPlanContext}
 
-Based on this data, generate a personalized workout recommendation for today. Consider their current state and provide an appropriate workout that will help them feel better while respecting their energy levels.`;
+Based on this data, generate a personalized workout recommendation for today. Consider their current state${activeFastingContext ? ', active fasting status,' : ''}${aiPlanContext ? ' and their fitness plan/goals' : ''}, and provide an appropriate workout that will help them feel better while respecting their energy levels.`;
+
+    logStep("Sending to AI", { hasActiveFast: !!activeFastingContext, hasAIPlan: !!aiPlanContext });
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -119,7 +211,7 @@ Based on this data, generate a personalized workout recommendation for today. Co
       recommendation = getDefaultRecommendation(energyLevel, stressLevel);
     }
 
-    logStep("Recommendation generated", { workoutType: recommendation.workoutType });
+    logStep("Recommendation generated", { workoutType: recommendation.workoutType, intensity: recommendation.intensity });
 
     return new Response(JSON.stringify({ recommendation }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
