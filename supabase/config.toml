@@ -80,3 +80,9 @@ verify_jwt = false
 
 [functions.redeem-promo-code]
 verify_jwt = false
+
+[functions.confirm-user-email]
+verify_jwt = false
+
+[functions.admin-update-password]
+verify_jwt = false
