@@ -10,7 +10,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Camera, Loader2, User, Crown, Settings, Calendar, Sparkles, Flame, RefreshCw, LayoutDashboard, Home, HelpCircle } from "lucide-react";
+import { ArrowLeft, Camera, Loader2, User, Crown, Settings, Calendar, Sparkles, Flame, RefreshCw, LayoutDashboard, Home, HelpCircle, Trash2, AlertTriangle } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Navbar from "@/components/Navbar";
 import HealthDashboard from "@/components/HealthDashboard";
@@ -45,6 +46,8 @@ const Profile = () => {
   const [managingSubscription, setManagingSubscription] = useState(false);
   const [resettingAssessment, setResettingAssessment] = useState(false);
   const [showWelcomeTour, setShowWelcomeTour] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
 
   const handleRetakeAssessment = async () => {
     setResettingAssessment(true);
@@ -89,6 +92,39 @@ const Profile = () => {
       });
     } finally {
       setManagingSubscription(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!session || deleteConfirmText !== "DELETE") return;
+    
+    setDeletingAccount(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('delete-account', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Account deleted",
+        description: "Your account has been permanently deleted.",
+      });
+
+      // Sign out and redirect to home
+      await supabase.auth.signOut();
+      navigate("/");
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete account",
+        variant: "destructive",
+      });
+    } finally {
+      setDeletingAccount(false);
+      setDeleteConfirmText("");
     }
   };
 
@@ -572,6 +608,77 @@ const Profile = () => {
               </Card>
             )}
           </div>
+
+          {/* Delete Account Section */}
+          <Card className="mt-6 border-destructive/30">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-destructive">
+                <AlertTriangle className="h-5 w-5" />
+                Danger Zone
+              </CardTitle>
+              <CardDescription>
+                Permanently delete your account and all associated data
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground mb-4">
+                Once you delete your account, there is no going back. This will permanently delete your profile, 
+                progress photos, workout history, and all other data associated with your account.
+              </p>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" className="gap-2">
+                    <Trash2 className="h-4 w-4" />
+                    Delete Account
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="flex items-center gap-2">
+                      <AlertTriangle className="h-5 w-5 text-destructive" />
+                      Delete Your Account?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription className="space-y-4">
+                      <p>
+                        This action cannot be undone. This will permanently delete your account and remove all your data from our servers.
+                      </p>
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium text-foreground">
+                          Type "DELETE" to confirm:
+                        </p>
+                        <input
+                          type="text"
+                          value={deleteConfirmText}
+                          onChange={(e) => setDeleteConfirmText(e.target.value.toUpperCase())}
+                          placeholder="DELETE"
+                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                        />
+                      </div>
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel onClick={() => setDeleteConfirmText("")}>
+                      Cancel
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleDeleteAccount}
+                      disabled={deleteConfirmText !== "DELETE" || deletingAccount}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      {deletingAccount ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Deleting...
+                        </>
+                      ) : (
+                        "Delete Account"
+                      )}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </CardContent>
+          </Card>
         </div>
       </main>
       

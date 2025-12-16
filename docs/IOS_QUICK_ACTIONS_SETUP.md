@@ -1,4 +1,19 @@
-# iOS Quick Actions & Siri Shortcuts Setup
+# iOS Setup Guide
+
+## Required Camera Permissions (CRITICAL)
+
+Your app uses photo uploads that may trigger the camera. You MUST add these keys to your `ios/App/App/Info.plist` file inside the main `<dict>` tag to prevent crashes:
+
+```xml
+<key>NSCameraUsageDescription</key>
+<string>Fortivus needs camera access to take progress photos and body analysis photos.</string>
+<key>NSPhotoLibraryUsageDescription</key>
+<string>Fortivus needs photo library access to upload progress photos.</string>
+<key>NSPhotoLibraryAddUsageDescription</key>
+<string>Fortivus needs permission to save photos to your library.</string>
+```
+
+**Without these permissions, the app will CRASH when users tap "Take Photo" or try to upload images.**
 
 ## Quick Actions (3D Touch / Long Press)
 
@@ -80,3 +95,19 @@ This requires native Swift/SwiftUI development beyond what can be configured in 
 1. Build and run the app on a device/simulator
 2. Long-press the app icon on the home screen
 3. You should see "Start Run", "Start Workout", and "Daily Check-in" options
+
+## Apple In-App Purchase Setup
+
+For iOS App Store compliance, you need to set up In-App Purchases in App Store Connect:
+
+1. **Create Products in App Store Connect:**
+   - Monthly subscription: `com.fortivus.elite.monthly` ($29.99/month)
+   - Yearly subscription: `com.fortivus.elite.yearly` ($199/year)
+
+2. **Configure Subscription Group:** Create a subscription group called "Fortivus Elite"
+
+3. **Implement StoreKit:** The app has hooks ready (`useAppleIAP`), but native StoreKit implementation is needed in Xcode
+
+4. **Server-Side Validation:** Set up receipt validation on your backend to verify purchases
+
+Note: The web version uses Stripe for payments. iOS native app must use Apple IAP exclusively.
