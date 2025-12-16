@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
+import { haptics } from './useNativeFeatures';
 
 interface SocialConnection {
   platform: string;
@@ -219,6 +220,9 @@ export function useGamification() {
           }).eq('user_id', user.id);
         }
 
+        // Haptic feedback for badge earned
+        haptics.success();
+        
         toast({
           title: '🏆 Badge Earned!',
           description: `You earned "${badge.name}"!`
@@ -310,6 +314,9 @@ export function useGamification() {
         xp_earned: userChallenge.challenge.xp_reward
       });
 
+      // Haptic feedback for challenge completion
+      haptics.success();
+      
       toast({
         title: '🎉 Challenge Completed!',
         description: `You completed "${userChallenge.challenge.title}" and earned ${userChallenge.challenge.xp_reward} XP!`

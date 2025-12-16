@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
+import { nativeGeolocation, haptics, isNativePlatform } from './useNativeFeatures';
+
 interface Coordinate {
   lat: number;
   lng: number;
@@ -87,9 +89,10 @@ export const useRunTracker = (): UseRunTrackerReturn => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  const watchIdRef = useRef<number | null>(null);
+  const watchIdRef = useRef<string | number | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const pausedDurationRef = useRef<number>(0);
+  const isNative = isNativePlatform();
 
   // Award XP and check for running badges
   const awardRunXPAndBadges = useCallback(async (
@@ -320,7 +323,14 @@ export const useRunTracker = (): UseRunTrackerReturn => {
   }, [user, fetchRunHistory]);
 
   const startRun = useCallback(async () => {
-    if (!navigator.geolocation) {
+    // Request permissions for native geolocation
+    if (isNative) {
+      const permissions = await nativeGeolocation.requestPermissions();
+      if (permissions.location === 'denied') {
+        setError('Location permission denied');
+        return;
+      }
+    } else if (!navigator.geolocation) {
       setError('Geolocation is not supported by your browser');
       return;
     }
@@ -329,6 +339,9 @@ export const useRunTracker = (): UseRunTrackerReturn => {
     setIsTracking(true);
     setIsPaused(false);
     pausedDurationRef.current = 0;
+    
+    // Haptic feedback when run starts
+    haptics.medium();
 
     const startTime = new Date();
     setActiveRun({
@@ -339,9 +352,16 @@ export const useRunTracker = (): UseRunTrackerReturn => {
       currentPace: 0,
     });
 
-    // Start watching position
-    watchIdRef.current = navigator.geolocation.watchPosition(
-      (position) => {
+    // Start watching position using native or web API
+    watchIdRef.current = await nativeGeolocation.watchPosition(
+      (position, err) => {
+        if (err) {
+          setError(`Geolocation error: ${err.message || 'Unknown error'}`);
+          return;
+        }
+        
+        if (!position) return;
+        
         const newCoord: Coordinate = {
           lat: position.coords.latitude,
           lng: position.coords.longitude,
@@ -373,9 +393,6 @@ export const useRunTracker = (): UseRunTrackerReturn => {
           });
         }
       },
-      (geoError) => {
-        setError(`Geolocation error: ${geoError.message}`);
-      },
       {
         enableHighAccuracy: true,
         timeout: 10000,
@@ -393,7 +410,7 @@ export const useRunTracker = (): UseRunTrackerReturn => {
         });
       }
     }, 1000);
-  }, [isPaused]);
+  }, [isPaused, isNative]);
 
   const pauseRun = useCallback(() => {
     setIsPaused(true);
@@ -410,9 +427,9 @@ export const useRunTracker = (): UseRunTrackerReturn => {
   const stopRun = useCallback(async (notes?: string): Promise<RunSession | null> => {
     if (!user || !activeRun) return null;
 
-    // Stop tracking
+    // Stop tracking - use native or web API based on watch ID type
     if (watchIdRef.current !== null) {
-      navigator.geolocation.clearWatch(watchIdRef.current);
+      await nativeGeolocation.clearWatch(watchIdRef.current);
       watchIdRef.current = null;
     }
     if (timerRef.current) {
@@ -422,6 +439,9 @@ export const useRunTracker = (): UseRunTrackerReturn => {
 
     setIsTracking(false);
     setIsPaused(false);
+    
+    // Haptic feedback when run completes
+    haptics.success();
 
     const completedAt = new Date();
     const durationSeconds = Math.round(activeRun.duration);
@@ -473,7 +493,7 @@ export const useRunTracker = (): UseRunTrackerReturn => {
   useEffect(() => {
     return () => {
       if (watchIdRef.current !== null) {
-        navigator.geolocation.clearWatch(watchIdRef.current);
+        nativeGeolocation.clearWatch(watchIdRef.current);
       }
       if (timerRef.current) {
         clearInterval(timerRef.current);
