@@ -2,17 +2,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { haptics } from './useNativeFeatures';
 
-// HealthKit types
-interface HealthKitSample {
-  uuid: string;
-  value: number;
-  unit: string;
-  startDate: string;
-  endDate: string;
-  sourceName: string;
-  sourceBundleId: string;
-}
-
 interface HealthData {
   steps: number;
   heartRate: number | null;
@@ -53,59 +42,48 @@ const defaultHealthData: HealthData = {
   lastSynced: null,
 };
 
-// Read permissions for HealthKit
-const READ_PERMISSIONS = [
-  'stepCount',
-  'heartRate', 
-  'sleepAnalysis',
-  'activeEnergyBurned',
-  'distanceWalkingRunning',
-  'workout',
-];
-
-// Write permissions for HealthKit  
-const WRITE_PERMISSIONS = [
-  'activeEnergyBurned',
-  'distanceWalkingRunning',
-  'workout',
-];
-
+/**
+ * Health Data Hook
+ * 
+ * This hook provides a unified interface for health data that:
+ * - On web: Stores data locally and returns unavailable status
+ * - On iOS: Will use native HealthKit via Swift bridge (requires native setup)
+ * 
+ * For iOS HealthKit integration, add the following to your native iOS project:
+ * 1. Enable HealthKit capability in Xcode
+ * 2. Add Info.plist entries for NSHealthShareUsageDescription and NSHealthUpdateUsageDescription
+ * 3. Implement native Swift plugin for HealthKit communication
+ */
 export const useHealthData = (): UseHealthDataReturn => {
   const [healthData, setHealthData] = useState<HealthData>(defaultHealthData);
   const [isAvailable, setIsAvailable] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [HealthKit, setHealthKit] = useState<any>(null);
 
   const isNativePlatform = Capacitor.isNativePlatform();
   const platform = Capacitor.getPlatform();
 
-  // Dynamically import HealthKit on iOS
+  // Check availability on mount
   useEffect(() => {
-    const loadHealthKit = async () => {
-      if (isNativePlatform && platform === 'ios') {
-        try {
-          const { CapacitorHealthkit } = await import('capacitor-healthkit');
-          setHealthKit(CapacitorHealthkit);
-          setIsAvailable(true);
-          
-          // Check if already authorized
-          const storedAuth = localStorage.getItem('healthkit_authorized');
-          if (storedAuth === 'true') {
-            setIsAuthorized(true);
-          }
-        } catch (err) {
-          console.error('Failed to load HealthKit:', err);
-          setIsAvailable(false);
+    // HealthKit is only available on iOS native
+    if (isNativePlatform && platform === 'ios') {
+      // Check if native HealthKit plugin is available
+      const plugins = (Capacitor as any).Plugins;
+      if (plugins?.HealthKit) {
+        setIsAvailable(true);
+        const storedAuth = localStorage.getItem('healthkit_authorized');
+        if (storedAuth === 'true') {
+          setIsAuthorized(true);
         }
       } else {
+        // Native plugin not configured - will need native setup
         setIsAvailable(false);
+        console.log('HealthKit native plugin not available. Configure in native iOS project.');
       }
-      setIsLoading(false);
-    };
-
-    loadHealthKit();
+    } else {
+      setIsAvailable(false);
+    }
   }, [isNativePlatform, platform]);
 
   const requestPermissions = useCallback(async (): Promise<boolean> => {
@@ -114,8 +92,9 @@ export const useHealthData = (): UseHealthDataReturn => {
       return false;
     }
 
-    if (!HealthKit) {
-      setError('HealthKit not loaded');
+    const plugins = (Capacitor as any).Plugins;
+    if (!plugins?.HealthKit) {
+      setError('HealthKit native plugin not configured');
       return false;
     }
 
@@ -123,10 +102,9 @@ export const useHealthData = (): UseHealthDataReturn => {
     setError(null);
 
     try {
-      await HealthKit.requestAuthorization({
-        all: [],
-        read: READ_PERMISSIONS,
-        write: WRITE_PERMISSIONS,
+      await plugins.HealthKit.requestAuthorization({
+        read: ['stepCount', 'heartRate', 'sleepAnalysis', 'activeEnergyBurned', 'distanceWalkingRunning', 'workout'],
+        write: ['activeEnergyBurned', 'distanceWalkingRunning', 'workout'],
       });
 
       localStorage.setItem('healthkit_authorized', 'true');
@@ -140,10 +118,13 @@ export const useHealthData = (): UseHealthDataReturn => {
     } finally {
       setIsLoading(false);
     }
-  }, [isNativePlatform, platform, HealthKit]);
+  }, [isNativePlatform, platform]);
 
   const syncHealthData = useCallback(async (): Promise<void> => {
-    if (!isAuthorized || !HealthKit) {
+    const plugins = (Capacitor as any).Plugins;
+    
+    if (!isAuthorized || !plugins?.HealthKit) {
+      // Load from local cache only
       return;
     }
 
@@ -153,101 +134,20 @@ export const useHealthData = (): UseHealthDataReturn => {
     try {
       const endDate = new Date();
       const startDate = new Date();
-      startDate.setHours(0, 0, 0, 0); // Start of today
+      startDate.setHours(0, 0, 0, 0);
 
-      // Query steps
-      let steps = 0;
-      try {
-        const stepsResult = await HealthKit.queryHKitSampleType({
-          sampleName: 'stepCount',
-          startDate: startDate.toISOString(),
-          endDate: endDate.toISOString(),
-          limit: 0,
-        });
-        steps = stepsResult?.resultData?.reduce((sum: number, s: HealthKitSample) => sum + s.value, 0) || 0;
-      } catch (e) {
-        console.log('Steps query failed:', e);
-      }
-
-      // Query heart rate (most recent)
-      let heartRate: number | null = null;
-      try {
-        const hrResult = await HealthKit.queryHKitSampleType({
-          sampleName: 'heartRate',
-          startDate: startDate.toISOString(),
-          endDate: endDate.toISOString(),
-          limit: 1,
-        });
-        if (hrResult?.resultData?.length > 0) {
-          heartRate = Math.round(hrResult.resultData[0].value);
-        }
-      } catch (e) {
-        console.log('Heart rate query failed:', e);
-      }
-
-      // Query active calories
-      let activeCalories: number | null = null;
-      try {
-        const calResult = await HealthKit.queryHKitSampleType({
-          sampleName: 'activeEnergyBurned',
-          startDate: startDate.toISOString(),
-          endDate: endDate.toISOString(),
-          limit: 0,
-        });
-        activeCalories = Math.round(calResult?.resultData?.reduce((sum: number, s: HealthKitSample) => sum + s.value, 0) || 0);
-      } catch (e) {
-        console.log('Calories query failed:', e);
-      }
-
-      // Query distance
-      let distance: number | null = null;
-      try {
-        const distResult = await HealthKit.queryHKitSampleType({
-          sampleName: 'distanceWalkingRunning',
-          startDate: startDate.toISOString(),
-          endDate: endDate.toISOString(),
-          limit: 0,
-        });
-        const totalMeters = distResult?.resultData?.reduce((sum: number, s: HealthKitSample) => sum + s.value, 0) || 0;
-        distance = Math.round((totalMeters / 1000) * 10) / 10; // Convert to km
-      } catch (e) {
-        console.log('Distance query failed:', e);
-      }
-
-      // Query sleep (last night)
-      let sleepHours: number | null = null;
-      try {
-        const sleepStart = new Date();
-        sleepStart.setDate(sleepStart.getDate() - 1);
-        sleepStart.setHours(20, 0, 0, 0); // 8pm yesterday
-        
-        const sleepResult = await HealthKit.queryHKitSampleType({
-          sampleName: 'sleepAnalysis',
-          startDate: sleepStart.toISOString(),
-          endDate: endDate.toISOString(),
-          limit: 0,
-        });
-        
-        if (sleepResult?.resultData?.length > 0) {
-          // Sum up sleep duration
-          let totalSleepMs = 0;
-          for (const sample of sleepResult.resultData) {
-            const start = new Date(sample.startDate).getTime();
-            const end = new Date(sample.endDate).getTime();
-            totalSleepMs += (end - start);
-          }
-          sleepHours = Math.round((totalSleepMs / (1000 * 60 * 60)) * 10) / 10;
-        }
-      } catch (e) {
-        console.log('Sleep query failed:', e);
-      }
+      const result = await plugins.HealthKit.queryHealthData({
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+        types: ['stepCount', 'heartRate', 'sleepAnalysis', 'activeEnergyBurned', 'distanceWalkingRunning'],
+      });
 
       const newHealthData: HealthData = {
-        steps,
-        heartRate,
-        sleepHours,
-        activeCalories,
-        distance,
+        steps: result?.steps || 0,
+        heartRate: result?.heartRate || null,
+        sleepHours: result?.sleepHours || null,
+        activeCalories: result?.activeCalories || null,
+        distance: result?.distance || null,
         lastSynced: new Date(),
       };
 
@@ -260,12 +160,14 @@ export const useHealthData = (): UseHealthDataReturn => {
     } finally {
       setIsLoading(false);
     }
-  }, [isAuthorized, HealthKit]);
+  }, [isAuthorized]);
 
-  // Write workout to HealthKit
+  // Write workout - stores locally for later sync if not on iOS
   const writeWorkout = useCallback(async (workout: WorkoutToSync): Promise<boolean> => {
+    const plugins = (Capacitor as any).Plugins;
+    
     // Store locally for sync later if not on iOS
-    if (!isAuthorized || !HealthKit) {
+    if (!isAuthorized || !plugins?.HealthKit) {
       const pendingWorkouts = JSON.parse(localStorage.getItem('pending_health_workouts') || '[]');
       pendingWorkouts.push({
         ...workout,
@@ -277,21 +179,13 @@ export const useHealthData = (): UseHealthDataReturn => {
     }
 
     try {
-      // Map workout type to HealthKit activity type
-      const activityTypeMap: Record<string, number> = {
-        running: 37, // HKWorkoutActivityType.running
-        strength: 50, // HKWorkoutActivityType.traditionalStrengthTraining  
-        cardio: 25, // HKWorkoutActivityType.highIntensityIntervalTraining
-        other: 3000, // HKWorkoutActivityType.other
-      };
-
-      await HealthKit.saveWorkout({
-        activityType: activityTypeMap[workout.type] || 3000,
+      await plugins.HealthKit.saveWorkout({
+        type: workout.type,
         startDate: workout.startDate.toISOString(),
         endDate: workout.endDate.toISOString(),
         duration: workout.duration,
-        totalEnergyBurned: workout.calories || 0,
-        totalDistance: workout.distance || 0,
+        calories: workout.calories || 0,
+        distance: workout.distance || 0,
       });
 
       haptics.success();
@@ -301,11 +195,13 @@ export const useHealthData = (): UseHealthDataReturn => {
       setError(err.message || 'Failed to write workout');
       return false;
     }
-  }, [isAuthorized, HealthKit]);
+  }, [isAuthorized]);
 
-  // Write calories to HealthKit
+  // Write calories - stores locally for later sync if not on iOS
   const writeCalories = useCallback(async (calories: number, date?: Date): Promise<boolean> => {
-    if (!isAuthorized || !HealthKit) {
+    const plugins = (Capacitor as any).Plugins;
+    
+    if (!isAuthorized || !plugins?.HealthKit) {
       const pendingCalories = JSON.parse(localStorage.getItem('pending_health_calories') || '[]');
       pendingCalories.push({ calories, date: (date || new Date()).toISOString() });
       localStorage.setItem('pending_health_calories', JSON.stringify(pendingCalories));
@@ -314,12 +210,9 @@ export const useHealthData = (): UseHealthDataReturn => {
 
     try {
       const sampleDate = date || new Date();
-      await HealthKit.saveQuantitySample({
-        sampleName: 'activeEnergyBurned',
+      await plugins.HealthKit.saveCalories({
         value: calories,
-        unit: 'kcal',
-        startDate: sampleDate.toISOString(),
-        endDate: sampleDate.toISOString(),
+        date: sampleDate.toISOString(),
       });
       return true;
     } catch (err: any) {
@@ -327,11 +220,13 @@ export const useHealthData = (): UseHealthDataReturn => {
       setError(err.message || 'Failed to write calories');
       return false;
     }
-  }, [isAuthorized, HealthKit]);
+  }, [isAuthorized]);
 
-  // Write distance to HealthKit
+  // Write distance - stores locally for later sync if not on iOS
   const writeDistance = useCallback(async (meters: number, date?: Date): Promise<boolean> => {
-    if (!isAuthorized || !HealthKit) {
+    const plugins = (Capacitor as any).Plugins;
+    
+    if (!isAuthorized || !plugins?.HealthKit) {
       const pendingDistance = JSON.parse(localStorage.getItem('pending_health_distance') || '[]');
       pendingDistance.push({ meters, date: (date || new Date()).toISOString() });
       localStorage.setItem('pending_health_distance', JSON.stringify(pendingDistance));
@@ -340,12 +235,9 @@ export const useHealthData = (): UseHealthDataReturn => {
 
     try {
       const sampleDate = date || new Date();
-      await HealthKit.saveQuantitySample({
-        sampleName: 'distanceWalkingRunning',
+      await plugins.HealthKit.saveDistance({
         value: meters,
-        unit: 'm',
-        startDate: sampleDate.toISOString(),
-        endDate: sampleDate.toISOString(),
+        date: sampleDate.toISOString(),
       });
       return true;
     } catch (err: any) {
@@ -353,7 +245,7 @@ export const useHealthData = (): UseHealthDataReturn => {
       setError(err.message || 'Failed to write distance');
       return false;
     }
-  }, [isAuthorized, HealthKit]);
+  }, [isAuthorized]);
 
   // Load cached data on mount
   useEffect(() => {
@@ -373,10 +265,10 @@ export const useHealthData = (): UseHealthDataReturn => {
 
   // Auto-sync when authorized
   useEffect(() => {
-    if (isAuthorized && HealthKit) {
+    if (isAuthorized && isAvailable) {
       syncHealthData();
     }
-  }, [isAuthorized, HealthKit, syncHealthData]);
+  }, [isAuthorized, isAvailable, syncHealthData]);
 
   return {
     healthData,
