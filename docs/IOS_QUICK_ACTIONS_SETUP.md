@@ -1,9 +1,22 @@
 # iOS Setup Guide
 
-## Required Camera Permissions (CRITICAL)
+## Native Features Overview
 
-Your app uses photo uploads that may trigger the camera. You MUST add these keys to your `ios/App/App/Info.plist` file inside the main `<dict>` tag to prevent crashes:
+Fortivus uses Capacitor plugins for native iOS functionality that differentiates it from a standard web app:
 
+- **Native GPS Tracking** - High-accuracy background location for run tracking
+- **Haptic Feedback** - Tactile responses for achievements, PRs, and interactions  
+- **HealthKit Integration** - Sync workouts and health data with Apple Health
+- **Quick Actions** - 3D Touch shortcuts from home screen
+- **Camera Access** - Progress photo uploads
+
+---
+
+## Required Info.plist Permissions (CRITICAL)
+
+Add ALL of these keys to your `ios/App/App/Info.plist` file inside the main `<dict>` tag:
+
+### Camera & Photos (Prevents Crashes)
 ```xml
 <key>NSCameraUsageDescription</key>
 <string>Fortivus needs camera access to take progress photos and body analysis photos.</string>
@@ -13,11 +26,47 @@ Your app uses photo uploads that may trigger the camera. You MUST add these keys
 <string>Fortivus needs permission to save photos to your library.</string>
 ```
 
-**Without these permissions, the app will CRASH when users tap "Take Photo" or try to upload images.**
+### Location (GPS Run Tracking)
+```xml
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>Fortivus uses your location to track runs and display your route on a map.</string>
+<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+<string>Fortivus uses your location to track runs in the background so you can see your full route.</string>
+<key>UIBackgroundModes</key>
+<array>
+    <string>location</string>
+</array>
+```
+
+### HealthKit (Apple Health Sync)
+```xml
+<key>NSHealthShareUsageDescription</key>
+<string>Fortivus reads your health data to personalize workouts and track your fitness progress.</string>
+<key>NSHealthUpdateUsageDescription</key>
+<string>Fortivus writes workout data to Apple Health to keep all your fitness data in one place.</string>
+```
+
+**Without these permissions, the app will CRASH when accessing camera, GPS, or HealthKit.**
+
+---
+
+## Native Capacitor Plugins
+
+The app uses these Capacitor plugins for native functionality:
+
+| Plugin | Purpose | App Feature |
+|--------|---------|-------------|
+| `@capacitor/geolocation` | Native GPS | Run Tracker with background tracking |
+| `@capacitor/haptics` | Vibration feedback | PRs, badges, achievements |
+| `@capacitor/core` | Platform detection | iOS/Android detection |
+
+These are already installed and integrated in the codebase.
+
+---
 
 ## Quick Actions (3D Touch / Long Press)
 
-After syncing the project with `npx cap sync ios`, add the following to your `ios/App/App/Info.plist` file, inside the main `<dict>` tag:
+Add to `ios/App/App/Info.plist`:
 
 ```xml
 <key>UIApplicationShortcutItems</key>
@@ -55,9 +104,23 @@ After syncing the project with `npx cap sync ios`, add the following to your `io
 </array>
 ```
 
+---
+
+## HealthKit Capability
+
+In Xcode:
+1. Select your project in the navigator
+2. Select the "App" target
+3. Go to "Signing & Capabilities"
+4. Click "+ Capability"
+5. Add "HealthKit"
+6. Enable "Clinical Health Records" if needed
+
+---
+
 ## Siri Shortcuts Setup
 
-To enable Siri Shortcuts, add to your `ios/App/App/AppDelegate.swift`:
+Add to `ios/App/App/AppDelegate.swift`:
 
 ```swift
 import Intents
@@ -65,7 +128,6 @@ import Intents
 // In application(_:continue:restorationHandler:) method:
 func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
     if userActivity.activityType == "com.fortivus.start-run" {
-        // Navigate to running page
         NotificationCenter.default.post(name: NSNotification.Name("OpenDeepLink"), object: nil, userInfo: ["path": "/running"])
         return true
     } else if userActivity.activityType == "com.fortivus.start-workout" {
@@ -79,35 +141,29 @@ func application(_ application: UIApplication, continue userActivity: NSUserActi
 }
 ```
 
-## Lock Screen Widget (iOS 16+)
-
-Lock Screen Widgets require creating a Widget Extension in Xcode:
-
-1. Open your project in Xcode
-2. File → New → Target → Widget Extension
-3. Name it "FortivusWidgets"
-4. Create the widget UI with buttons for Run/Workout/Check-in
-
-This requires native Swift/SwiftUI development beyond what can be configured in Capacitor.
-
-## Testing Quick Actions
-
-1. Build and run the app on a device/simulator
-2. Long-press the app icon on the home screen
-3. You should see "Start Run", "Start Workout", and "Daily Check-in" options
+---
 
 ## Apple In-App Purchase Setup
 
-For iOS App Store compliance, you need to set up In-App Purchases in App Store Connect:
+For iOS App Store compliance:
 
 1. **Create Products in App Store Connect:**
-   - Monthly subscription: `com.fortivus.elite.monthly` ($29.99/month)
-   - Yearly subscription: `com.fortivus.elite.yearly` ($199/year)
+   - Monthly: `com.fortivus.elite.monthly` ($29.99/month)
+   - Yearly: `com.fortivus.elite.yearly` ($199/year)
 
-2. **Configure Subscription Group:** Create a subscription group called "Fortivus Elite"
+2. **Configure Subscription Group:** Create "Fortivus Elite" group
 
-3. **Implement StoreKit:** The app has hooks ready (`useAppleIAP`), but native StoreKit implementation is needed in Xcode
+3. **Implement StoreKit:** The app has hooks ready (`useAppleIAP`), native StoreKit implementation needed
 
-4. **Server-Side Validation:** Set up receipt validation on your backend to verify purchases
+4. **Server-Side Validation:** Set up receipt validation on backend
 
-Note: The web version uses Stripe for payments. iOS native app must use Apple IAP exclusively.
+---
+
+## Testing Checklist
+
+- [ ] Long-press app icon shows Quick Actions
+- [ ] Run tracker gets GPS location
+- [ ] Haptic feedback triggers on PR/badge achievements  
+- [ ] HealthKit permission prompt appears
+- [ ] Camera permission prompt appears for progress photos
+- [ ] IAP products load correctly

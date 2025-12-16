@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Trophy } from 'lucide-react';
+import { haptics } from '@/hooks/useNativeFeatures';
 
 interface PRCelebrationProps {
   isVisible: boolean;
@@ -21,6 +22,9 @@ export default function PRCelebration({
   useEffect(() => {
     if (isVisible) {
       setShow(true);
+      // Trigger success haptic for PR achievement
+      haptics.success();
+      
       const timer = setTimeout(() => {
         setShow(false);
         setTimeout(onComplete, 300);
