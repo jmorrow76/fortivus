@@ -86,3 +86,9 @@ verify_jwt = false
 
 [functions.admin-update-password]
 verify_jwt = false
+
+[functions.create-demo-account]
+verify_jwt = false
+
+[functions.delete-account]
+verify_jwt = false
