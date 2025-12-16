@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
 import { nativeGeolocation, haptics, isNativePlatform } from './useNativeFeatures';
+import { useHealthData } from './useHealthData';
 
 interface Coordinate {
   lat: number;
@@ -81,6 +82,7 @@ const estimateCalories = (distanceMeters: number): number => {
 export const useRunTracker = (): UseRunTrackerReturn => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { writeWorkout, writeDistance } = useHealthData();
   const [isTracking, setIsTracking] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [activeRun, setActiveRun] = useState<ActiveRun | null>(null);
@@ -475,6 +477,17 @@ export const useRunTracker = (): UseRunTrackerReturn => {
       
       // Update running streak
       await updateRunningStreak();
+
+      // Sync to Apple HealthKit
+      writeWorkout({
+        type: 'running',
+        startDate: activeRun.startTime,
+        endDate: completedAt,
+        calories,
+        distance: distanceMeters,
+        duration: durationSeconds,
+      });
+      writeDistance(distanceMeters, completedAt);
 
       setActiveRun(null);
       await fetchRunHistory();
