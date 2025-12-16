@@ -201,10 +201,11 @@ Structure your article with:
 2. At least 5-7 major sections with ## headings
 3. Each section should have 3-5 paragraphs of detailed content
 4. Specific, actionable advice and protocols with step-by-step guidance
-5. Scientific backing where relevant (cite general research, not specific papers)
+5. Scientific backing with citations - Include a "References" or "Sources" section at the end with 3-5 relevant scientific studies, medical guidelines, or authoritative sources (e.g., "American Heart Association Guidelines", "Journal of Strength and Conditioning Research", "Mayo Clinic", etc.)
 6. Biblical wisdom and scripture references where they naturally support the content
 7. Real-world examples and scenarios Christian men over 40 can relate to
 8. A comprehensive conclusion with key takeaways (bulleted list)
+9. IMPORTANT: Include a brief medical disclaimer at the end before references: "This article is for informational purposes only and is not a substitute for professional medical advice. Consult your healthcare provider before starting any new exercise or nutrition program."
 
 CRITICAL FORMATTING REQUIREMENTS:
 - Break content into SHORT paragraphs (2-4 sentences each)

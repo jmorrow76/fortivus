@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Check, Sparkles, Zap, Crown, Loader2, X } from "lucide-react";
+import { Check, Sparkles, Zap, Crown, Loader2, X, Apple, RefreshCw } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -14,13 +14,15 @@ import {
 import { useAuth, FORTIVUS_ELITE } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAppleIAP, APPLE_IAP_PRODUCTS } from "@/hooks/useAppleIAP";
 
 const Pricing = () => {
-  const { user, session, subscription } = useAuth();
+  const { user, session, subscription, checkSubscription } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState<string | null>(null);
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
+  const { isNativeIOS, purchasing, purchaseSubscription, restorePurchases } = useAppleIAP();
 
   const handleSubscribe = async (planName: string) => {
     if (!user || !session) {
@@ -32,6 +34,37 @@ const Pricing = () => {
       return;
     }
 
+    // Handle iOS native purchases
+    if (isNativeIOS) {
+      setLoading(planName);
+      try {
+        const productId = billingCycle === "yearly" 
+          ? APPLE_IAP_PRODUCTS.yearly 
+          : APPLE_IAP_PRODUCTS.monthly;
+        
+        const success = await purchaseSubscription(productId);
+        
+        if (success) {
+          toast({
+            title: "Purchase successful!",
+            description: "Your Elite membership is now active.",
+          });
+          // Refresh subscription status
+          await checkSubscription();
+        }
+      } catch (error: any) {
+        toast({
+          title: "Purchase failed",
+          description: error.message || "Unable to complete purchase",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(null);
+      }
+      return;
+    }
+
+    // Handle web purchases via Stripe
     setLoading(planName);
     try {
       const priceId = billingCycle === "yearly" 
@@ -54,6 +87,35 @@ const Pricing = () => {
       toast({
         title: "Error",
         description: error.message || "Failed to start checkout",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  const handleRestorePurchases = async () => {
+    if (!isNativeIOS) return;
+    
+    setLoading("restore");
+    try {
+      const success = await restorePurchases();
+      if (success) {
+        toast({
+          title: "Purchases restored",
+          description: "Your subscription has been restored.",
+        });
+        await checkSubscription();
+      } else {
+        toast({
+          title: "No purchases found",
+          description: "No previous purchases were found to restore.",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to restore purchases",
         variant: "destructive",
       });
     } finally {
@@ -188,6 +250,26 @@ const Pricing = () => {
               10% of all proceeds support local churches and Christian ministries
             </span>
           </div>
+          
+          {/* iOS Restore Purchases */}
+          {isNativeIOS && !subscription.subscribed && (
+            <div className="mt-4 flex justify-center">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleRestorePurchases}
+                disabled={loading === "restore"}
+                className="gap-2"
+              >
+                {loading === "restore" ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <RefreshCw className="h-4 w-4" />
+                )}
+                Restore Purchases
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Billing Toggle */}

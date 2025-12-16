@@ -168,6 +168,15 @@ const ArticleDetail = () => {
 
           {/* Content */}
           <ArticleContent content={article.content} />
+
+          {/* Medical Disclaimer */}
+          <div className="mt-12 pt-8 border-t border-border">
+            <div className="bg-secondary/50 rounded-lg p-4">
+              <p className="text-sm text-muted-foreground">
+                <strong className="text-foreground">Medical Disclaimer:</strong> The information provided in this article is for general informational and educational purposes only and is not intended as medical advice. Always consult with a qualified healthcare professional before beginning any exercise program, making changes to your diet, or if you have any questions about a medical condition. Individual results may vary.
+              </p>
+            </div>
+          </div>
         </article>
       </main>
       <Footer />
