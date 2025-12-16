@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
-
+import { haptics } from './useNativeFeatures';
+import { useHealthData } from './useHealthData';
 export interface Exercise {
   id: string;
   name: string;
@@ -82,6 +83,7 @@ export interface PRCelebrationData {
 export const useWorkoutTracker = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { writeWorkout, writeCalories } = useHealthData();
   
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [templates, setTemplates] = useState<WorkoutTemplate[]>([]);
@@ -377,6 +379,10 @@ export const useWorkoutTracker = () => {
     const startTime = new Date(activeSession.started_at);
     const endTime = new Date();
     const durationMinutes = Math.round((endTime.getTime() - startTime.getTime()) / 60000);
+    const durationSeconds = durationMinutes * 60;
+    
+    // Estimate calories burned (rough estimate: 5 cal/min for strength training)
+    const estimatedCalories = durationMinutes * 5;
     
     const { error } = await supabase
       .from('workout_sessions')
@@ -391,6 +397,19 @@ export const useWorkoutTracker = () => {
       toast({ title: 'Error', description: 'Failed to save workout', variant: 'destructive' });
       return;
     }
+    
+    // Haptic feedback on workout complete
+    haptics.success();
+    
+    // Sync to Apple HealthKit
+    writeWorkout({
+      type: 'strength',
+      startDate: startTime,
+      endDate: endTime,
+      calories: estimatedCalories,
+      duration: durationSeconds,
+    });
+    writeCalories(estimatedCalories, endTime);
     
     toast({ title: 'Workout Complete!', description: `${durationMinutes} minutes - Great job!` });
     setActiveSession(null);
