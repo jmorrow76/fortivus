@@ -12,13 +12,14 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { 
   Plus, Search, Trash2, CalendarIcon, Apple, Beef, 
-  Cookie, Droplets, ChevronLeft, ChevronRight, Flame, CheckCircle, Zap, Camera, Utensils
+  Cookie, Droplets, ChevronLeft, ChevronRight, Flame, CheckCircle, Zap, Camera, Utensils, ScanBarcode
 } from 'lucide-react';
 import { useCalorieTracker, Food, MealType, MEAL_TYPES } from '@/hooks/useCalorieTracker';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { FoodPhotoAnalyzer } from '@/components/FoodPhotoAnalyzer';
 import MenuAnalyzer from '@/components/MenuAnalyzer';
+import { NutritionLabelScanner } from '@/components/NutritionLabelScanner';
 
 export function CalorieTracker() {
   const {
@@ -262,22 +263,33 @@ export function CalorieTracker() {
           </DialogHeader>
           
           <Tabs defaultValue="photo" className="w-full">
-            <TabsList className="w-full grid grid-cols-4">
-              <TabsTrigger value="photo" className="gap-1.5 text-xs px-2">
+            <TabsList className="w-full grid grid-cols-5">
+              <TabsTrigger value="photo" className="gap-1 text-xs px-1.5">
                 <Camera className="w-3.5 h-3.5" />
-                AI Photo
+                <span className="hidden sm:inline">Snap</span> Food
               </TabsTrigger>
-              <TabsTrigger value="menu" className="gap-1.5 text-xs px-2">
+              <TabsTrigger value="label" className="gap-1 text-xs px-1.5">
+                <ScanBarcode className="w-3.5 h-3.5" />
+                Label
+              </TabsTrigger>
+              <TabsTrigger value="menu" className="gap-1 text-xs px-1.5">
                 <Utensils className="w-3.5 h-3.5" />
                 Menu
               </TabsTrigger>
-              <TabsTrigger value="search" className="text-xs px-2">Search</TabsTrigger>
-              <TabsTrigger value="add" className="text-xs px-2">Manual</TabsTrigger>
+              <TabsTrigger value="search" className="text-xs px-1.5">Search</TabsTrigger>
+              <TabsTrigger value="add" className="text-xs px-1.5">Manual</TabsTrigger>
             </TabsList>
             
             <TabsContent value="photo" className="mt-4">
               <FoodPhotoAnalyzer 
                 onLogMeal={logMeal}
+                addFoodAndLog={addFoodAndLog}
+                onClose={() => setIsLogDialogOpen(false)} 
+              />
+            </TabsContent>
+            
+            <TabsContent value="label" className="mt-4">
+              <NutritionLabelScanner 
                 addFoodAndLog={addFoodAndLog}
                 onClose={() => setIsLogDialogOpen(false)} 
               />

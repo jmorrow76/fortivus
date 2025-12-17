@@ -104,3 +104,6 @@ verify_jwt = false
 
 [functions.analyze-menu]
 verify_jwt = false
+
+[functions.analyze-nutrition-label]
+verify_jwt = false
