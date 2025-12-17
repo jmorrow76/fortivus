@@ -1,7 +1,6 @@
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Camera, Upload, Loader2, Sparkles, CheckCircle, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -129,15 +128,16 @@ export function FoodPhotoAnalyzer({ onLogMeal, onClose }: FoodPhotoAnalyzerProps
     }
   };
 
-  const logAnalyzedMeal = async () => {
+  const logAnalyzedMeal = async (mealType: MealType) => {
     if (!analysis || !analysis.items.length) return;
 
     setLogging(true);
+    setSelectedMealType(mealType);
 
     try {
       // Log each food item as a custom meal
       for (const item of analysis.items) {
-        await onLogMeal(null, 1, selectedMealType, {
+        await onLogMeal(null, 1, mealType, {
           name: `${item.name} (${item.portion})`,
           calories: item.calories,
           protein: item.protein,
@@ -146,7 +146,7 @@ export function FoodPhotoAnalyzer({ onLogMeal, onClose }: FoodPhotoAnalyzerProps
         });
       }
 
-      toast.success(`Logged ${analysis.items.length} item(s)`);
+      toast.success(`Added ${analysis.items.length} item(s) to ${mealType}`);
       onClose();
     } catch (err) {
       console.error('Error logging meal:', err);
@@ -290,38 +290,25 @@ export function FoodPhotoAnalyzer({ onLogMeal, onClose }: FoodPhotoAnalyzerProps
                 <p className="text-xs text-muted-foreground italic">{analysis.notes}</p>
               )}
 
-              {/* Meal type and log button */}
-              <div className="space-y-3 pt-2 border-t">
-                <div>
-                  <Label>Meal Type</Label>
-                  <Select value={selectedMealType} onValueChange={(v) => setSelectedMealType(v as MealType)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {MEAL_TYPES.map((type) => (
-                        <SelectItem key={type} value={type} className="capitalize">
-                          {type}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+              {/* Quick add buttons for each meal type */}
+              <div className="space-y-3 pt-3 border-t">
+                <Label className="text-center block">Add to Calorie Tracker</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  {MEAL_TYPES.map((type) => (
+                    <Button
+                      key={type}
+                      variant={type === 'snack' ? 'outline' : 'default'}
+                      onClick={() => logAnalyzedMeal(type)}
+                      disabled={logging}
+                      className="capitalize"
+                    >
+                      {logging && selectedMealType === type ? (
+                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                      ) : null}
+                      {type}
+                    </Button>
+                  ))}
                 </div>
-
-                <Button
-                  onClick={logAnalyzedMeal}
-                  disabled={logging}
-                  className="w-full"
-                >
-                  {logging ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                      Logging...
-                    </>
-                  ) : (
-                    `Log ${analysis.items.length} Item${analysis.items.length > 1 ? 's' : ''}`
-                  )}
-                </Button>
               </div>
             </div>
           )}
