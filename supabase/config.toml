@@ -1,5 +1,8 @@
 project_id = "olfyvfxtphpkxlcwqqmt"
 
+[functions.analyze-photo-comparison]
+verify_jwt = false
+
 [functions.analyze-body]
 verify_jwt = false
 
