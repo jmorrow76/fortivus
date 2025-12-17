@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
-import { History, TrendingUp, TrendingDown, Minus, ChevronDown, ChevronUp, BarChart3, GitCompare } from 'lucide-react';
+import { History, TrendingUp, TrendingDown, Minus, ChevronDown, ChevronUp, BarChart3, GitCompare, Image } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -19,6 +19,7 @@ import {
 interface BodyAnalysisRecord {
   id: string;
   created_at: string;
+  image_url: string | null;
   body_fat_percentage: number | null;
   body_fat_category: string | null;
   muscle_assessment: string | null;
@@ -206,7 +207,7 @@ const BodyAnalysisHistory = () => {
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-lg">
               <GitCompare className="w-5 h-5 text-accent" />
-              Comparison
+              Photo Comparison
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -216,6 +217,13 @@ const BodyAnalysisHistory = () => {
                 <p className="text-xs text-muted-foreground text-center">
                   {format(new Date(comparison.older.created_at), 'MMM d, yyyy')}
                 </p>
+                {comparison.older.image_url && (
+                  <img 
+                    src={comparison.older.image_url} 
+                    alt="Before" 
+                    className="w-full aspect-[3/4] object-cover rounded-lg"
+                  />
+                )}
                 <div className="text-center">
                   <div className="text-3xl font-bold text-muted-foreground">
                     {comparison.older.body_fat_percentage}%
@@ -258,6 +266,13 @@ const BodyAnalysisHistory = () => {
                 <p className="text-xs text-muted-foreground text-center">
                   {format(new Date(comparison.newer.created_at), 'MMM d, yyyy')}
                 </p>
+                {comparison.newer.image_url && (
+                  <img 
+                    src={comparison.newer.image_url} 
+                    alt="After" 
+                    className="w-full aspect-[3/4] object-cover rounded-lg"
+                  />
+                )}
                 <div className="text-center">
                   <div className="text-3xl font-bold text-accent">
                     {comparison.newer.body_fat_percentage}%
@@ -331,6 +346,18 @@ const BodyAnalysisHistory = () => {
                         {isSelected && <div className="w-2 h-2 rounded-full bg-white" />}
                       </div>
                     )}
+                    {/* Thumbnail */}
+                    {record.image_url ? (
+                      <img 
+                        src={record.image_url} 
+                        alt="Analysis" 
+                        className="w-12 h-12 object-cover rounded-lg"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 bg-secondary rounded-lg flex items-center justify-center">
+                        <Image className="w-5 h-5 text-muted-foreground" />
+                      </div>
+                    )}
                     <div>
                       <p className="font-medium">
                         {format(new Date(record.created_at), 'MMMM d, yyyy')}
@@ -364,6 +391,17 @@ const BodyAnalysisHistory = () => {
 
                 {isExpanded && !compareMode && (
                   <div className="px-4 pb-4 space-y-4 border-t border-border pt-4">
+                    {/* Show full image if available */}
+                    {record.image_url && (
+                      <div className="flex justify-center">
+                        <img 
+                          src={record.image_url} 
+                          alt="Body analysis" 
+                          className="max-h-64 object-contain rounded-lg"
+                        />
+                      </div>
+                    )}
+                    
                     <p className="text-sm text-muted-foreground">{record.muscle_assessment}</p>
                     
                     <div className="grid md:grid-cols-2 gap-4">
