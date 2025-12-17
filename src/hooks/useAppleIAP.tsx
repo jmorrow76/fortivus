@@ -8,8 +8,8 @@ export const APPLE_IAP_PRODUCTS = {
   yearly: 'com.fortivus.elite.yearly',
 };
 
-// RevenueCat API Key - replace with your actual key from RevenueCat dashboard
-const REVENUECAT_API_KEY = 'appl_YOUR_REVENUECAT_API_KEY';
+// RevenueCat API Key for iOS
+const REVENUECAT_API_KEY = 'appl_LNxseVCZmssAQoTrYeODnBMxyoB';
 
 export const useAppleIAP = () => {
   const [loading, setLoading] = useState(false);
