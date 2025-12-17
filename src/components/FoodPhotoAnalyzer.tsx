@@ -39,10 +39,15 @@ interface FoodPhotoAnalyzerProps {
     mealType: MealType,
     customFood?: { name: string; calories: number; protein: number; carbs: number; fat: number }
   ) => Promise<boolean>;
+  addFoodAndLog?: (
+    foodData: { name: string; calories: number; protein: number; carbs: number; fat: number },
+    servings: number,
+    mealType: MealType
+  ) => Promise<boolean>;
   onClose: () => void;
 }
 
-export function FoodPhotoAnalyzer({ onLogMeal, onClose }: FoodPhotoAnalyzerProps) {
+export function FoodPhotoAnalyzer({ onLogMeal, addFoodAndLog, onClose }: FoodPhotoAnalyzerProps) {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
@@ -135,15 +140,23 @@ export function FoodPhotoAnalyzer({ onLogMeal, onClose }: FoodPhotoAnalyzerProps
     setSelectedMealType(mealType);
 
     try {
-      // Log each food item as a custom meal
+      // Log each food item - save to shared database if addFoodAndLog is provided
       for (const item of analysis.items) {
-        await onLogMeal(null, 1, mealType, {
+        const foodData = {
           name: `${item.name} (${item.portion})`,
           calories: item.calories,
           protein: item.protein,
           carbs: item.carbs,
           fat: item.fat
-        });
+        };
+
+        if (addFoodAndLog) {
+          // Save to shared database and log
+          await addFoodAndLog(foodData, 1, mealType);
+        } else {
+          // Fallback to custom food logging
+          await onLogMeal(null, 1, mealType, foodData);
+        }
       }
 
       toast.success(`Added ${analysis.items.length} item(s) to ${mealType}`);
