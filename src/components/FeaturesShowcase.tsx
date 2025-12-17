@@ -46,8 +46,9 @@ const eliteFeatures = [
   },
   {
     icon: Salad,
-    title: "Calorie & Macro Tracking",
-    description: "Log meals with our 100+ food database. Set custom macro goals and see daily/weekly nutrition trends.",
+    title: "AI Calorie Tracking",
+    description: "Snap a photo of any meal for instant AI calorie estimates. Plus manual logging with 100+ foods and custom macro goals.",
+    highlight: "New",
     link: "/calorie-tracking",
   },
   {
@@ -64,8 +65,9 @@ const eliteFeatures = [
   },
   {
     icon: BarChart3,
-    title: "Progress Photos",
-    description: "Build a visual timeline of your transformation. Compare photos side-by-side and see how far you've come.",
+    title: "AI Progress Analysis",
+    description: "Build a visual timeline of your transformation. AI compares your photos to quantify muscle gains, fat loss, and overall progress.",
+    highlight: "New",
     link: "/progress",
   },
   {
