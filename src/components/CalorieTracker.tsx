@@ -32,6 +32,7 @@ export function CalorieTracker() {
     searchFoods,
     addFood,
     logMeal,
+    addFoodAndLog,
     deleteMealLog,
     getDailyTotals,
     getMealsByType
@@ -276,7 +277,8 @@ export function CalorieTracker() {
             
             <TabsContent value="photo" className="mt-4">
               <FoodPhotoAnalyzer 
-                onLogMeal={logMeal} 
+                onLogMeal={logMeal}
+                addFoodAndLog={addFoodAndLog}
                 onClose={() => setIsLogDialogOpen(false)} 
               />
             </TabsContent>
@@ -286,13 +288,18 @@ export function CalorieTracker() {
                 dailyProgress={totals}
                 macroGoals={macroGoals}
                 onLogMeal={(item, mealType) => {
-                  logMeal(null, 1, mealType as MealType, {
-                    name: item.name,
-                    calories: item.calories,
-                    protein: item.protein,
-                    carbs: item.carbs,
-                    fat: item.fat,
-                  });
+                  // Save food to database for all users, then log it
+                  addFoodAndLog(
+                    {
+                      name: item.name,
+                      calories: item.calories,
+                      protein: item.protein,
+                      carbs: item.carbs,
+                      fat: item.fat,
+                    },
+                    1,
+                    mealType as MealType
+                  );
                 }}
               />
             </TabsContent>

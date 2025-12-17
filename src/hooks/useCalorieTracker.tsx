@@ -289,6 +289,80 @@ export function useCalorieTracker() {
     return true;
   };
 
+  // Add food to shared database and log it - used for menu analyzer results
+  const addFoodAndLog = async (
+    foodData: { name: string; calories: number; protein: number; carbs: number; fat: number },
+    servings: number,
+    mealType: MealType
+  ) => {
+    if (!user) return false;
+    
+    // First check if this food already exists (by exact name match)
+    const { data: existingFood } = await supabase
+      .from('foods')
+      .select('*')
+      .ilike('name', foodData.name)
+      .maybeSingle();
+    
+    let foodId: string;
+    
+    if (existingFood) {
+      // Use existing food
+      foodId = existingFood.id;
+    } else {
+      // Add new food to database for all users
+      const { data: newFood, error: foodError } = await supabase
+        .from('foods')
+        .insert({
+          name: foodData.name,
+          calories: foodData.calories,
+          protein: foodData.protein,
+          carbs: foodData.carbs,
+          fat: foodData.fat,
+          serving_size: 1,
+          serving_unit: 'serving',
+          created_by: user.id,
+          is_verified: false
+        })
+        .select()
+        .single();
+      
+      if (foodError || !newFood) {
+        console.error('Error adding food to database:', foodError);
+        // Fall back to custom food logging
+        return logMeal(null, servings, mealType, foodData);
+      }
+      
+      foodId = newFood.id;
+      // Update local foods list
+      setFoods(prev => [newFood as Food, ...prev]);
+    }
+    
+    // Log the meal with the food reference
+    const dateStr = selectedDate.toISOString().split('T')[0];
+    
+    const { error } = await supabase
+      .from('meal_logs')
+      .insert({
+        user_id: user.id,
+        food_id: foodId,
+        servings,
+        meal_type: mealType,
+        log_date: dateStr
+      });
+    
+    if (error) {
+      console.error('Error logging meal:', error);
+      toast.error('Failed to log meal');
+      return false;
+    }
+    
+    await fetchMealLogs(selectedDate);
+    await fetchFrequentFoods();
+    toast.success('Meal logged & added to food database');
+    return true;
+  };
+
   const deleteMealLog = async (logId: string) => {
     const { error } = await supabase
       .from('meal_logs')
@@ -346,6 +420,7 @@ export function useCalorieTracker() {
     searchFoods,
     addFood,
     logMeal,
+    addFoodAndLog,
     deleteMealLog,
     getDailyTotals,
     getMealsByType,
