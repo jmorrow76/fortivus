@@ -2,44 +2,30 @@ import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Camera, Upload, Loader2, Sparkles, CheckCircle, AlertCircle } from 'lucide-react';
+import { Camera, Upload, Loader2, Sparkles, CheckCircle, AlertCircle, ScanBarcode } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { MealType, MEAL_TYPES } from '@/hooks/useCalorieTracker';
 import { useNativeCamera } from '@/hooks/useNativeCamera';
-import { Capacitor } from '@capacitor/core';
 import { cn } from '@/lib/utils';
 
-interface FoodItem {
+interface NutritionData {
   name: string;
-  portion: string;
+  brand?: string;
+  serving_size: number;
+  serving_unit: string;
   calories: number;
   protein: number;
   carbs: number;
   fat: number;
-}
-
-interface AnalysisResult {
-  items: FoodItem[];
-  total: {
-    calories: number;
-    protein: number;
-    carbs: number;
-    fat: number;
-  };
+  fiber?: number;
   confidence?: string;
   notes?: string;
   error?: string;
 }
 
-interface FoodPhotoAnalyzerProps {
-  onLogMeal: (
-    foodId: string | null,
-    servings: number,
-    mealType: MealType,
-    customFood?: { name: string; calories: number; protein: number; carbs: number; fat: number }
-  ) => Promise<boolean>;
-  addFoodAndLog?: (
+interface NutritionLabelScannerProps {
+  addFoodAndLog: (
     foodData: { name: string; calories: number; protein: number; carbs: number; fat: number },
     servings: number,
     mealType: MealType
@@ -47,11 +33,11 @@ interface FoodPhotoAnalyzerProps {
   onClose: () => void;
 }
 
-export function FoodPhotoAnalyzer({ onLogMeal, addFoodAndLog, onClose }: FoodPhotoAnalyzerProps) {
+export function NutritionLabelScanner({ addFoodAndLog, onClose }: NutritionLabelScannerProps) {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
-  const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
-  const [selectedMealType, setSelectedMealType] = useState<MealType>('lunch');
+  const [nutritionData, setNutritionData] = useState<NutritionData | null>(null);
+  const [selectedMealType, setSelectedMealType] = useState<MealType>('snack');
   const [logging, setLogging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { takePhoto, pickFromGallery, isNative } = useNativeCamera();
@@ -64,7 +50,7 @@ export function FoodPhotoAnalyzer({ onLogMeal, addFoodAndLog, onClose }: FoodPho
     reader.onload = (e) => {
       const result = e.target?.result as string;
       setImagePreview(result);
-      setAnalysis(null);
+      setNutritionData(null);
     };
     reader.readAsDataURL(file);
   };
@@ -74,10 +60,9 @@ export function FoodPhotoAnalyzer({ onLogMeal, addFoodAndLog, onClose }: FoodPho
       const result = await takePhoto();
       if (result?.dataUrl) {
         setImagePreview(result.dataUrl);
-        setAnalysis(null);
+        setNutritionData(null);
       }
     } else {
-      // Fallback for web - use file input with capture
       if (fileInputRef.current) {
         fileInputRef.current.setAttribute('capture', 'environment');
         fileInputRef.current.click();
@@ -90,7 +75,7 @@ export function FoodPhotoAnalyzer({ onLogMeal, addFoodAndLog, onClose }: FoodPho
       const result = await pickFromGallery();
       if (result?.dataUrl) {
         setImagePreview(result.dataUrl);
-        setAnalysis(null);
+        setNutritionData(null);
       }
     } else {
       if (fileInputRef.current) {
@@ -100,70 +85,69 @@ export function FoodPhotoAnalyzer({ onLogMeal, addFoodAndLog, onClose }: FoodPho
     }
   };
 
-  const analyzePhoto = async () => {
+  const analyzeLabel = async () => {
     if (!imagePreview) return;
 
     setAnalyzing(true);
-    setAnalysis(null);
+    setNutritionData(null);
 
     try {
-      const { data, error } = await supabase.functions.invoke('analyze-food-photo', {
+      const { data, error } = await supabase.functions.invoke('analyze-nutrition-label', {
         body: { imageBase64: imagePreview }
       });
 
       if (error) {
-        console.error('Error analyzing photo:', error);
-        toast.error('Failed to analyze photo');
+        console.error('Error analyzing label:', error);
+        toast.error('Failed to analyze nutrition label');
         return;
       }
 
       if (data.error) {
         toast.error(data.error);
-        setAnalysis(data);
+        setNutritionData(data);
         return;
       }
 
-      setAnalysis(data);
-      toast.success('Food analyzed successfully!');
+      setNutritionData(data);
+      toast.success('Nutrition label analyzed!');
     } catch (err) {
       console.error('Error:', err);
-      toast.error('Failed to analyze photo');
+      toast.error('Failed to analyze nutrition label');
     } finally {
       setAnalyzing(false);
     }
   };
 
-  const logAnalyzedMeal = async (mealType: MealType) => {
-    if (!analysis || !analysis.items.length) return;
+  const logFood = async (mealType: MealType) => {
+    if (!nutritionData || nutritionData.error) return;
 
     setLogging(true);
     setSelectedMealType(mealType);
 
     try {
-      // Log each food item - save to shared database if addFoodAndLog is provided
-      for (const item of analysis.items) {
-        const foodData = {
-          name: `${item.name} (${item.portion})`,
-          calories: item.calories,
-          protein: item.protein,
-          carbs: item.carbs,
-          fat: item.fat
-        };
+      const foodName = nutritionData.brand 
+        ? `${nutritionData.name} (${nutritionData.brand})`
+        : nutritionData.name;
 
-        if (addFoodAndLog) {
-          // Save to shared database and log
-          await addFoodAndLog(foodData, 1, mealType);
-        } else {
-          // Fallback to custom food logging
-          await onLogMeal(null, 1, mealType, foodData);
-        }
+      const success = await addFoodAndLog(
+        {
+          name: foodName,
+          calories: nutritionData.calories,
+          protein: nutritionData.protein,
+          carbs: nutritionData.carbs,
+          fat: nutritionData.fat
+        },
+        1,
+        mealType
+      );
+
+      if (success) {
+        toast.success(`Added ${foodName} to ${mealType}`);
+        onClose();
       }
-
-      toast.success(`Added ${analysis.items.length} item(s) to ${mealType}`);
-      onClose();
     } catch (err) {
-      console.error('Error logging meal:', err);
-      toast.error('Failed to log meal');
+      console.error('Error logging food:', err);
+      toast.error('Failed to log food');
     } finally {
       setLogging(false);
     }
@@ -180,7 +164,6 @@ export function FoodPhotoAnalyzer({ onLogMeal, addFoodAndLog, onClose }: FoodPho
 
   return (
     <div className="space-y-4">
-      {/* Image capture/upload section */}
       {!imagePreview ? (
         <div className="space-y-3">
           <div className="flex gap-3">
@@ -189,8 +172,8 @@ export function FoodPhotoAnalyzer({ onLogMeal, addFoodAndLog, onClose }: FoodPho
               className="flex-1 h-24 flex-col gap-2"
               onClick={handleCameraCapture}
             >
-              <Camera className="w-6 h-6" />
-              <span className="text-xs">Take Photo</span>
+              <ScanBarcode className="w-6 h-6" />
+              <span className="text-xs">Scan Label</span>
             </Button>
             <Button
               variant="outline"
@@ -202,16 +185,15 @@ export function FoodPhotoAnalyzer({ onLogMeal, addFoodAndLog, onClose }: FoodPho
             </Button>
           </div>
           <p className="text-xs text-center text-muted-foreground">
-            <strong>Take a photo of your actual food</strong> (plate, meal, snack) and AI will estimate the calories and macros
+            Scan a nutrition label or barcode to automatically extract food data. This food will be saved for all users to search.
           </p>
         </div>
       ) : (
         <div className="space-y-4">
-          {/* Image preview */}
           <div className="relative">
             <img
               src={imagePreview}
-              alt="Food preview"
+              alt="Label preview"
               className="w-full h-48 object-cover rounded-lg"
             />
             <Button
@@ -220,90 +202,86 @@ export function FoodPhotoAnalyzer({ onLogMeal, addFoodAndLog, onClose }: FoodPho
               className="absolute top-2 right-2"
               onClick={() => {
                 setImagePreview(null);
-                setAnalysis(null);
+                setNutritionData(null);
               }}
             >
               Change
             </Button>
           </div>
 
-          {/* Analyze button */}
-          {!analysis && (
+          {!nutritionData && (
             <Button
-              onClick={analyzePhoto}
+              onClick={analyzeLabel}
               disabled={analyzing}
               className="w-full gap-2"
             >
               {analyzing ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Analyzing...
+                  Analyzing Label...
                 </>
               ) : (
                 <>
                   <Sparkles className="w-4 h-4" />
-                  Analyze Food
+                  Extract Nutrition Info
                 </>
               )}
             </Button>
           )}
 
-          {/* Analysis results */}
-          {analysis && !analysis.error && (
+          {nutritionData && !nutritionData.error && (
             <div className="space-y-3">
-              {/* Confidence indicator */}
-              {analysis.confidence && (
+              {nutritionData.confidence && (
                 <div className="flex items-center gap-2 text-sm">
-                  <CheckCircle className={cn("w-4 h-4", getConfidenceColor(analysis.confidence))} />
-                  <span className={getConfidenceColor(analysis.confidence)}>
-                    {analysis.confidence.charAt(0).toUpperCase() + analysis.confidence.slice(1)} confidence
+                  <CheckCircle className={cn("w-4 h-4", getConfidenceColor(nutritionData.confidence))} />
+                  <span className={getConfidenceColor(nutritionData.confidence)}>
+                    {nutritionData.confidence.charAt(0).toUpperCase() + nutritionData.confidence.slice(1)} confidence
                   </span>
                 </div>
               )}
 
-              {/* Food items */}
-              <div className="space-y-2">
-                {analysis.items.map((item, index) => (
-                  <Card key={index} className="bg-secondary/50">
-                    <CardContent className="p-3">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-medium text-sm">{item.name}</p>
-                          <p className="text-xs text-muted-foreground">{item.portion}</p>
-                        </div>
-                        <p className="font-semibold text-sm">{item.calories} kcal</p>
-                      </div>
-                      <div className="flex gap-3 mt-2 text-xs text-muted-foreground">
-                        <span>P: {item.protein}g</span>
-                        <span>C: {item.carbs}g</span>
-                        <span>F: {item.fat}g</span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-
-              {/* Total */}
-              <Card className="bg-accent/10 border-accent/20">
-                <CardContent className="p-3">
-                  <div className="flex justify-between items-center">
-                    <span className="font-medium">Total</span>
-                    <span className="font-bold">{analysis.total.calories} kcal</span>
+              <Card className="bg-secondary/50">
+                <CardContent className="p-3 space-y-2">
+                  <div>
+                    <p className="font-medium">{nutritionData.name}</p>
+                    {nutritionData.brand && (
+                      <p className="text-xs text-muted-foreground">{nutritionData.brand}</p>
+                    )}
                   </div>
-                  <div className="flex gap-3 mt-1 text-sm text-muted-foreground">
-                    <span>Protein: {analysis.total.protein}g</span>
-                    <span>Carbs: {analysis.total.carbs}g</span>
-                    <span>Fat: {analysis.total.fat}g</span>
+                  <div className="text-xs text-muted-foreground">
+                    Serving: {nutritionData.serving_size}{nutritionData.serving_unit}
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-sm pt-2 border-t">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Calories</span>
+                      <span className="font-semibold">{nutritionData.calories}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Protein</span>
+                      <span className="font-semibold">{nutritionData.protein}g</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Carbs</span>
+                      <span className="font-semibold">{nutritionData.carbs}g</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Fat</span>
+                      <span className="font-semibold">{nutritionData.fat}g</span>
+                    </div>
+                    {nutritionData.fiber !== undefined && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Fiber</span>
+                        <span className="font-semibold">{nutritionData.fiber}g</span>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Notes */}
-              {analysis.notes && (
-                <p className="text-xs text-muted-foreground italic">{analysis.notes}</p>
+              {nutritionData.notes && (
+                <p className="text-xs text-muted-foreground italic">{nutritionData.notes}</p>
               )}
 
-              {/* Quick add buttons for each meal type */}
               <div className="space-y-3 pt-3 border-t">
                 <Label className="text-center block">Add to Calorie Tracker</Label>
                 <div className="grid grid-cols-2 gap-2">
@@ -311,7 +289,7 @@ export function FoodPhotoAnalyzer({ onLogMeal, addFoodAndLog, onClose }: FoodPho
                     <Button
                       key={type}
                       variant={type === 'snack' ? 'outline' : 'default'}
-                      onClick={() => logAnalyzedMeal(type)}
+                      onClick={() => logFood(type)}
                       disabled={logging}
                       className="capitalize"
                     >
@@ -326,11 +304,10 @@ export function FoodPhotoAnalyzer({ onLogMeal, addFoodAndLog, onClose }: FoodPho
             </div>
           )}
 
-          {/* Error state */}
-          {analysis?.error && (
+          {nutritionData?.error && (
             <div className="flex items-center gap-2 p-3 bg-destructive/10 rounded-lg text-sm text-destructive">
               <AlertCircle className="w-4 h-4" />
-              {analysis.error}
+              {nutritionData.error}
             </div>
           )}
         </div>
