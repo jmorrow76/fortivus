@@ -167,7 +167,7 @@ const MenuAnalyzer = ({ dailyProgress, macroGoals, onLogMeal }: MenuAnalyzerProp
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
       {/* Upload Section */}
       <Card>
         <CardHeader className="pb-3">
