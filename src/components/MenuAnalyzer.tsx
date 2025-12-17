@@ -2,7 +2,9 @@ import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Camera, Loader2, Utensils, AlertTriangle, Lightbulb, Plus, Upload, Trophy, Coffee, Sun, Moon, Cookie } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Camera, Loader2, Utensils, AlertTriangle, Lightbulb, Plus, Upload, Trophy, Coffee, Sun, Moon, Cookie, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useOnboardingQuery } from "@/hooks/queries";
@@ -15,6 +17,7 @@ interface MenuRecommendation {
   carbs: number;
   fat: number;
   reason: string;
+  exceeds_budget?: boolean;
 }
 
 interface MenuAvoid {
@@ -53,6 +56,7 @@ const MenuAnalyzer = ({ dailyProgress, macroGoals, onLogMeal }: MenuAnalyzerProp
   const [menuImage, setMenuImage] = useState<string | null>(null);
   const [mealTypeDialogOpen, setMealTypeDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<MenuRecommendation | null>(null);
+  const [allowOverBudget, setAllowOverBudget] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { takePhoto, isNative } = useNativeCamera();
 
@@ -76,6 +80,7 @@ const MenuAnalyzer = ({ dailyProgress, macroGoals, onLogMeal }: MenuAnalyzerProp
           goals,
           dailyProgress,
           macroGoals,
+          allowOverBudget,
         },
       });
 
@@ -199,6 +204,21 @@ const MenuAnalyzer = ({ dailyProgress, macroGoals, onLogMeal }: MenuAnalyzerProp
             remaining macros ({remainingCalories} cal, {remainingProtein}g protein left today).
           </p>
 
+          {/* Over Budget Toggle */}
+          <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50 mb-4">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="h-4 w-4 text-muted-foreground" />
+              <Label htmlFor="over-budget" className="text-sm cursor-pointer">
+                Include items over calorie budget
+              </Label>
+            </div>
+            <Switch
+              id="over-budget"
+              checked={allowOverBudget}
+              onCheckedChange={setAllowOverBudget}
+            />
+          </div>
+
           <input
             ref={fileInputRef}
             type="file"
@@ -266,21 +286,35 @@ const MenuAnalyzer = ({ dailyProgress, macroGoals, onLogMeal }: MenuAnalyzerProp
                 {analysis.recommendations.map((item, index) => (
                   <div 
                     key={index} 
-                    className="p-4 rounded-lg bg-primary/5 border border-primary/10"
+                    className={`p-4 rounded-lg border ${
+                      item.exceeds_budget 
+                        ? 'bg-amber-500/5 border-amber-500/30' 
+                        : 'bg-primary/5 border-primary/10'
+                    }`}
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-xs font-semibold uppercase tracking-wide text-primary bg-primary/10 px-2 py-0.5 rounded">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <span className={`text-xs font-semibold uppercase tracking-wide px-2 py-0.5 rounded ${
+                            item.exceeds_budget 
+                              ? 'text-amber-600 bg-amber-500/10' 
+                              : 'text-primary bg-primary/10'
+                          }`}>
                             {getRecommendationLabel(index)}
                           </span>
+                          {item.exceeds_budget && (
+                            <span className="text-xs font-medium text-amber-600 bg-amber-500/10 px-2 py-0.5 rounded flex items-center gap-1">
+                              <AlertCircle className="h-3 w-3" />
+                              Over Budget
+                            </span>
+                          )}
                         </div>
                         <h4 className="font-semibold text-lg">{item.name}</h4>
                       </div>
                       {onLogMeal && (
                         <Button
                           size="sm"
-                          variant="default"
+                          variant={item.exceeds_budget ? "outline" : "default"}
                           onClick={() => handleLogItem(item)}
                           className="shrink-0"
                         >
@@ -296,7 +330,7 @@ const MenuAnalyzer = ({ dailyProgress, macroGoals, onLogMeal }: MenuAnalyzerProp
                     </div>
 
                     <div className="grid grid-cols-4 gap-2 mt-3 text-center text-sm">
-                      <div className="p-2 rounded bg-background">
+                      <div className={`p-2 rounded ${item.exceeds_budget && item.calories > remainingCalories ? 'bg-amber-500/10' : 'bg-background'}`}>
                         <div className="font-semibold">{item.calories}</div>
                         <div className="text-xs text-muted-foreground">cal</div>
                       </div>
