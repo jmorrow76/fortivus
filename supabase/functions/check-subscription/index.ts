@@ -39,21 +39,24 @@ serve(async (req) => {
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { userId: user.id, email: user.email });
 
-    // Check for manual subscription grant first
+    // Check for manual subscription grant or iOS purchase first
     const { data: grantData } = await supabaseClient
       .from('subscription_grants')
       .select('*')
       .eq('user_email', user.email.toLowerCase())
       .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`)
+      .order('granted_at', { ascending: false })
+      .limit(1)
       .maybeSingle();
 
     if (grantData) {
-      logStep("Manual subscription grant found", { grantId: grantData.id });
+      const isIOSPurchase = grantData.grant_type === 'ios_purchase';
+      logStep("Subscription grant found", { grantId: grantData.id, type: grantData.grant_type });
       return new Response(JSON.stringify({
         subscribed: true,
-        product_id: 'manual_grant',
+        product_id: isIOSPurchase ? 'ios_purchase' : 'manual_grant',
         subscription_end: grantData.expires_at,
-        grant_type: 'manual'
+        grant_type: grantData.grant_type
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,

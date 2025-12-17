@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { CapacitorPurchases, Offerings, PurchaserInfo, Package } from 'capacitor-purchases';
+import { supabase } from '@/integrations/supabase/client';
 
 // Apple IAP Product IDs - these must match what you configure in App Store Connect
 export const APPLE_IAP_PRODUCTS = {
@@ -10,6 +11,25 @@ export const APPLE_IAP_PRODUCTS = {
 
 // RevenueCat API Key for iOS
 const REVENUECAT_API_KEY = 'appl_LNxseVCZmssAQoTrYeODnBMxyoB';
+
+// Sync iOS purchase to backend
+const syncPurchaseToBackend = async (productId: string, transactionId?: string, expiresAt?: string) => {
+  try {
+    console.log('[IAP] Syncing purchase to backend', { productId, transactionId });
+    const { data, error } = await supabase.functions.invoke('sync-ios-purchase', {
+      body: { productId, transactionId, expiresAt }
+    });
+    if (error) {
+      console.error('[IAP] Failed to sync purchase:', error);
+      return false;
+    }
+    console.log('[IAP] Purchase synced successfully', data);
+    return true;
+  } catch (err) {
+    console.error('[IAP] Error syncing purchase:', err);
+    return false;
+  }
+};
 
 export const useAppleIAP = () => {
   const [loading, setLoading] = useState(false);
@@ -116,7 +136,19 @@ export const useAppleIAP = () => {
       );
 
       if (hasElite || purchaserInfo?.activeSubscriptions?.length > 0) {
-        console.log('[IAP] Purchase successful');
+        console.log('[IAP] Purchase successful, syncing to backend');
+        
+        // Get expiration date from active entitlement
+        const activeEntitlement = Object.values(entitlements)[0] as any;
+        const expiresAt = activeEntitlement?.expirationDate;
+        
+        // Sync purchase to backend so it's recognized across platforms
+        await syncPurchaseToBackend(
+          productId,
+          purchaserInfo?.originalAppUserId,
+          expiresAt
+        );
+        
         return true;
       }
 
@@ -160,7 +192,20 @@ export const useAppleIAP = () => {
       );
 
       if (hasElite || purchaserInfo?.activeSubscriptions?.length > 0) {
-        console.log('[IAP] Restore successful');
+        console.log('[IAP] Restore successful, syncing to backend');
+        
+        // Get the first active subscription's product ID
+        const activeSubscription = purchaserInfo?.activeSubscriptions?.[0];
+        const activeEntitlement = Object.values(entitlements)[0] as any;
+        const expiresAt = activeEntitlement?.expirationDate;
+        
+        // Sync restored purchase to backend
+        await syncPurchaseToBackend(
+          activeSubscription || 'restored_purchase',
+          purchaserInfo?.originalAppUserId,
+          expiresAt
+        );
+        
         return true;
       }
 
