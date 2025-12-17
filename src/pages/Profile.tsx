@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth, FORTIVUS_ELITE } from "@/hooks/useAuth";
 import { useOnboarding } from "@/hooks/useOnboarding";
+import { useNativeCamera } from "@/hooks/useNativeCamera";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +25,7 @@ import { format } from "date-fns";
 const Profile = () => {
   const { user, loading: authLoading, subscription, session } = useAuth();
   const { hasCompletedOnboarding, resetOnboarding } = useOnboarding();
+  const { isNative, loading: cameraLoading, getPhotoWithPrompt } = useNativeCamera();
   const isManualGrant = subscription.productId === 'manual_grant';
   const isElite = subscription.subscribed && (
     subscription.productId === FORTIVUS_ELITE.monthly.product_id ||
@@ -166,15 +168,37 @@ const Profile = () => {
     }
   };
 
-  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file || !user) return;
-
-    const fileExt = file.name.split(".").pop();
-    const filePath = `${user.id}/${crypto.randomUUID()}.${fileExt}`;
-
+  // Handle avatar upload - use native camera on iOS/Android
+  const handleAvatarUpload = async (event?: React.ChangeEvent<HTMLInputElement>) => {
+    if (!user) return;
+    
     setUploading(true);
     try {
+      let file: File | Blob | undefined;
+      let fileExt = 'jpg';
+
+      // On native platform, use the camera plugin
+      if (isNative) {
+        const result = await getPhotoWithPrompt();
+        if (!result?.blob) {
+          setUploading(false);
+          return; // User cancelled
+        }
+        file = result.blob;
+        fileExt = 'jpg';
+      } else {
+        // On web, use file input
+        const inputFile = event?.target?.files?.[0];
+        if (!inputFile) {
+          setUploading(false);
+          return;
+        }
+        file = inputFile;
+        fileExt = inputFile.name.split(".").pop() || 'jpg';
+      }
+
+      const filePath = `${user.id}/${crypto.randomUUID()}.${fileExt}`;
+
       const { error: uploadError } = await supabase.storage
         .from("avatars")
         .upload(filePath, file, { upsert: true });
@@ -206,6 +230,13 @@ const Profile = () => {
       });
     } finally {
       setUploading(false);
+    }
+  };
+
+  // Native camera button handler (for iOS/Android)
+  const handleNativeCameraClick = () => {
+    if (isNative) {
+      handleAvatarUpload();
     }
   };
 
@@ -356,27 +387,46 @@ const Profile = () => {
                       <User className="h-10 w-10" />
                     </AvatarFallback>
                   </Avatar>
-                  <label
-                    htmlFor="avatar-upload"
-                    className="absolute bottom-0 right-0 p-2 bg-accent text-accent-foreground rounded-full cursor-pointer hover:opacity-90 transition-opacity"
-                  >
-                    {uploading ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Camera className="h-4 w-4" />
-                    )}
-                  </label>
-                  <input
-                    id="avatar-upload"
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleAvatarUpload}
-                    disabled={uploading}
-                  />
+                  {isNative ? (
+                    // Native iOS/Android: Use camera plugin button
+                    <button
+                      onClick={handleNativeCameraClick}
+                      disabled={uploading || cameraLoading}
+                      className="absolute bottom-0 right-0 p-2 bg-accent text-accent-foreground rounded-full cursor-pointer hover:opacity-90 transition-opacity disabled:opacity-50"
+                      aria-label="Take photo or choose from library"
+                    >
+                      {uploading || cameraLoading ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Camera className="h-4 w-4" />
+                      )}
+                    </button>
+                  ) : (
+                    // Web: Use file input
+                    <>
+                      <label
+                        htmlFor="avatar-upload"
+                        className="absolute bottom-0 right-0 p-2 bg-accent text-accent-foreground rounded-full cursor-pointer hover:opacity-90 transition-opacity"
+                      >
+                        {uploading ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Camera className="h-4 w-4" />
+                        )}
+                      </label>
+                      <input
+                        id="avatar-upload"
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleAvatarUpload}
+                        disabled={uploading}
+                      />
+                    </>
+                  )}
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Click the camera icon to upload a new photo
+                  {isNative ? "Tap the camera to take or choose a photo" : "Click the camera icon to upload a new photo"}
                 </p>
               </div>
 
