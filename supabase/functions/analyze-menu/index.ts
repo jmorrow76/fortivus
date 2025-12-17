@@ -11,7 +11,7 @@ serve(async (req) => {
   }
 
   try {
-    const { imageBase64, goals, dailyProgress, macroGoals } = await req.json();
+    const { imageBase64, goals, dailyProgress, macroGoals, allowOverBudget } = await req.json();
 
     if (!imageBase64) {
       return new Response(
@@ -35,6 +35,10 @@ serve(async (req) => {
     const remainingCarbs = (macroGoals?.carbs || 200) - (dailyProgress?.carbs || 0);
     const remainingFat = (macroGoals?.fat || 65) - (dailyProgress?.fat || 0);
 
+    const budgetConstraint = allowOverBudget 
+      ? `The user has chosen to see ALL options, including those that exceed their remaining calories. Still prioritize items within budget, but include higher-calorie options if they are good choices nutritionally. Clearly note in the reason if an item exceeds their remaining ${remainingCalories} calories.`
+      : `CRITICAL: Only recommend items that are ${remainingCalories} calories or LESS. Do NOT recommend any item that would put the user over their daily calorie goal. If very few items fit within the budget, recommend the closest options and suggest modifications (like "without fries" or "half portion") to make them fit.`;
+
     const systemPrompt = `You are a nutrition expert helping a Christian man over 40 make healthy restaurant choices aligned with his fitness goals.
 
 The user's fitness goal: ${goals?.fitnessGoal || 'general health'}
@@ -47,19 +51,22 @@ REMAINING MACROS FOR TODAY:
 - Carbs: ${remainingCarbs}g remaining
 - Fat: ${remainingFat}g remaining
 
+${budgetConstraint}
+
 Based on the menu image provided, recommend the TOP 3 menu items that:
-1. Best fit within their remaining daily macros
+1. ${allowOverBudget ? 'Best align with their fitness goals (may exceed calorie budget)' : 'MUST fit within their remaining ' + remainingCalories + ' calories'}
 2. Align with their fitness goal (${goals?.fitnessGoal || 'general health'})
 3. Support muscle building and recovery for men over 40
 4. Consider any dietary preferences
 
 For each recommendation, provide:
-- Item name (exactly as shown on menu)
+- Item name (exactly as shown on menu, with any modifications needed to fit budget)
 - Estimated calories
 - Estimated protein (g)
 - Estimated carbs (g)
 - Estimated fat (g)
-- Brief reason why this is a good choice (1-2 sentences)
+- Brief reason why this is a good choice (1-2 sentences)${!allowOverBudget ? ' - MUST mention that it fits within their remaining calories' : ''}
+- exceeds_budget: boolean indicating if this item exceeds their remaining calories
 
 Also provide a brief "What to avoid" section listing 1-2 menu items that would not align with their goals and why.
 
@@ -72,7 +79,8 @@ Format your response as JSON with this structure:
       "protein": 35,
       "carbs": 40,
       "fat": 20,
-      "reason": "High protein choice that fits your remaining macros..."
+      "reason": "High protein choice that fits your remaining macros...",
+      "exceeds_budget": false
     }
   ],
   "avoid": [
