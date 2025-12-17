@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Camera, Loader2, Utensils, AlertTriangle, Lightbulb, Plus } from "lucide-react";
+import { Camera, Loader2, Utensils, AlertTriangle, Lightbulb, Plus, Upload, Trophy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useOnboardingQuery } from "@/hooks/queries";
+import { useNativeCamera } from "@/hooks/useNativeCamera";
 
 interface MenuRecommendation {
   name: string;
@@ -49,62 +50,43 @@ const MenuAnalyzer = ({ dailyProgress, macroGoals, onLogMeal }: MenuAnalyzerProp
   const [analyzing, setAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<MenuAnalysis | null>(null);
   const [menuImage, setMenuImage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { takePhoto, isNative } = useNativeCamera();
 
-  const handleImageCapture = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    // Validate file size (max 10MB)
-    if (file.size > 10 * 1024 * 1024) {
-      toast({
-        title: "File too large",
-        description: "Please use an image under 10MB",
-        variant: "destructive",
-      });
-      return;
-    }
-
+  const analyzeMenu = async (base64: string) => {
     setAnalyzing(true);
     setAnalysis(null);
+    setMenuImage(base64);
 
     try {
-      // Convert to base64
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        const base64 = reader.result as string;
-        setMenuImage(base64);
+      // Prepare goals from onboarding data
+      const goals = onboardingData ? {
+        fitnessGoal: onboardingData.fitness_goal,
+        experienceLevel: onboardingData.experience_level,
+        dietaryPreference: onboardingData.dietary_preference,
+      } : {};
 
-        // Prepare goals from onboarding data
-        const goals = onboardingData ? {
-          fitnessGoal: onboardingData.fitness_goal,
-          experienceLevel: onboardingData.experience_level,
-          dietaryPreference: onboardingData.dietary_preference,
-        } : {};
+      // Call edge function
+      const { data, error } = await supabase.functions.invoke('analyze-menu', {
+        body: {
+          imageBase64: base64,
+          goals,
+          dailyProgress,
+          macroGoals,
+        },
+      });
 
-        // Call edge function
-        const { data, error } = await supabase.functions.invoke('analyze-menu', {
-          body: {
-            imageBase64: base64,
-            goals,
-            dailyProgress,
-            macroGoals,
-          },
+      if (error) throw error;
+
+      if (data?.analysis) {
+        setAnalysis(data.analysis);
+        toast({
+          title: "Menu analyzed!",
+          description: "Here are your personalized recommendations.",
         });
-
-        if (error) throw error;
-
-        if (data?.analysis) {
-          setAnalysis(data.analysis);
-          toast({
-            title: "Menu analyzed!",
-            description: "Here are your personalized recommendations.",
-          });
-        } else if (data?.error) {
-          throw new Error(data.error);
-        }
-      };
-
-      reader.readAsDataURL(file);
+      } else if (data?.error) {
+        throw new Error(data.error);
+      }
     } catch (error: any) {
       console.error('Menu analysis error:', error);
       toast({
@@ -116,6 +98,54 @@ const MenuAnalyzer = ({ dailyProgress, macroGoals, onLogMeal }: MenuAnalyzerProp
     } finally {
       setAnalyzing(false);
     }
+  };
+
+  const handleTakePhoto = async () => {
+    if (isNative) {
+      const result = await takePhoto();
+      if (result?.dataUrl) {
+        await analyzeMenu(result.dataUrl);
+      }
+    } else {
+      // Fallback for web - trigger file input with camera
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.capture = 'environment';
+      input.onchange = async (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0];
+        if (file) await handleFile(file);
+      };
+      input.click();
+    }
+  };
+
+  const handleUpload = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFile = async (file: File) => {
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast({
+        title: "File too large",
+        description: "Please use an image under 10MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64 = reader.result as string;
+      await analyzeMenu(base64);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) await handleFile(file);
   };
 
   const handleLogItem = (item: MenuRecommendation) => {
@@ -131,6 +161,11 @@ const MenuAnalyzer = ({ dailyProgress, macroGoals, onLogMeal }: MenuAnalyzerProp
   const remainingCalories = macroGoals.calories - dailyProgress.calories;
   const remainingProtein = macroGoals.protein - dailyProgress.protein;
 
+  const getRecommendationLabel = (index: number) => {
+    const labels = ["Recommended #1", "Recommended #2", "Recommended #3"];
+    return labels[index] || `Recommended #${index + 1}`;
+  };
+
   return (
     <div className="space-y-4">
       {/* Upload Section */}
@@ -143,42 +178,47 @@ const MenuAnalyzer = ({ dailyProgress, macroGoals, onLogMeal }: MenuAnalyzerProp
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground mb-4">
-            Take a photo of a restaurant menu and get personalized recommendations based on your 
+            Take a photo or upload a restaurant menu to get personalized recommendations based on your 
             remaining macros ({remainingCalories} cal, {remainingProtein}g protein left today).
           </p>
 
-          <div className="flex flex-col items-center gap-4">
-            <input
-              type="file"
-              accept="image/*"
-              capture="environment"
-              onChange={handleImageCapture}
-              className="hidden"
-              id="menu-capture"
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            className="hidden"
+            disabled={analyzing}
+          />
+
+          <div className="grid grid-cols-2 gap-3">
+            <Button
+              variant="outline"
+              className="h-20 flex flex-col gap-2"
               disabled={analyzing}
-            />
-            <label htmlFor="menu-capture" className="w-full">
-              <Button
-                variant="outline"
-                className="w-full h-24 border-dashed"
-                disabled={analyzing}
-                asChild
-              >
-                <span className="flex flex-col items-center gap-2 cursor-pointer">
-                  {analyzing ? (
-                    <>
-                      <Loader2 className="h-8 w-8 animate-spin" />
-                      <span>Analyzing menu...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Camera className="h-8 w-8" />
-                      <span>Capture or Upload Menu Photo</span>
-                    </>
-                  )}
-                </span>
-              </Button>
-            </label>
+              onClick={handleTakePhoto}
+            >
+              {analyzing ? (
+                <Loader2 className="h-6 w-6 animate-spin" />
+              ) : (
+                <Camera className="h-6 w-6" />
+              )}
+              <span className="text-sm">Take Photo</span>
+            </Button>
+            
+            <Button
+              variant="outline"
+              className="h-20 flex flex-col gap-2"
+              disabled={analyzing}
+              onClick={handleUpload}
+            >
+              {analyzing ? (
+                <Loader2 className="h-6 w-6 animate-spin" />
+              ) : (
+                <Upload className="h-6 w-6" />
+              )}
+              <span className="text-sm">Upload Menu</span>
+            </Button>
           </div>
 
           {menuImage && !analyzing && (
@@ -200,7 +240,10 @@ const MenuAnalyzer = ({ dailyProgress, macroGoals, onLogMeal }: MenuAnalyzerProp
           {analysis.recommendations && analysis.recommendations.length > 0 && (
             <Card className="border-primary/20">
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg text-primary">Top 3 Recommendations</CardTitle>
+                <CardTitle className="text-lg text-primary flex items-center gap-2">
+                  <Trophy className="h-5 w-5" />
+                  Top Recommendations
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {analysis.recommendations.map((item, index) => (
@@ -210,18 +253,17 @@ const MenuAnalyzer = ({ dailyProgress, macroGoals, onLogMeal }: MenuAnalyzerProp
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1">
-                        <h4 className="font-semibold flex items-center gap-2">
-                          <span className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm">
-                            {index + 1}
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-xs font-semibold uppercase tracking-wide text-primary bg-primary/10 px-2 py-0.5 rounded">
+                            {getRecommendationLabel(index)}
                           </span>
-                          {item.name}
-                        </h4>
-                        <p className="text-sm text-muted-foreground mt-1">{item.reason}</p>
+                        </div>
+                        <h4 className="font-semibold text-lg">{item.name}</h4>
                       </div>
                       {onLogMeal && (
                         <Button
                           size="sm"
-                          variant="ghost"
+                          variant="default"
                           onClick={() => handleLogItem(item)}
                           className="shrink-0"
                         >
@@ -230,6 +272,12 @@ const MenuAnalyzer = ({ dailyProgress, macroGoals, onLogMeal }: MenuAnalyzerProp
                         </Button>
                       )}
                     </div>
+                    
+                    <div className="mt-3 p-3 rounded-md bg-background/50 border border-border/50">
+                      <p className="text-sm font-medium text-muted-foreground">Why this choice:</p>
+                      <p className="text-sm mt-1">{item.reason}</p>
+                    </div>
+
                     <div className="grid grid-cols-4 gap-2 mt-3 text-center text-sm">
                       <div className="p-2 rounded bg-background">
                         <div className="font-semibold">{item.calories}</div>
