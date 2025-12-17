@@ -92,3 +92,9 @@ verify_jwt = false
 
 [functions.delete-account]
 verify_jwt = false
+
+[functions.analyze-food-photo]
+verify_jwt = false
+
+[functions.sync-ios-purchase]
+verify_jwt = false

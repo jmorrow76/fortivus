@@ -12,11 +12,12 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { 
   Plus, Search, Trash2, CalendarIcon, Apple, Beef, 
-  Cookie, Droplets, ChevronLeft, ChevronRight, Flame, CheckCircle, Zap
+  Cookie, Droplets, ChevronLeft, ChevronRight, Flame, CheckCircle, Zap, Camera
 } from 'lucide-react';
 import { useCalorieTracker, Food, MealType, MEAL_TYPES } from '@/hooks/useCalorieTracker';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { FoodPhotoAnalyzer } from '@/components/FoodPhotoAnalyzer';
 
 export function CalorieTracker() {
   const {
@@ -258,11 +259,22 @@ export function CalorieTracker() {
             <DialogTitle>Log Food</DialogTitle>
           </DialogHeader>
           
-          <Tabs defaultValue="search" className="w-full">
-            <TabsList className="w-full">
-              <TabsTrigger value="search" className="flex-1">Search Foods</TabsTrigger>
-              <TabsTrigger value="add" className="flex-1">Add New Food</TabsTrigger>
+          <Tabs defaultValue="photo" className="w-full">
+            <TabsList className="w-full grid grid-cols-3">
+              <TabsTrigger value="photo" className="gap-1.5">
+                <Camera className="w-3.5 h-3.5" />
+                AI Photo
+              </TabsTrigger>
+              <TabsTrigger value="search">Search</TabsTrigger>
+              <TabsTrigger value="add">Manual</TabsTrigger>
             </TabsList>
+            
+            <TabsContent value="photo" className="mt-4">
+              <FoodPhotoAnalyzer 
+                onLogMeal={logMeal} 
+                onClose={() => setIsLogDialogOpen(false)} 
+              />
+            </TabsContent>
             
             <TabsContent value="search" className="space-y-4">
               <div className="relative">
