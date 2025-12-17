@@ -193,6 +193,7 @@ const Pricing = () => {
         "AI workout recommendations",
         "AI nutrition & meal planning",
         "AI food photo calorie analysis",
+        "Menu, barcode & nutrition label scanning",
         "Calorie & macro tracking",
         "Advanced workout tracker",
         "Running GPS tracker with goals",
