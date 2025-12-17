@@ -1,12 +1,14 @@
-import { useState, useRef } from 'react';
-import { Upload, Camera, Loader2, TrendingUp, Apple, Dumbbell, Moon, AlertCircle, CheckCircle, Target, Lightbulb, User, Sun, Save, History } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Upload, Camera, Loader2, TrendingUp, TrendingDown, Apple, Dumbbell, Moon, AlertCircle, CheckCircle, Target, Lightbulb, User, Sun, Save, History, Minus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import BodyAnalysisHistory from './BodyAnalysisHistory';
+import { format } from 'date-fns';
 
 interface AnalysisResult {
   bodyFatPercentage: number;
@@ -23,15 +25,55 @@ interface AnalysisResult {
   disclaimer: string;
 }
 
-const BodyAnalysis = () => {
+interface PreviousAnalysis {
+  id: string;
+  created_at: string;
+  body_fat_percentage: number | null;
+  body_fat_category: string | null;
+  image_url: string | null;
+}
+
+interface BodyAnalysisProps {
+  onSaved?: () => void;
+}
+
+const BodyAnalysis = ({ onSaved }: BodyAnalysisProps) => {
   const { user } = useAuth();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [previousAnalysis, setPreviousAnalysis] = useState<PreviousAnalysis | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch previous analysis on mount
+  useEffect(() => {
+    if (user) {
+      fetchPreviousAnalysis();
+    }
+  }, [user]);
+
+  const fetchPreviousAnalysis = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('body_analysis_results')
+        .select('id, created_at, body_fat_percentage, body_fat_category, image_url')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (error) throw error;
+      setPreviousAnalysis(data);
+    } catch (error) {
+      console.error('Error fetching previous analysis:', error);
+    }
+  };
 
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -47,10 +89,12 @@ const BodyAnalysis = () => {
       return;
     }
 
+    setSelectedFile(file);
     const reader = new FileReader();
     reader.onload = (e) => {
       setSelectedImage(e.target?.result as string);
       setResult(null);
+      setSaved(false);
     };
     reader.readAsDataURL(file);
   };
@@ -85,7 +129,6 @@ const BodyAnalysis = () => {
       }
 
       setResult(data.analysis);
-      setSaved(false);
       toast.success('Analysis complete!');
     } catch (error) {
       console.error('Analysis error:', error);
@@ -98,17 +141,33 @@ const BodyAnalysis = () => {
   };
 
   const handleSaveAnalysis = async () => {
-    if (!result || !user) {
+    if (!result || !user || !selectedFile) {
       toast.error('Please complete an analysis first');
       return;
     }
 
     setIsSaving(true);
     try {
-      const { error } = await supabase
+      // 1. Upload image to storage
+      const fileExt = selectedFile.name.split('.').pop();
+      const filePath = `${user.id}/${crypto.randomUUID()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('progress-photos')
+        .upload(filePath, selectedFile);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('progress-photos')
+        .getPublicUrl(filePath);
+
+      // 2. Save body analysis result with image URL
+      const { error: analysisError } = await supabase
         .from('body_analysis_results')
         .insert({
           user_id: user.id,
+          image_url: publicUrl,
           body_fat_percentage: result.bodyFatPercentage,
           body_fat_category: result.bodyFatCategory,
           muscle_assessment: result.muscleAssessment,
@@ -120,10 +179,31 @@ const BodyAnalysis = () => {
           estimated_timeframe: result.estimatedTimeframe,
         });
 
-      if (error) throw error;
+      if (analysisError) throw analysisError;
+
+      // 3. Also save to progress photos for the gallery
+      const { error: progressError } = await supabase
+        .from('progress_photos')
+        .insert({
+          user_id: user.id,
+          photo_url: publicUrl,
+          photo_date: new Date().toISOString().split('T')[0],
+          notes: `Body Analysis: ${result.bodyFatPercentage}% body fat (${result.bodyFatCategory})`,
+        });
+
+      if (progressError) {
+        console.error('Progress photo save error:', progressError);
+        // Don't fail the whole operation if progress photo fails
+      }
 
       setSaved(true);
-      toast.success('Analysis saved! It will be used to personalize your AI fitness plans.');
+      toast.success('Analysis saved to your progress photos!');
+      
+      // Update previous analysis for next comparison
+      fetchPreviousAnalysis();
+      
+      // Notify parent to refresh photos
+      onSaved?.();
     } catch (error) {
       console.error('Save error:', error);
       toast.error('Failed to save analysis');
@@ -134,6 +214,7 @@ const BodyAnalysis = () => {
 
   const resetAnalysis = () => {
     setSelectedImage(null);
+    setSelectedFile(null);
     setResult(null);
     setErrorMessage(null);
     setSaved(false);
@@ -157,31 +238,75 @@ const BodyAnalysis = () => {
     }
   };
 
-  return (
-    <section id="analysis" className="section-padding bg-secondary/30">
-      <div className="container mx-auto max-w-6xl">
-        <div className="section-header">
-          <span className="section-label">AI-Powered</span>
-          <h2 className="section-title">
-            Body Composition <span className="text-accent">Analysis</span>
-          </h2>
-          <p className="section-description">
-            Upload a photo and get an AI-powered estimate of your body fat percentage 
-            with personalized recommendations tailored for men over 40.
-          </p>
-        </div>
+  const getCategoryBadgeColor = (category: string | null) => {
+    switch (category) {
+      case 'Athletic':
+        return 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20';
+      case 'Fit':
+        return 'bg-green-500/10 text-green-600 border-green-500/20';
+      case 'Average':
+        return 'bg-amber-500/10 text-amber-600 border-amber-500/20';
+      case 'Above Average':
+        return 'bg-orange-500/10 text-orange-600 border-orange-500/20';
+      default:
+        return 'bg-red-500/10 text-red-600 border-red-500/20';
+    }
+  };
 
-        <Tabs defaultValue="analyze" className="w-full">
-          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
-            <TabsTrigger value="analyze" className="gap-2">
-              <Camera className="w-4 h-4" />
-              New Analysis
-            </TabsTrigger>
-            <TabsTrigger value="history" className="gap-2">
-              <History className="w-4 h-4" />
-              History & Trends
-            </TabsTrigger>
-          </TabsList>
+  const getChangeIndicator = () => {
+    if (!previousAnalysis?.body_fat_percentage || !result) return null;
+    
+    const diff = result.bodyFatPercentage - previousAnalysis.body_fat_percentage;
+    
+    if (Math.abs(diff) < 0.5) {
+      return (
+        <div className="flex items-center gap-1 text-muted-foreground">
+          <Minus className="w-4 h-4" />
+          <span className="text-sm">No significant change</span>
+        </div>
+      );
+    }
+    
+    if (diff < 0) {
+      return (
+        <div className="flex items-center gap-1 text-emerald-600">
+          <TrendingDown className="w-4 h-4" />
+          <span className="text-sm font-medium">{Math.abs(diff).toFixed(1)}% decrease</span>
+        </div>
+      );
+    }
+    
+    return (
+      <div className="flex items-center gap-1 text-amber-600">
+        <TrendingUp className="w-4 h-4" />
+        <span className="text-sm font-medium">{diff.toFixed(1)}% increase</span>
+      </div>
+    );
+  };
+
+  return (
+    <div className="space-y-8">
+      <div className="text-center mb-8">
+        <h2 className="text-2xl font-heading font-bold mb-2">
+          Body Composition <span className="text-accent">Analysis</span>
+        </h2>
+        <p className="text-muted-foreground max-w-2xl mx-auto">
+          Upload a photo and get an AI-powered estimate of your body fat percentage 
+          with personalized recommendations. Photos are automatically saved to your progress gallery.
+        </p>
+      </div>
+
+      <Tabs defaultValue="analyze" className="w-full">
+        <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
+          <TabsTrigger value="analyze" className="gap-2">
+            <Camera className="w-4 h-4" />
+            New Analysis
+          </TabsTrigger>
+          <TabsTrigger value="history" className="gap-2">
+            <History className="w-4 h-4" />
+            History & Trends
+          </TabsTrigger>
+        </TabsList>
 
           <TabsContent value="analyze">
             <div className="grid lg:grid-cols-2 gap-8">
@@ -250,6 +375,34 @@ const BodyAnalysis = () => {
                 </Button>
               </div>
 
+              {/* Previous Analysis Reference */}
+              {previousAnalysis && (
+                <div className="bg-secondary/50 rounded-lg p-4">
+                  <h4 className="font-semibold text-sm flex items-center gap-2 mb-2">
+                    <History className="w-4 h-4 text-accent" />
+                    Previous Analysis
+                  </h4>
+                  <div className="flex items-center gap-4">
+                    {previousAnalysis.image_url && (
+                      <img 
+                        src={previousAnalysis.image_url} 
+                        alt="Previous" 
+                        className="w-16 h-16 object-cover rounded-lg"
+                      />
+                    )}
+                    <div>
+                      <p className="text-lg font-bold">{previousAnalysis.body_fat_percentage}%</p>
+                      <Badge variant="outline" className={getCategoryBadgeColor(previousAnalysis.body_fat_category)}>
+                        {previousAnalysis.body_fat_category}
+                      </Badge>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {format(new Date(previousAnalysis.created_at), 'MMM d, yyyy')}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Photo Tips */}
               <div className="bg-secondary/50 rounded-lg p-4 space-y-3">
                 <h4 className="font-semibold text-sm flex items-center gap-2">
@@ -282,7 +435,7 @@ const BodyAnalysis = () => {
               </div>
               
               <div className="text-xs text-muted-foreground">
-                <p>🔒 Your photo is processed securely and not stored</p>
+                <p>📸 Your photo will be saved to your progress gallery when you save the analysis</p>
               </div>
             </CardContent>
           </Card>
@@ -342,6 +495,14 @@ const BodyAnalysis = () => {
                         {result.bodyFatCategory}
                       </div>
                       <p className="text-muted-foreground mt-2 text-sm">{result.muscleAssessment}</p>
+                      
+                      {/* Comparison with previous */}
+                      {previousAnalysis && (
+                        <div className="mt-4 pt-4 border-t border-border">
+                          <p className="text-xs text-muted-foreground mb-2">vs. Previous ({format(new Date(previousAnalysis.created_at), 'MMM d')})</p>
+                          {getChangeIndicator()}
+                        </div>
+                      )}
                     </div>
 
                     <div className="grid grid-cols-2 gap-4 mt-6">
@@ -417,9 +578,9 @@ const BodyAnalysis = () => {
                         {isSaving ? (
                           <><Loader2 className="h-4 w-4 animate-spin" /> Saving...</>
                         ) : saved ? (
-                          <><CheckCircle className="h-4 w-4" /> Saved for AI Plans</>
+                          <><CheckCircle className="h-4 w-4" /> Saved to Progress</>
                         ) : (
-                          <><Save className="h-4 w-4" /> Save for AI Plan</>
+                          <><Save className="h-4 w-4" /> Save to Progress</>
                         )}
                       </Button>
                       <Button variant="outline" onClick={resetAnalysis}>
@@ -429,7 +590,7 @@ const BodyAnalysis = () => {
                     
                     {saved && (
                       <p className="text-sm text-center text-accent mb-4">
-                        ✓ This analysis will be used to personalize your next AI fitness plan
+                        ✓ Photo saved to your progress gallery and analysis will personalize your AI fitness plans
                       </p>
                     )}
                     
@@ -449,8 +610,7 @@ const BodyAnalysis = () => {
             <BodyAnalysisHistory />
           </TabsContent>
         </Tabs>
-      </div>
-    </section>
+    </div>
   );
 };
 
