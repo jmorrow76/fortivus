@@ -47,7 +47,7 @@ const eliteFeatures = [
   {
     icon: Salad,
     title: "AI Calorie Tracking",
-    description: "Snap a photo of any meal for instant AI calorie estimates. Plus manual logging with 100+ foods and custom macro goals.",
+    description: "Snap food photos, scan nutrition labels & barcodes, or analyze restaurant menus for instant AI calorie estimates. Smart logging with 100+ foods and custom macro goals.",
     highlight: "New",
     link: "/calorie-tracking",
   },
