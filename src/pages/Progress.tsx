@@ -198,6 +198,7 @@ const Progress = () => {
                   <ul className="text-sm text-muted-foreground space-y-2 text-left">
                     <li>• Unlimited progress photo storage</li>
                     <li>• Side-by-side comparison view</li>
+                    <li>• <strong className="text-foreground">AI transformation analysis</strong> - quantify your progress</li>
                     <li>• Weight tracking charts</li>
                     <li>• AI body composition analysis</li>
                   </ul>
