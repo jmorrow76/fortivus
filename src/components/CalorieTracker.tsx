@@ -12,12 +12,13 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { 
   Plus, Search, Trash2, CalendarIcon, Apple, Beef, 
-  Cookie, Droplets, ChevronLeft, ChevronRight, Flame, CheckCircle, Zap, Camera
+  Cookie, Droplets, ChevronLeft, ChevronRight, Flame, CheckCircle, Zap, Camera, Utensils
 } from 'lucide-react';
 import { useCalorieTracker, Food, MealType, MEAL_TYPES } from '@/hooks/useCalorieTracker';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { FoodPhotoAnalyzer } from '@/components/FoodPhotoAnalyzer';
+import MenuAnalyzer from '@/components/MenuAnalyzer';
 
 export function CalorieTracker() {
   const {
@@ -260,19 +261,39 @@ export function CalorieTracker() {
           </DialogHeader>
           
           <Tabs defaultValue="photo" className="w-full">
-            <TabsList className="w-full grid grid-cols-3">
-              <TabsTrigger value="photo" className="gap-1.5">
+            <TabsList className="w-full grid grid-cols-4">
+              <TabsTrigger value="photo" className="gap-1.5 text-xs px-2">
                 <Camera className="w-3.5 h-3.5" />
                 AI Photo
               </TabsTrigger>
-              <TabsTrigger value="search">Search</TabsTrigger>
-              <TabsTrigger value="add">Manual</TabsTrigger>
+              <TabsTrigger value="menu" className="gap-1.5 text-xs px-2">
+                <Utensils className="w-3.5 h-3.5" />
+                Menu
+              </TabsTrigger>
+              <TabsTrigger value="search" className="text-xs px-2">Search</TabsTrigger>
+              <TabsTrigger value="add" className="text-xs px-2">Manual</TabsTrigger>
             </TabsList>
             
             <TabsContent value="photo" className="mt-4">
               <FoodPhotoAnalyzer 
                 onLogMeal={logMeal} 
                 onClose={() => setIsLogDialogOpen(false)} 
+              />
+            </TabsContent>
+            
+            <TabsContent value="menu" className="mt-4">
+              <MenuAnalyzer 
+                dailyProgress={totals}
+                macroGoals={macroGoals}
+                onLogMeal={(item, mealType) => {
+                  logMeal(null, 1, mealType as MealType, {
+                    name: item.name,
+                    calories: item.calories,
+                    protein: item.protein,
+                    carbs: item.carbs,
+                    fat: item.fat,
+                  });
+                }}
               />
             </TabsContent>
             
