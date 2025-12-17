@@ -1,7 +1,8 @@
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Camera, Loader2, Utensils, AlertTriangle, Lightbulb, Plus, Upload, Trophy } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Camera, Loader2, Utensils, AlertTriangle, Lightbulb, Plus, Upload, Trophy, Coffee, Sun, Moon, Cookie } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useOnboardingQuery } from "@/hooks/queries";
@@ -50,6 +51,8 @@ const MenuAnalyzer = ({ dailyProgress, macroGoals, onLogMeal }: MenuAnalyzerProp
   const [analyzing, setAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<MenuAnalysis | null>(null);
   const [menuImage, setMenuImage] = useState<string | null>(null);
+  const [mealTypeDialogOpen, setMealTypeDialogOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<MenuRecommendation | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { takePhoto, isNative } = useNativeCamera();
 
@@ -149,14 +152,28 @@ const MenuAnalyzer = ({ dailyProgress, macroGoals, onLogMeal }: MenuAnalyzerProp
   };
 
   const handleLogItem = (item: MenuRecommendation) => {
-    if (onLogMeal) {
-      onLogMeal(item, 'lunch');
+    setSelectedItem(item);
+    setMealTypeDialogOpen(true);
+  };
+
+  const confirmLogItem = (mealType: string) => {
+    if (onLogMeal && selectedItem) {
+      onLogMeal(selectedItem, mealType);
       toast({
         title: "Added to tracker",
-        description: `${item.name} logged to your calorie tracker.`,
+        description: `${selectedItem.name} logged as ${mealType}.`,
       });
     }
+    setMealTypeDialogOpen(false);
+    setSelectedItem(null);
   };
+
+  const mealTypes = [
+    { id: 'breakfast', label: 'Breakfast', icon: Coffee },
+    { id: 'lunch', label: 'Lunch', icon: Sun },
+    { id: 'dinner', label: 'Dinner', icon: Moon },
+    { id: 'snack', label: 'Snack', icon: Cookie },
+  ];
 
   const remainingCalories = macroGoals.calories - dailyProgress.calories;
   const remainingProtein = macroGoals.protein - dailyProgress.protein;
@@ -344,6 +361,28 @@ const MenuAnalyzer = ({ dailyProgress, macroGoals, onLogMeal }: MenuAnalyzerProp
           )}
         </>
       )}
+
+      {/* Meal Type Selection Dialog */}
+      <Dialog open={mealTypeDialogOpen} onOpenChange={setMealTypeDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Log as which meal?</DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-2 gap-3 py-4">
+            {mealTypes.map((meal) => (
+              <Button
+                key={meal.id}
+                variant="outline"
+                className="h-20 flex flex-col gap-2"
+                onClick={() => confirmLogItem(meal.id)}
+              >
+                <meal.icon className="h-6 w-6" />
+                <span>{meal.label}</span>
+              </Button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
