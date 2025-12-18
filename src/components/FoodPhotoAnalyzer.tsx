@@ -71,10 +71,18 @@ export function FoodPhotoAnalyzer({ onLogMeal, addFoodAndLog, onClose }: FoodPho
 
   const handleCameraCapture = async () => {
     if (isNative) {
-      const result = await takePhoto();
-      if (result?.dataUrl) {
-        setImagePreview(result.dataUrl);
-        setAnalysis(null);
+      try {
+        const result = await takePhoto();
+        if (result?.dataUrl) {
+          setImagePreview(result.dataUrl);
+          setAnalysis(null);
+        }
+      } catch (err: any) {
+        console.error('[FoodPhotoAnalyzer] Camera error:', err);
+        const errorMessage = err?.message || String(err);
+        if (!errorMessage.includes('cancelled') && !errorMessage.includes('canceled') && !errorMessage.includes('User cancelled')) {
+          toast.error('Unable to access camera. Please check your permissions in Settings.');
+        }
       }
     } else {
       // Fallback for web - use file input with capture
@@ -87,10 +95,18 @@ export function FoodPhotoAnalyzer({ onLogMeal, addFoodAndLog, onClose }: FoodPho
 
   const handleGallerySelect = async () => {
     if (isNative) {
-      const result = await pickFromGallery();
-      if (result?.dataUrl) {
-        setImagePreview(result.dataUrl);
-        setAnalysis(null);
+      try {
+        const result = await pickFromGallery();
+        if (result?.dataUrl) {
+          setImagePreview(result.dataUrl);
+          setAnalysis(null);
+        }
+      } catch (err: any) {
+        console.error('[FoodPhotoAnalyzer] Gallery error:', err);
+        const errorMessage = err?.message || String(err);
+        if (!errorMessage.includes('cancelled') && !errorMessage.includes('canceled') && !errorMessage.includes('User cancelled')) {
+          toast.error('Unable to access photo library. Please check your permissions in Settings.');
+        }
       }
     } else {
       if (fileInputRef.current) {

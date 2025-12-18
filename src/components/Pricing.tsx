@@ -124,6 +124,12 @@ const Pricing = () => {
   };
 
   const handleManageSubscription = async () => {
+    // For iOS, redirect to App Store subscription management
+    if (isNativeIOS) {
+      window.location.href = 'https://apps.apple.com/account/subscriptions';
+      return;
+    }
+
     if (!session) return;
 
     setLoading("manage");
@@ -360,8 +366,10 @@ const Pricing = () => {
                   >
                     {loading === "manage" ? (
                       <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    ) : isNativeIOS ? (
+                      <Apple className="h-4 w-4 mr-2" />
                     ) : null}
-                    Manage Subscription
+                    {isNativeIOS ? "Manage in App Store" : "Manage Subscription"}
                   </Button>
                 ) : plan.authLink ? (
                   <Button
