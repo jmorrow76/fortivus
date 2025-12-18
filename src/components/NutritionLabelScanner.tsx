@@ -57,10 +57,18 @@ export function NutritionLabelScanner({ addFoodAndLog, onClose }: NutritionLabel
 
   const handleCameraCapture = async () => {
     if (isNative) {
-      const result = await takePhoto();
-      if (result?.dataUrl) {
-        setImagePreview(result.dataUrl);
-        setNutritionData(null);
+      try {
+        const result = await takePhoto();
+        if (result?.dataUrl) {
+          setImagePreview(result.dataUrl);
+          setNutritionData(null);
+        }
+      } catch (err: any) {
+        console.error('[NutritionLabelScanner] Camera error:', err);
+        const errorMessage = err?.message || String(err);
+        if (!errorMessage.includes('cancelled') && !errorMessage.includes('canceled') && !errorMessage.includes('User cancelled')) {
+          toast.error('Unable to access camera. Please check your permissions in Settings.');
+        }
       }
     } else {
       if (fileInputRef.current) {
@@ -72,10 +80,18 @@ export function NutritionLabelScanner({ addFoodAndLog, onClose }: NutritionLabel
 
   const handleGallerySelect = async () => {
     if (isNative) {
-      const result = await pickFromGallery();
-      if (result?.dataUrl) {
-        setImagePreview(result.dataUrl);
-        setNutritionData(null);
+      try {
+        const result = await pickFromGallery();
+        if (result?.dataUrl) {
+          setImagePreview(result.dataUrl);
+          setNutritionData(null);
+        }
+      } catch (err: any) {
+        console.error('[NutritionLabelScanner] Gallery error:', err);
+        const errorMessage = err?.message || String(err);
+        if (!errorMessage.includes('cancelled') && !errorMessage.includes('canceled') && !errorMessage.includes('User cancelled')) {
+          toast.error('Unable to access photo library. Please check your permissions in Settings.');
+        }
       }
     } else {
       if (fileInputRef.current) {

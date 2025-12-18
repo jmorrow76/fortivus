@@ -110,9 +110,22 @@ const MenuAnalyzer = ({ dailyProgress, macroGoals, onLogMeal }: MenuAnalyzerProp
 
   const handleTakePhoto = async () => {
     if (isNative) {
-      const result = await takePhoto();
-      if (result?.dataUrl) {
-        await analyzeMenu(result.dataUrl);
+      try {
+        const result = await takePhoto();
+        if (result?.dataUrl) {
+          await analyzeMenu(result.dataUrl);
+        }
+      } catch (err: any) {
+        console.error('[MenuAnalyzer] Camera error:', err);
+        const errorMessage = err?.message || String(err);
+        // Don't show error for user cancellation
+        if (!errorMessage.includes('cancelled') && !errorMessage.includes('canceled') && !errorMessage.includes('User cancelled')) {
+          toast({
+            title: "Camera Error",
+            description: "Unable to access camera. Please check your permissions in Settings.",
+            variant: "destructive",
+          });
+        }
       }
     } else {
       // Fallback for web - trigger file input with camera
