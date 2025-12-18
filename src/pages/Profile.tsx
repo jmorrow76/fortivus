@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth, FORTIVUS_ELITE } from "@/hooks/useAuth";
 import { useOnboarding } from "@/hooks/useOnboarding";
 import { useNativeCamera } from "@/hooks/useNativeCamera";
+import { useAppleIAP } from "@/hooks/useAppleIAP";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Camera, Loader2, User, Crown, Settings, Calendar, Sparkles, Flame, RefreshCw, LayoutDashboard, Home, HelpCircle, Trash2, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Camera, Loader2, User, Crown, Settings, Calendar, Sparkles, Flame, RefreshCw, LayoutDashboard, Home, HelpCircle, Trash2, AlertTriangle, Apple } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Navbar from "@/components/Navbar";
@@ -25,7 +26,8 @@ import { format } from "date-fns";
 const Profile = () => {
   const { user, loading: authLoading, subscription, session } = useAuth();
   const { hasCompletedOnboarding, resetOnboarding } = useOnboarding();
-  const { isNative, loading: cameraLoading, getPhotoWithPrompt } = useNativeCamera();
+  const { isNative, loading: cameraLoading, getPhotoWithPrompt, error: cameraError } = useNativeCamera();
+  const { isNativeIOS } = useAppleIAP();
   const isManualGrant = subscription.productId === 'manual_grant';
   const isElite = subscription.subscribed && (
     subscription.productId === FORTIVUS_ELITE.monthly.product_id ||
@@ -179,13 +181,30 @@ const Profile = () => {
 
       // On native platform, use the camera plugin
       if (isNative) {
-        const result = await getPhotoWithPrompt();
-        if (!result?.blob) {
+        try {
+          const result = await getPhotoWithPrompt();
+          if (!result?.blob) {
+            setUploading(false);
+            return; // User cancelled
+          }
+          file = result.blob;
+          fileExt = 'jpg';
+        } catch (cameraErr: any) {
+          console.error('[Camera] Error getting photo:', cameraErr);
+          // Handle specific error cases
+          const errorMessage = cameraErr?.message || String(cameraErr);
+          if (errorMessage.includes('cancelled') || errorMessage.includes('canceled') || errorMessage.includes('User cancelled')) {
+            setUploading(false);
+            return; // User cancelled, not an error
+          }
+          toast({
+            title: "Camera error",
+            description: "Unable to access camera. Please check your permissions in Settings.",
+            variant: "destructive",
+          });
           setUploading(false);
-          return; // User cancelled
+          return;
         }
-        file = result.blob;
-        fileExt = 'jpg';
       } else {
         // On web, use file input
         const inputFile = event?.target?.files?.[0];
@@ -195,6 +214,11 @@ const Profile = () => {
         }
         file = inputFile;
         fileExt = inputFile.name.split(".").pop() || 'jpg';
+      }
+
+      if (!file) {
+        setUploading(false);
+        return;
       }
 
       const filePath = `${user.id}/${crypto.randomUUID()}.${fileExt}`;
@@ -223,9 +247,10 @@ const Profile = () => {
         description: "Your profile picture has been updated successfully.",
       });
     } catch (error: any) {
+      console.error('[Profile] Avatar upload error:', error);
       toast({
         title: "Upload failed",
-        description: error.message,
+        description: error.message || "Failed to upload photo. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -234,9 +259,14 @@ const Profile = () => {
   };
 
   // Native camera button handler (for iOS/Android)
-  const handleNativeCameraClick = () => {
+  const handleNativeCameraClick = async () => {
     if (isNative) {
-      handleAvatarUpload();
+      try {
+        await handleAvatarUpload();
+      } catch (err) {
+        console.error('[Profile] Camera click error:', err);
+        // Error already handled in handleAvatarUpload
+      }
     }
   };
 
@@ -325,6 +355,24 @@ const Profile = () => {
                       <Sparkles className="h-4 w-4 text-accent" />
                       Complimentary membership
                     </span>
+                  ) : isNativeIOS ? (
+                    // iOS users manage via App Store
+                    <div className="flex flex-col gap-2">
+                      <p className="text-xs text-muted-foreground">
+                        Manage your subscription in the App Store Settings
+                      </p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          // Deep link to App Store subscription management
+                          window.location.href = 'https://apps.apple.com/account/subscriptions';
+                        }}
+                      >
+                        <Apple className="h-4 w-4 mr-2" />
+                        Manage in App Store
+                      </Button>
+                    </div>
                   ) : (
                     <Button
                       variant="outline"
@@ -659,15 +707,15 @@ const Profile = () => {
             )}
           </div>
 
-          {/* Delete Account Section */}
-          <Card className="mt-6 border-destructive/30">
+          {/* Delete Account Section - Made prominent for App Store compliance */}
+          <Card id="delete-account" className="mt-6 border-destructive/50 bg-destructive/5">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-destructive">
-                <AlertTriangle className="h-5 w-5" />
-                Danger Zone
+                <Trash2 className="h-5 w-5" />
+                Delete Account
               </CardTitle>
               <CardDescription>
-                Permanently delete your account and all associated data
+                Permanently delete your account and all associated data. This action cannot be undone.
               </CardDescription>
             </CardHeader>
             <CardContent>
