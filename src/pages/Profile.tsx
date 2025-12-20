@@ -74,6 +74,12 @@ const Profile = () => {
   };
 
   const handleManageSubscription = async () => {
+    // For iOS, redirect to App Store subscription management
+    if (isNativeIOS) {
+      window.location.href = 'https://apps.apple.com/account/subscriptions';
+      return;
+    }
+    
     if (!session) return;
     
     setManagingSubscription(true);

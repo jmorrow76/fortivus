@@ -169,9 +169,26 @@ const ArticleDetail = () => {
           {/* Content */}
           <ArticleContent content={article.content} />
 
-          {/* Medical Disclaimer */}
+          {/* Sources and Citations */}
           <div className="mt-12 pt-8 border-t border-border">
-            <div className="bg-secondary/50 rounded-lg p-4">
+            <h3 className="text-lg font-bold mb-4">Sources & References</h3>
+            <div className="bg-secondary/30 rounded-lg p-4 space-y-2">
+              <p className="text-sm text-muted-foreground">
+                The health and fitness information in this article is based on peer-reviewed research and established guidelines from:
+              </p>
+              <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                <li>American College of Sports Medicine (ACSM) - <a href="https://www.acsm.org" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">acsm.org</a></li>
+                <li>National Strength and Conditioning Association (NSCA) - <a href="https://www.nsca.com" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">nsca.com</a></li>
+                <li>Academy of Nutrition and Dietetics - <a href="https://www.eatright.org" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">eatright.org</a></li>
+                <li>National Institutes of Health (NIH) - <a href="https://www.nih.gov" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">nih.gov</a></li>
+                <li>PubMed Central - <a href="https://www.ncbi.nlm.nih.gov/pmc" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">ncbi.nlm.nih.gov/pmc</a></li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Medical Disclaimer */}
+          <div className="mt-6">
+            <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4">
               <p className="text-sm text-muted-foreground">
                 <strong className="text-foreground">Medical Disclaimer:</strong> The information provided in this article is for general informational and educational purposes only and is not intended as medical advice. Always consult with a qualified healthcare professional before beginning any exercise program, making changes to your diet, or if you have any questions about a medical condition. Individual results may vary.
               </p>

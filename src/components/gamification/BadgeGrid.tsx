@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { haptics } from '@/hooks/useNativeFeatures';
 
 interface Badge {
   id: string;
@@ -117,7 +118,12 @@ export function BadgeGrid({ badges, userBadges }: BadgeGridProps) {
                     ? `bg-gradient-to-br ${colors.bg} ${colors.border} hover:scale-105 shadow-lg ${colors.glow}`
                     : "bg-muted/20 border-border/30 opacity-40 grayscale hover:opacity-60"
                 )}
-                onClick={() => isEarned && setSelectedBadge(selectedBadge?.id === badge.id ? null : badge)}
+                onClick={() => {
+                  if (isEarned) {
+                    haptics.selectionChanged();
+                    setSelectedBadge(selectedBadge?.id === badge.id ? null : badge);
+                  }
+                }}
               >
                 {/* Badge Icon Container */}
                 <div className={cn(
