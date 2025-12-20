@@ -141,24 +141,53 @@ export const useNativeCamera = () => {
     setError(null);
 
     try {
-      const hasPermission = await checkPermissions();
+      // Check permissions first - with detailed error handling
+      let hasPermission = false;
+      try {
+        hasPermission = await checkPermissions();
+      } catch (permErr) {
+        console.error('[Camera] Permission check failed:', permErr);
+        throw new Error('Unable to access camera permissions. Please check Settings > Privacy > Camera.');
+      }
+      
       if (!hasPermission) {
-        throw new Error('Camera/Photo permission denied. Please enable access in Settings.');
+        throw new Error('Camera/Photo permission denied. Please enable access in Settings > Privacy > Camera.');
       }
 
-      const photo = await Camera.getPhoto({
-        quality: 80,
-        allowEditing: false,
-        resultType: CameraResultType.DataUrl,
-        source: CameraSource.Prompt, // Shows action sheet with Camera/Photo Library options
-        promptLabelHeader: 'Choose Photo Source',
-        promptLabelCancel: 'Cancel',
-        promptLabelPhoto: 'Photo Library',
-        promptLabelPicture: 'Camera',
-        correctOrientation: true,
-      });
+      // Wrap the camera call in its own try-catch for better error isolation
+      let photo;
+      try {
+        photo = await Camera.getPhoto({
+          quality: 80,
+          allowEditing: false,
+          resultType: CameraResultType.DataUrl,
+          source: CameraSource.Prompt, // Shows action sheet with Camera/Photo Library options
+          promptLabelHeader: 'Choose Photo Source',
+          promptLabelCancel: 'Cancel',
+          promptLabelPhoto: 'Photo Library',
+          promptLabelPicture: 'Camera',
+          correctOrientation: true,
+          webUseInput: true, // Fallback for web
+        });
+      } catch (cameraErr: unknown) {
+        console.error('[Camera] Camera.getPhoto error:', cameraErr);
+        const errMsg = cameraErr instanceof Error ? cameraErr.message : String(cameraErr);
+        
+        // Check for various cancellation patterns (iOS can return different messages)
+        if (errMsg.includes('cancel') || 
+            errMsg.includes('Cancel') || 
+            errMsg.includes('User') || 
+            errMsg.includes('dismissed') ||
+            errMsg.includes('No image') ||
+            errMsg === 'No photo selected') {
+          setLoading(false);
+          return null; // User cancelled - not an error
+        }
+        
+        throw cameraErr; // Re-throw if it's a real error
+      }
 
-      if (photo.dataUrl) {
+      if (photo?.dataUrl) {
         const response = await fetch(photo.dataUrl);
         const blob = await response.blob();
         
@@ -172,10 +201,16 @@ export const useNativeCamera = () => {
       return null;
     } catch (err: unknown) {
       console.error('[Camera] Get photo error:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to get photo';
+      const errorMessage = err instanceof Error ? err.message : String(err);
       
-      if (errorMessage.includes('cancelled') || errorMessage.includes('canceled') || errorMessage.includes('User cancelled')) {
+      // Final check for cancellation patterns
+      if (errorMessage.includes('cancelled') || 
+          errorMessage.includes('canceled') || 
+          errorMessage.includes('User cancelled') ||
+          errorMessage.includes('dismissed') ||
+          errorMessage.includes('No image')) {
         setError(null);
+        setLoading(false);
         return null;
       }
       
