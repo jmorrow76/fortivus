@@ -97,14 +97,18 @@ const TermsOfService = () => {
               <h3 className="text-xl font-heading font-medium text-foreground mb-3 mt-6">
                 Payment Processing
               </h3>
-              <p className="text-muted-foreground leading-relaxed">
-                All payments are processed securely through Stripe. We do not store your complete credit 
-                card information on our servers. By providing payment information, you represent that you 
-                are authorized to use the payment method.
+              <p className="text-muted-foreground leading-relaxed mb-4">
+                Payments are processed through different providers depending on your platform:
+              </p>
+              <ul className="list-disc list-inside text-muted-foreground space-y-2 ml-4">
+                <li><strong>iOS App:</strong> All subscriptions are processed through Apple In-App Purchase via the App Store. Subscription management and cancellation must be done through your Apple ID settings.</li>
+                <li><strong>Web:</strong> Payments are processed securely through Stripe. We do not store your complete credit card information on our servers.</li>
+              </ul>
+              <p className="text-muted-foreground leading-relaxed mt-4">
+                By providing payment information, you represent that you are authorized to use the payment method. For iOS users, Apple's standard terms and conditions for in-app purchases apply.
               </p>
             </section>
 
-            {/* User Responsibilities */}
             <section>
               <h2 className="text-2xl font-heading font-semibold text-foreground mb-4">
                 User Responsibilities
