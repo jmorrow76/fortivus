@@ -713,27 +713,49 @@ const Profile = () => {
             )}
           </div>
 
-          {/* Delete Account Section - Made prominent for App Store compliance */}
-          <Card id="delete-account" className="mt-6 border-destructive/50 bg-destructive/5">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-destructive">
-                <Trash2 className="h-5 w-5" />
-                Delete Account
-              </CardTitle>
-              <CardDescription>
-                Permanently delete your account and all associated data. This action cannot be undone.
-              </CardDescription>
+          {/* DELETE ACCOUNT SECTION - PROMINENT FOR APP STORE REVIEW */}
+          {/* Location: Profile → scroll to bottom → "Delete Account" section */}
+          <Card id="delete-account" className="mt-8 border-2 border-destructive bg-destructive/10 shadow-lg">
+            <CardHeader className="pb-2">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-destructive rounded-full">
+                  <Trash2 className="h-6 w-6 text-destructive-foreground" />
+                </div>
+                <div>
+                  <CardTitle className="text-xl text-destructive">
+                    Delete Account
+                  </CardTitle>
+                  <CardDescription className="text-destructive/80">
+                    Permanently remove your account and all data
+                  </CardDescription>
+                </div>
+              </div>
             </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
-                Once you delete your account, there is no going back. This will permanently delete your profile, 
-                progress photos, workout history, and all other data associated with your account.
-              </p>
+            <CardContent className="space-y-4">
+              <div className="p-4 bg-destructive/5 rounded-lg border border-destructive/20">
+                <p className="text-sm text-foreground font-medium mb-2">
+                  ⚠️ This action cannot be undone
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Deleting your account will permanently remove:
+                </p>
+                <ul className="text-sm text-muted-foreground mt-2 ml-4 list-disc">
+                  <li>Your profile and personal information</li>
+                  <li>All workout history and progress photos</li>
+                  <li>Saved plans, goals, and achievements</li>
+                  <li>Any active subscriptions will be cancelled</li>
+                </ul>
+              </div>
+              
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="destructive" className="gap-2">
-                    <Trash2 className="h-4 w-4" />
-                    Delete Account
+                  <Button 
+                    variant="destructive" 
+                    size="lg"
+                    className="w-full gap-2 font-semibold text-base"
+                  >
+                    <Trash2 className="h-5 w-5" />
+                    Delete My Account
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
@@ -775,7 +797,7 @@ const Profile = () => {
                           Deleting...
                         </>
                       ) : (
-                        "Delete Account"
+                        "Permanently Delete Account"
                       )}
                     </AlertDialogAction>
                   </AlertDialogFooter>

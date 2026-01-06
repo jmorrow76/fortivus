@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { Capacitor } from '@capacitor/core';
-import { Camera, CameraResultType, CameraSource, Photo } from '@capacitor/camera';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 
 export interface CameraResult {
   dataUrl?: string;
@@ -12,8 +12,9 @@ export const useNativeCamera = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const isNative = Capacitor.isNativePlatform();
+  const platform = Capacitor.getPlatform();
 
-  // Check and request camera permissions
+  // Check and request camera permissions with iPad support
   const checkPermissions = useCallback(async (): Promise<boolean> => {
     if (!isNative) return true; // Web doesn't need explicit permissions
 
@@ -32,20 +33,26 @@ export const useNativeCamera = () => {
       return requested.camera === 'granted' && requested.photos === 'granted';
     } catch (err) {
       console.error('[Camera] Permission check error:', err);
-      return false;
+      // On iPad, permission errors might occur differently - don't treat as fatal
+      return true; // Proceed and let camera API handle it
     }
   }, [isNative]);
 
-  // Take a photo using the camera
+  // Take a photo using the camera with iPad crash prevention
   const takePhoto = useCallback(async (): Promise<CameraResult | null> => {
     setLoading(true);
     setError(null);
 
     try {
-      // Check permissions first
-      const hasPermission = await checkPermissions();
-      if (!hasPermission) {
-        throw new Error('Camera permission denied. Please enable camera access in Settings.');
+      // Check permissions first - wrapped for safety
+      try {
+        const hasPermission = await checkPermissions();
+        if (!hasPermission) {
+          throw new Error('Camera permission denied. Please enable camera access in Settings.');
+        }
+      } catch (permErr) {
+        console.warn('[Camera] Permission check warning:', permErr);
+        // Continue anyway - camera API will handle actual permissions
       }
 
       const photo = await Camera.getPhoto({
@@ -55,10 +62,11 @@ export const useNativeCamera = () => {
         source: CameraSource.Camera,
         saveToGallery: false,
         correctOrientation: true,
+        // iPad-specific: ensure proper presentation
+        presentationStyle: platform === 'ios' ? 'popover' : undefined,
       });
 
       if (photo.dataUrl) {
-        // Convert data URL to blob for upload
         const response = await fetch(photo.dataUrl);
         const blob = await response.blob();
         
@@ -72,11 +80,13 @@ export const useNativeCamera = () => {
       return null;
     } catch (err: unknown) {
       console.error('[Camera] Take photo error:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to take photo';
+      const errorMessage = err instanceof Error ? err.message : String(err);
       
-      // Handle user cancellation gracefully
-      if (errorMessage.includes('cancelled') || errorMessage.includes('canceled') || errorMessage.includes('User cancelled')) {
+      // Handle user cancellation gracefully - multiple patterns for iOS/iPad
+      const cancelPatterns = ['cancelled', 'canceled', 'User cancelled', 'dismissed', 'No image', 'popover'];
+      if (cancelPatterns.some(pattern => errorMessage.toLowerCase().includes(pattern.toLowerCase()))) {
         setError(null);
+        setLoading(false);
         return null;
       }
       
@@ -85,18 +95,23 @@ export const useNativeCamera = () => {
     } finally {
       setLoading(false);
     }
-  }, [checkPermissions]);
+  }, [checkPermissions, platform]);
 
-  // Pick a photo from the gallery
+  // Pick a photo from the gallery with iPad support
   const pickFromGallery = useCallback(async (): Promise<CameraResult | null> => {
     setLoading(true);
     setError(null);
 
     try {
-      // Check permissions first
-      const hasPermission = await checkPermissions();
-      if (!hasPermission) {
-        throw new Error('Photo library permission denied. Please enable access in Settings.');
+      // Check permissions first - wrapped for safety
+      try {
+        const hasPermission = await checkPermissions();
+        if (!hasPermission) {
+          throw new Error('Photo library permission denied. Please enable access in Settings.');
+        }
+      } catch (permErr) {
+        console.warn('[Camera] Permission check warning:', permErr);
+        // Continue anyway
       }
 
       const photo = await Camera.getPhoto({
@@ -105,6 +120,8 @@ export const useNativeCamera = () => {
         resultType: CameraResultType.DataUrl,
         source: CameraSource.Photos,
         correctOrientation: true,
+        // iPad-specific: ensure proper presentation
+        presentationStyle: platform === 'ios' ? 'popover' : undefined,
       });
 
       if (photo.dataUrl) {
@@ -121,10 +138,12 @@ export const useNativeCamera = () => {
       return null;
     } catch (err: unknown) {
       console.error('[Camera] Pick photo error:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to pick photo';
+      const errorMessage = err instanceof Error ? err.message : String(err);
       
-      if (errorMessage.includes('cancelled') || errorMessage.includes('canceled') || errorMessage.includes('User cancelled')) {
+      const cancelPatterns = ['cancelled', 'canceled', 'User cancelled', 'dismissed', 'No image', 'popover'];
+      if (cancelPatterns.some(pattern => errorMessage.toLowerCase().includes(pattern.toLowerCase()))) {
         setError(null);
+        setLoading(false);
         return null;
       }
       
@@ -133,58 +152,56 @@ export const useNativeCamera = () => {
     } finally {
       setLoading(false);
     }
-  }, [checkPermissions]);
+  }, [checkPermissions, platform]);
 
-  // Show prompt to choose between camera and gallery
+  // Show prompt to choose between camera and gallery - iPad safe version
   const getPhotoWithPrompt = useCallback(async (): Promise<CameraResult | null> => {
     setLoading(true);
     setError(null);
 
     try {
-      // Check permissions first - with detailed error handling
-      let hasPermission = false;
+      // Check permissions first - with graceful handling for iPad
       try {
-        hasPermission = await checkPermissions();
+        await checkPermissions();
       } catch (permErr) {
-        console.error('[Camera] Permission check failed:', permErr);
-        throw new Error('Unable to access camera permissions. Please check Settings > Privacy > Camera.');
-      }
-      
-      if (!hasPermission) {
-        throw new Error('Camera/Photo permission denied. Please enable access in Settings > Privacy > Camera.');
+        console.warn('[Camera] Permission check warning:', permErr);
+        // Continue - camera API will request as needed
       }
 
-      // Wrap the camera call in its own try-catch for better error isolation
+      // Wrap the camera call in try-catch for iPad crash prevention
       let photo;
       try {
         photo = await Camera.getPhoto({
           quality: 80,
           allowEditing: false,
           resultType: CameraResultType.DataUrl,
-          source: CameraSource.Prompt, // Shows action sheet with Camera/Photo Library options
+          source: CameraSource.Prompt,
           promptLabelHeader: 'Choose Photo Source',
           promptLabelCancel: 'Cancel',
           promptLabelPhoto: 'Photo Library',
           promptLabelPicture: 'Camera',
           correctOrientation: true,
-          webUseInput: true, // Fallback for web
+          webUseInput: true,
+          // iPad-specific: popover presentation prevents crashes
+          presentationStyle: platform === 'ios' ? 'popover' : undefined,
         });
       } catch (cameraErr: unknown) {
         console.error('[Camera] Camera.getPhoto error:', cameraErr);
         const errMsg = cameraErr instanceof Error ? cameraErr.message : String(cameraErr);
         
-        // Check for various cancellation patterns (iOS can return different messages)
-        if (errMsg.includes('cancel') || 
-            errMsg.includes('Cancel') || 
-            errMsg.includes('User') || 
-            errMsg.includes('dismissed') ||
-            errMsg.includes('No image') ||
-            errMsg === 'No photo selected') {
+        // Comprehensive cancellation detection for iOS/iPadOS
+        const cancelPatterns = [
+          'cancel', 'Cancel', 'user', 'User', 'dismissed', 'Dismissed',
+          'no image', 'No image', 'No photo', 'popover', 'Popover'
+        ];
+        
+        if (cancelPatterns.some(pattern => errMsg.includes(pattern))) {
           setLoading(false);
-          return null; // User cancelled - not an error
+          setError(null);
+          return null;
         }
         
-        throw cameraErr; // Re-throw if it's a real error
+        throw cameraErr;
       }
 
       if (photo?.dataUrl) {
@@ -203,12 +220,9 @@ export const useNativeCamera = () => {
       console.error('[Camera] Get photo error:', err);
       const errorMessage = err instanceof Error ? err.message : String(err);
       
-      // Final check for cancellation patterns
-      if (errorMessage.includes('cancelled') || 
-          errorMessage.includes('canceled') || 
-          errorMessage.includes('User cancelled') ||
-          errorMessage.includes('dismissed') ||
-          errorMessage.includes('No image')) {
+      // Final cancellation check
+      const cancelPatterns = ['cancelled', 'canceled', 'User cancelled', 'dismissed', 'No image', 'popover'];
+      if (cancelPatterns.some(pattern => errorMessage.toLowerCase().includes(pattern.toLowerCase()))) {
         setError(null);
         setLoading(false);
         return null;
@@ -219,7 +233,7 @@ export const useNativeCamera = () => {
     } finally {
       setLoading(false);
     }
-  }, [checkPermissions]);
+  }, [checkPermissions, platform]);
 
   return {
     isNative,

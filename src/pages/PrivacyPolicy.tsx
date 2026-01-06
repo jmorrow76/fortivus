@@ -75,6 +75,33 @@ const PrivacyPolicy = () => {
                 <li>Log data (access times, pages viewed, app crashes)</li>
                 <li>Location data (with your permission, for GPS run tracking)</li>
               </ul>
+
+              <h3 className="text-xl font-heading font-medium text-foreground mb-3 mt-6">
+                No Tracking or Third-Party Analytics
+              </h3>
+              <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-lg mb-4">
+                <p className="text-foreground font-medium mb-2">🔒 Your Privacy is Protected</p>
+                <p className="text-muted-foreground leading-relaxed">
+                  <strong>We do not use tracking cookies, advertising identifiers, or third-party analytics services 
+                  that track users across apps or websites.</strong> We do not share data with data brokers 
+                  or use your data for targeted advertising purposes.
+                </p>
+              </div>
+              <p className="text-muted-foreground leading-relaxed">
+                Specifically, we do not:
+              </p>
+              <ul className="list-disc list-inside text-muted-foreground space-y-2 ml-4">
+                <li>Use cookies for tracking or advertising purposes</li>
+                <li>Share data with advertising networks or data brokers</li>
+                <li>Use third-party analytics that track users across apps</li>
+                <li>Collect device advertising identifiers (IDFA)</li>
+                <li>Link your data with third-party data for advertising</li>
+              </ul>
+              <p className="text-muted-foreground leading-relaxed mt-4">
+                We only use first-party data storage (like localStorage) for essential app functionality 
+                such as remembering your UI preferences (e.g., sidebar state). This data stays on your 
+                device and is not transmitted to any servers.
+              </p>
             </section>
 
             {/* How We Use Your Information */}
