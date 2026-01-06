@@ -76,32 +76,33 @@ const PrivacyPolicy = () => {
                 <li>Location data (with your permission, for GPS run tracking)</li>
               </ul>
 
-              <h3 className="text-xl font-heading font-medium text-foreground mb-3 mt-6">
-                No Tracking or Third-Party Analytics
-              </h3>
-              <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-lg mb-4">
-                <p className="text-foreground font-medium mb-2">🔒 Your Privacy is Protected</p>
-                <p className="text-muted-foreground leading-relaxed">
-                  <strong>We do not use tracking cookies, advertising identifiers, or third-party analytics services 
-                  that track users across apps or websites.</strong> We do not share data with data brokers 
-                  or use your data for targeted advertising purposes.
-                </p>
+              {/* NO TRACKING Section - CRITICAL for App Store Guideline 5.1.2 */}
+              <div className="p-6 bg-green-500/10 border-2 border-green-500/30 rounded-xl mb-4 mt-6">
+                <h3 className="font-heading text-xl font-semibold mb-4 text-green-700 dark:text-green-400 flex items-center gap-2">
+                  🔒 No Tracking - Your Privacy is Protected
+                </h3>
+                <div className="space-y-4 text-muted-foreground leading-relaxed">
+                  <p className="font-medium text-foreground">
+                    Fortivus does NOT track you across apps or websites. We do NOT use:
+                  </p>
+                  <ul className="list-disc list-inside space-y-2 ml-4">
+                    <li><strong>No tracking cookies</strong> - We don't use cookies for advertising or cross-site tracking</li>
+                    <li><strong>No advertising identifiers (IDFA)</strong> - We don't collect or use Apple's advertising identifier</li>
+                    <li><strong>No third-party analytics</strong> - We don't use Google Analytics, Facebook Pixel, or similar tracking services</li>
+                    <li><strong>No data broker sharing</strong> - We never sell or share your data with data brokers</li>
+                    <li><strong>No cross-app tracking</strong> - We don't link your activity with other apps or websites</li>
+                  </ul>
+                  <p className="mt-4">
+                    We only use first-party local storage (localStorage) for essential app functionality such as 
+                    remembering your UI preferences (e.g., sidebar state). This data stays entirely on your device 
+                    and is never transmitted to any servers or third parties.
+                  </p>
+                  <p className="font-medium text-foreground mt-4">
+                    Your fitness journey data is stored securely in our database solely for providing you 
+                    the app's features. We do not monetize your data in any way.
+                  </p>
+                </div>
               </div>
-              <p className="text-muted-foreground leading-relaxed">
-                Specifically, we do not:
-              </p>
-              <ul className="list-disc list-inside text-muted-foreground space-y-2 ml-4">
-                <li>Use cookies for tracking or advertising purposes</li>
-                <li>Share data with advertising networks or data brokers</li>
-                <li>Use third-party analytics that track users across apps</li>
-                <li>Collect device advertising identifiers (IDFA)</li>
-                <li>Link your data with third-party data for advertising</li>
-              </ul>
-              <p className="text-muted-foreground leading-relaxed mt-4">
-                We only use first-party data storage (like localStorage) for essential app functionality 
-                such as remembering your UI preferences (e.g., sidebar state). This data stays on your 
-                device and is not transmitted to any servers.
-              </p>
             </section>
 
             {/* How We Use Your Information */}
