@@ -99,6 +99,13 @@ const Footer = () => {
           </p>
         </div>
 
+        {/* Privacy Notice */}
+        <div className="py-4 mb-4 text-center">
+          <p className="text-xs text-background/50">
+            🔒 We do not track you. No advertising cookies. No third-party analytics. Your data stays private.
+          </p>
+        </div>
+
         {/* Bottom */}
         <div className="pt-8 border-t border-background/10 flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="text-center md:text-left">

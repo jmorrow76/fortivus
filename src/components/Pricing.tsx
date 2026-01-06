@@ -34,7 +34,7 @@ const Pricing = () => {
       return;
     }
 
-    // Handle iOS native purchases
+    // CRITICAL: iOS devices MUST use Apple IAP - no Stripe allowed
     if (isNativeIOS) {
       setLoading(planName);
       try {
@@ -49,7 +49,6 @@ const Pricing = () => {
             title: "Purchase successful!",
             description: "Your Elite membership is now active.",
           });
-          // Refresh subscription status
           await checkSubscription();
         }
       } catch (error: any) {
@@ -61,10 +60,10 @@ const Pricing = () => {
       } finally {
         setLoading(null);
       }
-      return;
+      return; // Always return here - never fall through to Stripe on iOS
     }
 
-    // Handle web purchases via Stripe
+    // Web-only: Handle purchases via Stripe (NOT available on iOS app)
     setLoading(planName);
     try {
       const priceId = billingCycle === "yearly" 
