@@ -46,7 +46,7 @@ const CoachingChat = ({ messages, isStreaming, onSendMessage }: CoachingChatProp
 
   return (
     <div className="flex flex-col h-full min-h-0">
-      <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto p-4">
+      <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full space-y-6 py-12">
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
@@ -64,7 +64,7 @@ const CoachingChat = ({ messages, isStreaming, onSendMessage }: CoachingChatProp
                 <Button
                   key={i}
                   variant="outline"
-                  className="text-left h-auto py-3 px-4 justify-start"
+                  className="text-left h-auto py-3 px-4 justify-start whitespace-normal break-words normal-case tracking-normal leading-snug"
                   onClick={() => onSendMessage(prompt)}
                   disabled={isStreaming}
                 >
@@ -98,7 +98,7 @@ const CoachingChat = ({ messages, isStreaming, onSendMessage }: CoachingChatProp
                       : 'bg-muted'
                   )}
                 >
-                  <div className="whitespace-pre-wrap text-sm">
+                  <div className="whitespace-pre-wrap break-words text-sm">
                     {message.content || (
                       <Loader2 className="w-4 h-4 animate-spin" />
                     )}
@@ -118,14 +118,14 @@ const CoachingChat = ({ messages, isStreaming, onSendMessage }: CoachingChatProp
       </div>
 
       <form onSubmit={handleSubmit} className="p-4 border-t shrink-0 pb-[max(1rem,env(safe-area-inset-bottom))]">
-        <div className="flex gap-2">
+        <div className="flex gap-2 min-w-0 items-end">
           <Textarea
             ref={textareaRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Ask your coach anything..."
-            className="min-h-[44px] max-h-32 resize-none"
+            className="min-h-[44px] max-h-32 resize-none flex-1 min-w-0 w-auto"
             rows={1}
             disabled={isStreaming}
           />
