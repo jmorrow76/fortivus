@@ -33,9 +33,9 @@ const Running = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="container mx-auto px-4 pt-44 md:pt-28 pb-8">
+      <main className="container mx-auto px-4 pt-24 md:pt-28 pb-8">
         <div className="max-w-4xl mx-auto">
-          <Button variant="ghost" className="mb-4" onClick={() => navigate(-1)}>
+          <Button variant="ghost" className="mb-4 -ml-2" onClick={() => navigate(-1)}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
