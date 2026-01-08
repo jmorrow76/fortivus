@@ -9,7 +9,7 @@ import ConversationSidebar from '@/components/coaching/ConversationSidebar';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Loader2, Lock, Crown, Menu, MessageSquare } from 'lucide-react';
+import { Loader2, Lock, Crown, Menu, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Coaching = () => {
@@ -104,23 +104,33 @@ const Coaching = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
-      <main className="flex-1 container mx-auto px-4 pt-44 md:pt-28 pb-6">
+      <main className="flex-1 container mx-auto px-4 pt-24 md:pt-28 pb-6">
         {/* Desktop header */}
         <div className="mb-6 hidden md:block">
-          <h1 className="text-2xl font-bold tracking-tight">AI Coaching</h1>
-          <p className="text-muted-foreground">
+          <div className="flex items-center gap-4 mb-2">
+            <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <h1 className="text-2xl font-bold tracking-tight">AI Coaching</h1>
+          </div>
+          <p className="text-muted-foreground ml-14">
             Your personal coach for training, nutrition, and mindset
           </p>
         </div>
 
         {/* Mobile header with menu */}
         <div className="mb-4 md:hidden">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-xl font-bold tracking-tight">AI Coaching</h1>
-              <p className="text-sm text-muted-foreground">
-                {currentConversation?.title || 'New conversation'}
-              </p>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <Button variant="ghost" size="icon" className="shrink-0" onClick={() => navigate(-1)}>
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+              <div className="min-w-0">
+                <h1 className="text-lg font-bold tracking-tight">AI Coaching</h1>
+                <p className="text-xs text-muted-foreground truncate">
+                  {currentConversation?.title || 'New conversation'}
+                </p>
+              </div>
             </div>
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
@@ -143,7 +153,7 @@ const Coaching = () => {
           </div>
         </div>
         
-        <Card className="h-[calc(100vh-200px)] md:h-[calc(100vh-220px)] overflow-hidden">
+        <Card className="h-[calc(100vh-240px)] md:h-[calc(100vh-220px)] overflow-hidden">
           <div className="flex h-full">
             {/* Desktop sidebar */}
             <div className="w-64 shrink-0 hidden md:block">
