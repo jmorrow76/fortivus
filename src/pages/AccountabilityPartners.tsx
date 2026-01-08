@@ -189,11 +189,11 @@ const AccountabilityPartners = () => {
           )}
 
           <Tabs defaultValue="partners" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="partners">My Partners</TabsTrigger>
-              <TabsTrigger value="journal">Prayer Journal</TabsTrigger>
-              <TabsTrigger value="find">Find Partners</TabsTrigger>
-              <TabsTrigger value="profile">My Profile</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 h-auto gap-1 p-1">
+              <TabsTrigger value="partners" className="text-xs md:text-sm py-2">Partners</TabsTrigger>
+              <TabsTrigger value="find" className="text-xs md:text-sm py-2">Find</TabsTrigger>
+              <TabsTrigger value="journal" className="text-xs md:text-sm py-2">Journal</TabsTrigger>
+              <TabsTrigger value="profile" className="text-xs md:text-sm py-2">Profile</TabsTrigger>
             </TabsList>
 
             {/* My Partners Tab */}
