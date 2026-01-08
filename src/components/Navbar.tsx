@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { 
   Menu, X, LogOut, Settings, LayoutDashboard, Shield, Home, Crown,
   ChevronDown, Battery, Moon, RotateCcw, Briefcase, MessageCircle,
-  Dumbbell, MapPin, Camera, Utensils, Mail, ShoppingBag
+  Dumbbell, MapPin, Camera, Utensils, Mail, ShoppingBag, Heart, Users
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useAdmin } from "@/hooks/useAdmin";
@@ -47,6 +47,8 @@ const Navbar = () => {
     { name: "Knowledge Hub", href: "/knowledge", isPage: true },
     { name: "Forum", href: "/forum", isPage: true },
     { name: "Community", href: "/community", isPage: true },
+    { name: "Testimonies", href: "/testimonies", isPage: true },
+    { name: "Accountability", href: "/accountability", isPage: true },
     { name: "Recommendations", href: "/recommendations", isPage: true },
   ];
 
@@ -54,6 +56,8 @@ const Navbar = () => {
     { name: "Knowledge Hub", href: "/knowledge", isPage: true },
     { name: "Forum", href: "/forum", isPage: true },
     { name: "Community", href: "/community", isPage: true },
+    { name: "Testimonies", href: "/testimonies", isPage: true },
+    { name: "Accountability", href: "/accountability", isPage: true },
     { name: "Recommendations", href: "/recommendations", isPage: true },
   ];
 
