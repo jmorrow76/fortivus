@@ -33,13 +33,19 @@ export default function PRCelebration({
     }
   }, [isVisible, onComplete]);
 
+  const handleDismiss = () => {
+    setShow(false);
+    setTimeout(onComplete, 300);
+  };
+
   if (!isVisible && !show) return null;
 
   return (
     <div 
-      className={`fixed inset-0 z-50 flex items-center justify-center pointer-events-none transition-opacity duration-300 ${
+      className={`fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-300 cursor-pointer ${
         show ? 'opacity-100' : 'opacity-0'
       }`}
+      onClick={handleDismiss}
     >
       {/* Background overlay */}
       <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" />
