@@ -572,22 +572,22 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
   return (
     <>
       <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
-        <CardHeader>
-          <div className="flex items-center justify-between flex-wrap gap-4">
+        <CardHeader className="pb-3 md:pb-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
             <div>
-              <CardTitle className="flex items-center gap-2">
-                <Lightbulb className="h-5 w-5 text-primary" />
+              <CardTitle className="flex items-center gap-2 text-base md:text-lg">
+                <Lightbulb className="h-4 w-4 md:h-5 md:w-5 text-primary" />
                 Mission Control
               </CardTitle>
-              <CardDescription className="mt-1">
+              <CardDescription className="mt-1 text-xs md:text-sm">
                 Based on your assessment • Your personalized fitness command center
               </CardDescription>
             </div>
-            <div className="flex flex-wrap gap-2">
-              <Badge variant="outline" className="capitalize">
+            <div className="flex flex-wrap gap-1.5 md:gap-2">
+              <Badge variant="outline" className="capitalize text-xs">
                 {onboardingData.fitness_goal.replace('_', ' ')}
               </Badge>
-              <Badge variant="outline" className="capitalize">
+              <Badge variant="outline" className="capitalize text-xs">
                 {onboardingData.experience_level}
               </Badge>
             </div>
@@ -641,49 +641,54 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
             );
           })()}
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className={cn("grid w-full mb-6", aiPlan ? "grid-cols-5" : "grid-cols-4")}>
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              {aiPlan && (
-                <TabsTrigger value="ai-plan" className="flex items-center gap-1">
-                  <Sparkles className="h-3 w-3" />
-                  AI Plan
-                </TabsTrigger>
-              )}
-              <TabsTrigger value="workouts">Workouts</TabsTrigger>
-              <TabsTrigger value="nutrition">Nutrition</TabsTrigger>
-              <TabsTrigger value="schedule">Schedule</TabsTrigger>
-            </TabsList>
+            <div className="overflow-x-auto -mx-1 px-1 pb-2">
+              <TabsList className={cn(
+                "inline-flex w-auto min-w-full md:grid md:w-full mb-4 md:mb-6 gap-1",
+                aiPlan ? "md:grid-cols-5" : "md:grid-cols-4"
+              )}>
+                <TabsTrigger value="overview" className="text-xs md:text-sm px-3 md:px-4">Overview</TabsTrigger>
+                {aiPlan && (
+                  <TabsTrigger value="ai-plan" className="flex items-center gap-1 text-xs md:text-sm px-3 md:px-4">
+                    <Sparkles className="h-3 w-3" />
+                    <span>AI Plan</span>
+                  </TabsTrigger>
+                )}
+                <TabsTrigger value="workouts" className="text-xs md:text-sm px-3 md:px-4">Workouts</TabsTrigger>
+                <TabsTrigger value="nutrition" className="text-xs md:text-sm px-3 md:px-4">Nutrition</TabsTrigger>
+                <TabsTrigger value="schedule" className="text-xs md:text-sm px-3 md:px-4">Schedule</TabsTrigger>
+              </TabsList>
+            </div>
 
             {/* Overview Tab */}
             <TabsContent value="overview" className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="p-4 bg-background rounded-lg border">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Target className="h-4 w-4 text-primary" />
-                    <span className="text-sm font-medium">Primary Focus</span>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+                <div className="p-3 md:p-4 bg-background rounded-lg border">
+                  <div className="flex items-center gap-2 mb-1.5 md:mb-2">
+                    <Target className="h-4 w-4 text-primary flex-shrink-0" />
+                    <span className="text-xs md:text-sm font-medium">Primary Focus</span>
                   </div>
-                  <p className="text-sm text-muted-foreground">{recommendations.primaryFocus}</p>
+                  <p className="text-xs md:text-sm text-muted-foreground line-clamp-3">{recommendations.primaryFocus}</p>
                 </div>
-                <div className="p-4 bg-background rounded-lg border">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Dumbbell className="h-4 w-4 text-primary" />
-                    <span className="text-sm font-medium">Workout Style</span>
+                <div className="p-3 md:p-4 bg-background rounded-lg border">
+                  <div className="flex items-center gap-2 mb-1.5 md:mb-2">
+                    <Dumbbell className="h-4 w-4 text-primary flex-shrink-0" />
+                    <span className="text-xs md:text-sm font-medium">Workout Style</span>
                   </div>
-                  <p className="text-sm text-muted-foreground">{recommendations.workoutType}</p>
+                  <p className="text-xs md:text-sm text-muted-foreground line-clamp-3">{recommendations.workoutType}</p>
                 </div>
-                <div className="p-4 bg-background rounded-lg border">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Utensils className="h-4 w-4 text-primary" />
-                    <span className="text-sm font-medium">Nutrition Tip</span>
+                <div className="p-3 md:p-4 bg-background rounded-lg border">
+                  <div className="flex items-center gap-2 mb-1.5 md:mb-2">
+                    <Utensils className="h-4 w-4 text-primary flex-shrink-0" />
+                    <span className="text-xs md:text-sm font-medium">Nutrition Tip</span>
                   </div>
-                  <p className="text-sm text-muted-foreground">{recommendations.nutritionTip}</p>
+                  <p className="text-xs md:text-sm text-muted-foreground line-clamp-3">{recommendations.nutritionTip}</p>
                 </div>
-                <div className="p-4 bg-background rounded-lg border">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Battery className="h-4 w-4 text-primary" />
-                    <span className="text-sm font-medium">Recovery Priority</span>
+                <div className="p-3 md:p-4 bg-background rounded-lg border">
+                  <div className="flex items-center gap-2 mb-1.5 md:mb-2">
+                    <Battery className="h-4 w-4 text-primary flex-shrink-0" />
+                    <span className="text-xs md:text-sm font-medium">Recovery</span>
                   </div>
-                  <p className="text-sm text-muted-foreground">{recommendations.recoveryPriority}</p>
+                  <p className="text-xs md:text-sm text-muted-foreground line-clamp-3">{recommendations.recoveryPriority}</p>
                 </div>
               </div>
 
