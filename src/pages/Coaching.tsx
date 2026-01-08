@@ -102,9 +102,9 @@ const Coaching = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-[100svh] bg-background flex flex-col">
       <Navbar />
-      <main className="flex-1 container mx-auto px-4 pt-24 md:pt-28 pb-6 flex flex-col min-h-0">
+      <main className="flex-1 container mx-auto px-4 pt-[calc(env(safe-area-inset-top)+84px)] md:pt-[calc(env(safe-area-inset-top)+96px)] pb-[max(1.5rem,env(safe-area-inset-bottom))] flex flex-col min-h-0">
         {/* Desktop header */}
         <div className="mb-6 hidden md:block">
           <div className="flex items-center gap-4 mb-2">
@@ -175,7 +175,6 @@ const Coaching = () => {
           </div>
         </Card>
       </main>
-      <Footer />
     </div>
   );
 };

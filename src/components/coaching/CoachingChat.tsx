@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Send, Bot, User, Loader2 } from 'lucide-react';
 import { Message } from '@/hooks/useCoaching';
@@ -47,7 +46,7 @@ const CoachingChat = ({ messages, isStreaming, onSendMessage }: CoachingChatProp
 
   return (
     <div className="flex flex-col h-full min-h-0">
-      <ScrollArea ref={scrollRef} className="flex-1 min-h-0 p-4">
+      <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto p-4">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full space-y-6 py-12">
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
@@ -116,9 +115,9 @@ const CoachingChat = ({ messages, isStreaming, onSendMessage }: CoachingChatProp
             ))}
           </div>
         )}
-      </ScrollArea>
+      </div>
 
-      <form onSubmit={handleSubmit} className="p-4 border-t shrink-0">
+      <form onSubmit={handleSubmit} className="p-4 border-t shrink-0 pb-[max(1rem,env(safe-area-inset-bottom))]">
         <div className="flex gap-2">
           <Textarea
             ref={textareaRef}
