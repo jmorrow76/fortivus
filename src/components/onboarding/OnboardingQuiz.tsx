@@ -1,10 +1,11 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
-import { ChevronLeft, ChevronRight, Target, Dumbbell, Calendar, AlertTriangle, Home, Focus, Utensils, CheckCircle2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Target, Dumbbell, Calendar, AlertTriangle, Home, Focus, Utensils, CheckCircle2, X } from 'lucide-react';
 import { OnboardingData } from '@/hooks/useOnboarding';
 import { cn } from '@/lib/utils';
 
@@ -152,12 +153,17 @@ const STEPS = [
 ];
 
 const OnboardingQuiz = ({ onComplete, isSubmitting = false }: OnboardingQuizProps) => {
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<Partial<OnboardingData>>({
     current_challenges: [],
     available_equipment: [],
     focus_areas: [],
   });
+
+  const handleExit = () => {
+    navigate('/dashboard');
+  };
 
   const step = STEPS[currentStep];
   const progress = ((currentStep + 1) / STEPS.length) * 100;
@@ -216,7 +222,16 @@ const OnboardingQuiz = ({ onComplete, isSubmitting = false }: OnboardingQuizProp
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-2xl">
+      <Card className="w-full max-w-2xl relative">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute top-4 right-4 z-10"
+          onClick={handleExit}
+          aria-label="Exit assessment"
+        >
+          <X className="h-5 w-5" />
+        </Button>
         <CardHeader className="text-center space-y-4">
           <div className="flex justify-center">
             <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center">
