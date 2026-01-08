@@ -67,8 +67,8 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border pt-[calc(env(safe-area-inset-top)+20px)] md:pt-[env(safe-area-inset-top)]">
       <div className="container mx-auto px-4 pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
         <div className="flex items-center justify-between h-16 md:h-20">
-          {/* Logo */}
-          <Link to={user ? "/dashboard" : "/"} className="flex items-center">
+          {/* Logo - On mobile, logged-in users go to Fitness Journey */}
+          <Link to={user ? "/my-progress" : "/"} className="flex items-center">
             <span className="text-lg md:text-xl font-medium tracking-[0.25em] uppercase text-foreground">
               Fortivus
             </span>
@@ -147,9 +147,10 @@ const Navbar = () => {
             {user ? (
               <>
                 <NotificationBell />
+                {/* Mobile: Default to Fitness Journey instead of Dashboard */}
                 <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
-                  <Link to="/dashboard">
-                    <LayoutDashboard className="h-4 w-4" />
+                  <Link to="/my-progress">
+                    <Crown className="h-4 w-4 text-amber-500" />
                   </Link>
                 </Button>
               </>
