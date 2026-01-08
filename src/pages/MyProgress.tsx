@@ -5,7 +5,7 @@ import { useOnboardingQuery } from "@/hooks/queries";
 import { 
   ArrowLeft, Sparkles, Camera, TrendingUp, Lock, Crown, Lightbulb,
   MessageCircle, Utensils, Battery, Shield, Moon, RotateCcw, Briefcase, Flame,
-  Dumbbell, ScanFace, Activity, Clock
+  Dumbbell, ScanFace, Activity, Clock, MapPin, Play, FileText, Calendar as CalendarIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -30,6 +30,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Loader2, Trash2, Calendar, Scale, LayoutGrid, Columns, LineChart } from "lucide-react";
 import { format } from "date-fns";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ProgressPhoto {
   id: string;
@@ -44,6 +45,7 @@ const MyProgress = () => {
   const navigate = useNavigate();
   const { user, loading, subscription } = useAuth();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   // Onboarding data for Quick Start Guide
   const { data: onboardingData, isLoading: onboardingLoading } = useOnboardingQuery();
@@ -278,22 +280,23 @@ const MyProgress = () => {
       <Navbar />
       <main className="pt-44 md:pt-28 pb-16 px-4">
         <div className="container max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-8">
+          {/* Mobile: Compact Header */}
+          <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 md:gap-6 mb-6">
             <div className="flex items-center gap-4">
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <Crown className="h-4 w-4 text-accent" />
                   <span className="text-xs font-medium tracking-wider uppercase text-accent">Elite Feature</span>
                 </div>
-                <h1 className="font-heading text-2xl md:text-3xl font-bold">Fitness Journey</h1>
-                <p className="text-muted-foreground text-sm">
-                  Your complete AI-powered progress hub
+                <h1 className="font-heading text-xl md:text-3xl font-bold">Fitness Journey</h1>
+                <p className="text-muted-foreground text-xs md:text-sm">
+                  Your AI-powered fitness command center
                 </p>
               </div>
             </div>
 
-            {/* Today's Status Card */}
-            <Card className="md:min-w-[200px]">
+            {/* Today's Status Card - Hidden on mobile, shown in quick actions */}
+            <Card className="hidden md:block md:min-w-[200px]">
               <CardHeader className="py-3 px-4">
                 <CardTitle className="text-sm flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
@@ -333,13 +336,132 @@ const MyProgress = () => {
             </Card>
           </div>
 
+          {/* MOBILE: Primary Quick Actions - Large, prominent buttons */}
+          <div className="md:hidden mb-6" data-tour="mobile-quick-actions">
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              {/* Start Workout - Primary Action */}
+              <Link to="/workouts" className="col-span-1">
+                <Card className="bg-gradient-to-br from-primary/20 to-primary/5 border-primary/30 hover:border-primary/50 transition-all h-full">
+                  <CardContent className="p-4 flex flex-col items-center justify-center text-center gap-2 min-h-[100px]">
+                    <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+                      <Dumbbell className="h-6 w-6 text-primary" />
+                    </div>
+                    <span className="font-semibold text-sm">Start Workout</span>
+                  </CardContent>
+                </Card>
+              </Link>
+              
+              {/* Track Run */}
+              <Link to="/running" className="col-span-1">
+                <Card className="bg-gradient-to-br from-green-500/20 to-green-500/5 border-green-500/30 hover:border-green-500/50 transition-all h-full">
+                  <CardContent className="p-4 flex flex-col items-center justify-center text-center gap-2 min-h-[100px]">
+                    <div className="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center">
+                      <MapPin className="h-6 w-6 text-green-500" />
+                    </div>
+                    <span className="font-semibold text-sm">Track Run</span>
+                  </CardContent>
+                </Card>
+              </Link>
+              
+              {/* Daily Check-in */}
+              <Link to="/checkin" className="col-span-1">
+                <Card className={`transition-all h-full ${
+                  (() => {
+                    const today = new Date();
+                    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+                    return latestCheckin?.check_in_date === todayStr;
+                  })() 
+                    ? "bg-gradient-to-br from-muted/50 to-muted/20 border-muted" 
+                    : "bg-gradient-to-br from-amber-500/20 to-amber-500/5 border-amber-500/30 hover:border-amber-500/50"
+                }`}>
+                  <CardContent className="p-4 flex flex-col items-center justify-center text-center gap-2 min-h-[100px]">
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                      (() => {
+                        const today = new Date();
+                        const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+                        return latestCheckin?.check_in_date === todayStr;
+                      })() 
+                        ? "bg-muted/50" 
+                        : "bg-amber-500/20"
+                    }`}>
+                      <Sparkles className={`h-6 w-6 ${
+                        (() => {
+                          const today = new Date();
+                          const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+                          return latestCheckin?.check_in_date === todayStr;
+                        })() 
+                          ? "text-muted-foreground" 
+                          : "text-amber-500"
+                      }`} />
+                    </div>
+                    <span className="font-semibold text-sm">
+                      {(() => {
+                        const today = new Date();
+                        const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+                        return latestCheckin?.check_in_date === todayStr ? "✓ Checked In" : "Check-in";
+                      })()}
+                    </span>
+                  </CardContent>
+                </Card>
+              </Link>
+              
+              {/* AI Coach */}
+              <Link to="/coaching" className="col-span-1">
+                <Card className="bg-gradient-to-br from-purple-500/20 to-purple-500/5 border-purple-500/30 hover:border-purple-500/50 transition-all h-full">
+                  <CardContent className="p-4 flex flex-col items-center justify-center text-center gap-2 min-h-[100px]">
+                    <div className="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center">
+                      <MessageCircle className="h-6 w-6 text-purple-500" />
+                    </div>
+                    <span className="font-semibold text-sm">AI Coach</span>
+                  </CardContent>
+                </Card>
+              </Link>
+            </div>
+            
+            {/* Secondary Quick Actions Row */}
+            <div className="grid grid-cols-4 gap-2">
+              <Link to="/calories" className="group">
+                <Card className="hover:border-primary/30 transition-all">
+                  <CardContent className="p-3 flex flex-col items-center text-center gap-1">
+                    <Utensils className="h-5 w-5 text-primary" />
+                    <span className="text-xs">Log Food</span>
+                  </CardContent>
+                </Card>
+              </Link>
+              <Link to="/body-analysis" className="group">
+                <Card className="hover:border-primary/30 transition-all">
+                  <CardContent className="p-3 flex flex-col items-center text-center gap-1">
+                    <ScanFace className="h-5 w-5 text-primary" />
+                    <span className="text-xs">Analyze</span>
+                  </CardContent>
+                </Card>
+              </Link>
+              <Link to="/personal-plan" className="group">
+                <Card className="hover:border-primary/30 transition-all">
+                  <CardContent className="p-3 flex flex-col items-center text-center gap-1">
+                    <FileText className="h-5 w-5 text-primary" />
+                    <span className="text-xs">My Plan</span>
+                  </CardContent>
+                </Card>
+              </Link>
+              <Link to="/progress" className="group">
+                <Card className="hover:border-primary/30 transition-all">
+                  <CardContent className="p-3 flex flex-col items-center text-center gap-1">
+                    <Camera className="h-5 w-5 text-primary" />
+                    <span className="text-xs">Progress</span>
+                  </CardContent>
+                </Card>
+              </Link>
+            </div>
+          </div>
+
           {/* Scripture of the Day */}
-          <div className="mb-8" data-tour="scripture">
+          <div className="mb-6 md:mb-8" data-tour="scripture">
             <ScriptureOfDay />
           </div>
 
           {/* Quick Start Guide - Always visible */}
-          <div className="mb-8" data-tour="quick-start">
+          <div className="mb-6 md:mb-8" data-tour="quick-start">
             {recommendations && onboardingData ? (
               <PersonalizedRecommendations 
                 recommendations={recommendations} 
@@ -347,10 +469,10 @@ const MyProgress = () => {
               />
             ) : (
               <Card>
-                <CardContent className="py-12 text-center">
-                  <Lightbulb className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <h3 className="font-semibold text-lg mb-2">Complete Your Assessment</h3>
-                  <p className="text-muted-foreground mb-4">
+                <CardContent className="py-8 md:py-12 text-center">
+                  <Lightbulb className="h-10 w-10 md:h-12 md:w-12 mx-auto text-muted-foreground mb-4" />
+                  <h3 className="font-semibold text-base md:text-lg mb-2">Complete Your Assessment</h3>
+                  <p className="text-muted-foreground text-sm mb-4">
                     Take the quick assessment to get personalized recommendations
                   </p>
                   <Button asChild>
@@ -361,8 +483,8 @@ const MyProgress = () => {
             )}
           </div>
 
-          {/* Quick Actions Grid */}
-          <div className="mb-8" data-tour="feature-nav">
+          {/* DESKTOP: Quick Actions Grid (hidden on mobile since we have the prominent version above) */}
+          <div className="hidden md:block mb-8" data-tour="feature-nav">
             <h2 className="font-heading text-lg font-semibold mb-4">Quick Actions</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
               <Link to="/coaching" className="group">
@@ -493,6 +615,61 @@ const MyProgress = () => {
                       <Clock className="h-5 w-5 text-primary" />
                     </div>
                     <span className="text-sm font-medium">Biblical Fasting</span>
+                  </CardContent>
+                </Card>
+              </Link>
+            </div>
+          </div>
+
+          {/* MOBILE: More Actions - Collapsible list of additional features */}
+          <div className="md:hidden mb-6">
+            <h2 className="font-heading text-base font-semibold mb-3">More Tools</h2>
+            <div className="grid grid-cols-3 gap-2">
+              <Link to="/hormonal" className="group">
+                <Card className="hover:border-primary/30 transition-all">
+                  <CardContent className="p-3 flex flex-col items-center text-center gap-1">
+                    <Activity className="h-5 w-5 text-primary" />
+                    <span className="text-xs">Hormonal</span>
+                  </CardContent>
+                </Card>
+              </Link>
+              <Link to="/sleep-adaptive" className="group">
+                <Card className="hover:border-primary/30 transition-all">
+                  <CardContent className="p-3 flex flex-col items-center text-center gap-1">
+                    <Moon className="h-5 w-5 text-primary" />
+                    <span className="text-xs">Sleep</span>
+                  </CardContent>
+                </Card>
+              </Link>
+              <Link to="/joint-health" className="group">
+                <Card className="hover:border-primary/30 transition-all">
+                  <CardContent className="p-3 flex flex-col items-center text-center gap-1">
+                    <Shield className="h-5 w-5 text-primary" />
+                    <span className="text-xs">Joint Health</span>
+                  </CardContent>
+                </Card>
+              </Link>
+              <Link to="/comeback" className="group">
+                <Card className="hover:border-primary/30 transition-all">
+                  <CardContent className="p-3 flex flex-col items-center text-center gap-1">
+                    <RotateCcw className="h-5 w-5 text-primary" />
+                    <span className="text-xs">Comeback</span>
+                  </CardContent>
+                </Card>
+              </Link>
+              <Link to="/executive-mode" className="group">
+                <Card className="hover:border-primary/30 transition-all">
+                  <CardContent className="p-3 flex flex-col items-center text-center gap-1">
+                    <Briefcase className="h-5 w-5 text-primary" />
+                    <span className="text-xs">Executive</span>
+                  </CardContent>
+                </Card>
+              </Link>
+              <Link to="/fasting" className="group">
+                <Card className="hover:border-primary/30 transition-all">
+                  <CardContent className="p-3 flex flex-col items-center text-center gap-1">
+                    <Clock className="h-5 w-5 text-primary" />
+                    <span className="text-xs">Fasting</span>
                   </CardContent>
                 </Card>
               </Link>

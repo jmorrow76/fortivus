@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { LayoutDashboard, Flame, Settings } from "lucide-react";
+import { LayoutDashboard, Flame, Settings, Crown } from "lucide-react";
 
 interface LandingPagePreferenceModalProps {
   open: boolean;
@@ -15,12 +15,10 @@ interface LandingPagePreferenceModalProps {
 }
 
 const LandingPagePreferenceModal = ({ open, onSelect }: LandingPagePreferenceModalProps) => {
-  const [selected, setSelected] = useState<"dashboard" | "fitness-journey" | null>(null);
+  const [selected, setSelected] = useState<"dashboard" | "fitness-journey">("fitness-journey");
 
   const handleConfirm = () => {
-    if (selected) {
-      onSelect(selected);
-    }
+    onSelect(selected);
   };
 
   return (
@@ -37,6 +35,28 @@ const LandingPagePreferenceModal = ({ open, onSelect }: LandingPagePreferenceMod
         
         <div className="grid gap-3 py-4">
           <button
+            onClick={() => setSelected("fitness-journey")}
+            className={`flex items-start gap-4 p-4 rounded-lg border-2 transition-all text-left ${
+              selected === "fitness-journey"
+                ? "border-accent bg-accent/5"
+                : "border-border hover:border-muted-foreground/50"
+            }`}
+          >
+            <div className="p-2 rounded-lg bg-amber-500/10">
+              <Crown className="h-5 w-5 text-amber-500" />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <h4 className="font-semibold">Fitness Journey</h4>
+                <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">Recommended</span>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Quick access to workouts, runs, check-ins, AI coaching & more
+              </p>
+            </div>
+          </button>
+          
+          <button
             onClick={() => setSelected("dashboard")}
             className={`flex items-start gap-4 p-4 rounded-lg border-2 transition-all text-left ${
               selected === "dashboard"
@@ -50,26 +70,7 @@ const LandingPagePreferenceModal = ({ open, onSelect }: LandingPagePreferenceMod
             <div className="flex-1">
               <h4 className="font-semibold">Member Dashboard</h4>
               <p className="text-sm text-muted-foreground">
-                Overview of stats, community, and quick links to all features
-              </p>
-            </div>
-          </button>
-          
-          <button
-            onClick={() => setSelected("fitness-journey")}
-            className={`flex items-start gap-4 p-4 rounded-lg border-2 transition-all text-left ${
-              selected === "fitness-journey"
-                ? "border-accent bg-accent/5"
-                : "border-border hover:border-muted-foreground/50"
-            }`}
-          >
-            <div className="p-2 rounded-lg bg-orange-500/10">
-              <Flame className="h-5 w-5 text-orange-500" />
-            </div>
-            <div className="flex-1">
-              <h4 className="font-semibold">Fitness Journey</h4>
-              <p className="text-sm text-muted-foreground">
-                AI coaching, personalized plans, and progress tracking hub
+                Overview of stats, community feed, and leaderboard
               </p>
             </div>
           </button>
@@ -78,7 +79,6 @@ const LandingPagePreferenceModal = ({ open, onSelect }: LandingPagePreferenceMod
         <div className="space-y-3">
           <Button 
             onClick={handleConfirm} 
-            disabled={!selected}
             className="w-full"
           >
             Continue
