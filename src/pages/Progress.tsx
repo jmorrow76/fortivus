@@ -223,22 +223,24 @@ const Progress = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="pt-44 md:pt-28 pb-16 px-4">
+      <main className="pt-[calc(env(safe-area-inset-top)+100px)] md:pt-28 pb-16 px-4">
         <div className="container max-w-6xl mx-auto">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-4">
+          {/* Mobile-friendly header */}
+          <div className="flex flex-col gap-4 mb-6 md:flex-row md:items-center md:justify-between md:mb-8">
+            <div className="flex items-center gap-3">
               <Button
                 variant="ghost"
-                onClick={() => navigate(-1)}
+                size="icon"
+                onClick={() => navigate('/my-progress')}
+                className="shrink-0"
               >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back
+                <ArrowLeft className="h-4 w-4" />
               </Button>
-              <div>
-              <h1 className="font-heading text-2xl md:text-3xl font-bold text-foreground">
+              <div className="min-w-0">
+                <h1 className="font-heading text-xl md:text-3xl font-bold text-foreground truncate">
                   Progress & Body Analysis
                 </h1>
-                <p className="text-muted-foreground">
+                <p className="text-sm text-muted-foreground hidden md:block">
                   Track your transformation with AI-powered analysis
                 </p>
               </div>
@@ -246,12 +248,12 @@ const Progress = () => {
 
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
-                <Button>
+                <Button size="sm" className="w-full md:w-auto">
                   <Plus className="h-4 w-4 mr-2" />
                   Add Photo
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-md">
+              <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle className="font-heading">Add Progress Photo</DialogTitle>
                 </DialogHeader>
@@ -316,24 +318,26 @@ const Progress = () => {
           </div>
 
           <Tabs defaultValue={defaultTab} className="w-full">
-            <TabsList className="mb-6">
-              <TabsTrigger value="analysis" className="gap-2">
-                <Scan className="h-4 w-4" />
-                Body Analysis
-              </TabsTrigger>
-              <TabsTrigger value="grid" className="gap-2">
-                <LayoutGrid className="h-4 w-4" />
-                Gallery
-              </TabsTrigger>
-              <TabsTrigger value="compare" className="gap-2">
-                <Columns className="h-4 w-4" />
-                Compare
-              </TabsTrigger>
-              <TabsTrigger value="chart" className="gap-2">
-                <LineChart className="h-4 w-4" />
-                Weight
-              </TabsTrigger>
-            </TabsList>
+            <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+              <TabsList className="mb-6 w-max md:w-auto">
+                <TabsTrigger value="analysis" className="gap-1.5 text-xs md:text-sm md:gap-2">
+                  <Scan className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                  <span className="hidden sm:inline">Body </span>Analysis
+                </TabsTrigger>
+                <TabsTrigger value="grid" className="gap-1.5 text-xs md:text-sm md:gap-2">
+                  <LayoutGrid className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                  Gallery
+                </TabsTrigger>
+                <TabsTrigger value="compare" className="gap-1.5 text-xs md:text-sm md:gap-2">
+                  <Columns className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                  Compare
+                </TabsTrigger>
+                <TabsTrigger value="chart" className="gap-1.5 text-xs md:text-sm md:gap-2">
+                  <LineChart className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                  Weight
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
             <TabsContent value="analysis">
               <BodyAnalysis onSaved={fetchPhotos} />
