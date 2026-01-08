@@ -129,7 +129,7 @@ export default function Messages() {
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
       
-      <main className="flex-1 container mx-auto px-4 pt-40 md:pt-28 pb-8">
+      <main className="flex-1 container mx-auto px-4 pt-44 md:pt-28 pb-8">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">Messages</h1>
           {totalUnread > 0 && (

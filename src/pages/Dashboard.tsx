@@ -284,7 +284,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="pt-40 md:pt-28 pb-16 px-4">
+      <main className="pt-44 md:pt-28 pb-16 px-4">
         <div className="container max-w-7xl mx-auto">
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">

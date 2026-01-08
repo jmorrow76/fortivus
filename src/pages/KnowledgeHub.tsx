@@ -6,7 +6,7 @@ const KnowledgeHub = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="pt-40 md:pt-28">
+      <main className="pt-44 md:pt-28">
         <Articles />
       </main>
       <Footer />

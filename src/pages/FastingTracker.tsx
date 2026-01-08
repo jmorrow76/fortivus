@@ -65,7 +65,7 @@ const FastingTracker = () => {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <main className="pt-40 md:pt-28 pb-16 px-4">
+        <main className="pt-44 md:pt-28 pb-16 px-4">
           <div className="container max-w-2xl mx-auto text-center">
             <Crown className="h-16 w-16 text-accent mx-auto mb-4" />
             <h1 className="text-2xl font-bold mb-2">Biblical Fasting Tracker</h1>
@@ -135,7 +135,7 @@ const FastingTracker = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="pt-40 md:pt-28 pb-16 px-4">
+      <main className="pt-44 md:pt-28 pb-16 px-4">
         <div className="container max-w-4xl mx-auto">
           {/* Header */}
           <div className="flex items-center gap-2 mb-6">
