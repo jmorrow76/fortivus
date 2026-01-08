@@ -338,33 +338,45 @@ const MyProgress = () => {
 
           {/* MOBILE: Primary Quick Actions - Large, prominent buttons */}
           <div className="md:hidden mb-6" data-tour="mobile-quick-actions">
-            <div className="grid grid-cols-2 gap-3 mb-4">
-              {/* Start Workout - Primary Action */}
-              <Link to="/workouts" className="col-span-1">
+            <div className="grid grid-cols-3 gap-2 mb-4">
+              {/* Start Workout */}
+              <Link to="/workouts">
                 <Card className="bg-gradient-to-br from-primary/20 to-primary/5 border-primary/30 hover:border-primary/50 transition-all h-full">
-                  <CardContent className="p-4 flex flex-col items-center justify-center text-center gap-2 min-h-[100px]">
-                    <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
-                      <Dumbbell className="h-6 w-6 text-primary" />
+                  <CardContent className="p-3 flex flex-col items-center justify-center text-center gap-1.5 min-h-[90px]">
+                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                      <Dumbbell className="h-5 w-5 text-primary" />
                     </div>
-                    <span className="font-semibold text-sm">Start Workout</span>
+                    <span className="font-semibold text-xs">Workout</span>
                   </CardContent>
                 </Card>
               </Link>
               
               {/* Track Run */}
-              <Link to="/running" className="col-span-1">
+              <Link to="/running">
                 <Card className="bg-gradient-to-br from-green-500/20 to-green-500/5 border-green-500/30 hover:border-green-500/50 transition-all h-full">
-                  <CardContent className="p-4 flex flex-col items-center justify-center text-center gap-2 min-h-[100px]">
-                    <div className="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center">
-                      <MapPin className="h-6 w-6 text-green-500" />
+                  <CardContent className="p-3 flex flex-col items-center justify-center text-center gap-1.5 min-h-[90px]">
+                    <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
+                      <MapPin className="h-5 w-5 text-green-500" />
                     </div>
-                    <span className="font-semibold text-sm">Track Run</span>
+                    <span className="font-semibold text-xs">Run</span>
+                  </CardContent>
+                </Card>
+              </Link>
+              
+              {/* Log Food */}
+              <Link to="/calories">
+                <Card className="bg-gradient-to-br from-orange-500/20 to-orange-500/5 border-orange-500/30 hover:border-orange-500/50 transition-all h-full">
+                  <CardContent className="p-3 flex flex-col items-center justify-center text-center gap-1.5 min-h-[90px]">
+                    <div className="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center">
+                      <Utensils className="h-5 w-5 text-orange-500" />
+                    </div>
+                    <span className="font-semibold text-xs">Log Food</span>
                   </CardContent>
                 </Card>
               </Link>
               
               {/* Daily Check-in */}
-              <Link to="/checkin" className="col-span-1">
+              <Link to="/checkin">
                 <Card className={`transition-all h-full ${
                   (() => {
                     const today = new Date();
@@ -374,8 +386,8 @@ const MyProgress = () => {
                     ? "bg-gradient-to-br from-muted/50 to-muted/20 border-muted" 
                     : "bg-gradient-to-br from-amber-500/20 to-amber-500/5 border-amber-500/30 hover:border-amber-500/50"
                 }`}>
-                  <CardContent className="p-4 flex flex-col items-center justify-center text-center gap-2 min-h-[100px]">
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                  <CardContent className="p-3 flex flex-col items-center justify-center text-center gap-1.5 min-h-[90px]">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
                       (() => {
                         const today = new Date();
                         const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
@@ -384,7 +396,7 @@ const MyProgress = () => {
                         ? "bg-muted/50" 
                         : "bg-amber-500/20"
                     }`}>
-                      <Sparkles className={`h-6 w-6 ${
+                      <Sparkles className={`h-5 w-5 ${
                         (() => {
                           const today = new Date();
                           const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
@@ -394,11 +406,11 @@ const MyProgress = () => {
                           : "text-amber-500"
                       }`} />
                     </div>
-                    <span className="font-semibold text-sm">
+                    <span className="font-semibold text-xs">
                       {(() => {
                         const today = new Date();
                         const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-                        return latestCheckin?.check_in_date === todayStr ? "✓ Checked In" : "Check-in";
+                        return latestCheckin?.check_in_date === todayStr ? "✓ Done" : "Check-in";
                       })()}
                     </span>
                   </CardContent>
@@ -406,13 +418,25 @@ const MyProgress = () => {
               </Link>
               
               {/* AI Coach */}
-              <Link to="/coaching" className="col-span-1">
+              <Link to="/coaching">
                 <Card className="bg-gradient-to-br from-purple-500/20 to-purple-500/5 border-purple-500/30 hover:border-purple-500/50 transition-all h-full">
-                  <CardContent className="p-4 flex flex-col items-center justify-center text-center gap-2 min-h-[100px]">
-                    <div className="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center">
-                      <MessageCircle className="h-6 w-6 text-purple-500" />
+                  <CardContent className="p-3 flex flex-col items-center justify-center text-center gap-1.5 min-h-[90px]">
+                    <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center">
+                      <MessageCircle className="h-5 w-5 text-purple-500" />
                     </div>
-                    <span className="font-semibold text-sm">AI Coach</span>
+                    <span className="font-semibold text-xs">AI Coach</span>
+                  </CardContent>
+                </Card>
+              </Link>
+              
+              {/* My Plan - 6th item to complete the 2x3 grid */}
+              <Link to="/personal-plan">
+                <Card className="bg-gradient-to-br from-blue-500/20 to-blue-500/5 border-blue-500/30 hover:border-blue-500/50 transition-all h-full">
+                  <CardContent className="p-3 flex flex-col items-center justify-center text-center gap-1.5 min-h-[90px]">
+                    <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center">
+                      <FileText className="h-5 w-5 text-blue-500" />
+                    </div>
+                    <span className="font-semibold text-xs">My Plan</span>
                   </CardContent>
                 </Card>
               </Link>
@@ -420,14 +444,6 @@ const MyProgress = () => {
             
             {/* Secondary Quick Actions Row */}
             <div className="grid grid-cols-4 gap-2">
-              <Link to="/calories" className="group">
-                <Card className="hover:border-primary/30 transition-all">
-                  <CardContent className="p-3 flex flex-col items-center text-center gap-1">
-                    <Utensils className="h-5 w-5 text-primary" />
-                    <span className="text-xs">Log Food</span>
-                  </CardContent>
-                </Card>
-              </Link>
               <Link to="/body-analysis" className="group">
                 <Card className="hover:border-primary/30 transition-all">
                   <CardContent className="p-3 flex flex-col items-center text-center gap-1">
@@ -436,19 +452,27 @@ const MyProgress = () => {
                   </CardContent>
                 </Card>
               </Link>
-              <Link to="/personal-plan" className="group">
-                <Card className="hover:border-primary/30 transition-all">
-                  <CardContent className="p-3 flex flex-col items-center text-center gap-1">
-                    <FileText className="h-5 w-5 text-primary" />
-                    <span className="text-xs">My Plan</span>
-                  </CardContent>
-                </Card>
-              </Link>
               <Link to="/progress" className="group">
                 <Card className="hover:border-primary/30 transition-all">
                   <CardContent className="p-3 flex flex-col items-center text-center gap-1">
                     <Camera className="h-5 w-5 text-primary" />
                     <span className="text-xs">Progress</span>
+                  </CardContent>
+                </Card>
+              </Link>
+              <Link to="/fasting" className="group">
+                <Card className="hover:border-primary/30 transition-all">
+                  <CardContent className="p-3 flex flex-col items-center text-center gap-1">
+                    <Clock className="h-5 w-5 text-primary" />
+                    <span className="text-xs">Fasting</span>
+                  </CardContent>
+                </Card>
+              </Link>
+              <Link to="/gamification" className="group">
+                <Card className="hover:border-primary/30 transition-all">
+                  <CardContent className="p-3 flex flex-col items-center text-center gap-1">
+                    <Flame className="h-5 w-5 text-primary" />
+                    <span className="text-xs">Badges</span>
                   </CardContent>
                 </Card>
               </Link>
