@@ -284,175 +284,171 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="pt-44 md:pt-28 pb-16 px-4">
+      <main className="pt-[calc(env(safe-area-inset-top)+100px)] md:pt-28 pb-16 px-4">
         <div className="container max-w-7xl mx-auto">
-          {/* Header */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-            <div className="flex items-center gap-4">
-              <Link to="/profile" className="relative group">
-                <Avatar className="h-16 w-16 border-2 border-primary group-hover:border-accent transition-colors">
+          {/* Header - Compact on mobile */}
+          <div className="flex items-center justify-between gap-3 mb-6">
+            <div className="flex items-center gap-3 min-w-0">
+              <Link to="/profile" className="relative group shrink-0">
+                <Avatar className="h-12 w-12 md:h-16 md:w-16 border-2 border-primary group-hover:border-accent transition-colors">
                   <AvatarImage src={profile?.avatar_url || undefined} />
-                  <AvatarFallback className="bg-primary/10 text-primary text-xl">
+                  <AvatarFallback className="bg-primary/10 text-primary text-lg md:text-xl">
                     {profile?.display_name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                <div className="absolute inset-0 flex items-center justify-center bg-background/60 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Settings className="h-5 w-5 text-foreground" />
-                </div>
               </Link>
-              <div>
-                <h1 className="text-2xl font-bold">
-                  Member Portal
+              <div className="min-w-0">
+                <h1 className="text-lg md:text-2xl font-bold truncate">
+                  {profile?.display_name || 'Member Portal'}
                 </h1>
-                <p className="text-muted-foreground">
-                  Welcome back, {profile?.display_name || 'Warrior'} •{' '}
+                <p className="text-xs md:text-sm text-muted-foreground flex items-center gap-1">
                   {subscription.subscribed ? (
-                    <span className="inline-flex items-center gap-1">
-                      <Crown className="h-4 w-4 text-amber-500" />
-                      Elite Member
-                    </span>
+                    <>
+                      <Crown className="h-3 w-3 text-amber-500 shrink-0" />
+                      <span>Elite Member</span>
+                    </>
                   ) : (
                     'Free Member'
                   )}
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" asChild>
+            <div className="flex items-center gap-2 shrink-0">
+              <Button variant="ghost" size="icon" className="h-9 w-9" asChild>
                 <Link to="/profile">
-                  <Settings className="h-4 w-4 mr-2" />
-                  Settings
+                  <Settings className="h-4 w-4" />
                 </Link>
               </Button>
               {!hasCheckedInToday && (
-                <Button asChild>
+                <Button size="sm" asChild>
                   <Link to="/checkin">
-                    <Calendar className="h-4 w-4 mr-2" />
-                    Daily Check-in
+                    <Calendar className="h-4 w-4 md:mr-2" />
+                    <span className="hidden md:inline">Check-in</span>
                   </Link>
                 </Button>
               )}
             </div>
           </div>
 
-          {/* Quick Actions */}
-          <div className="flex flex-wrap gap-3 mb-8">
-            {subscription.subscribed && (
-              <Button asChild size="lg" className="flex-1 sm:flex-none">
+          {/* Quick Actions - Mobile optimized */}
+          {subscription.subscribed && (
+            <div className="mb-6">
+              <Button asChild size="default" className="w-full md:w-auto">
                 <Link to="/my-progress">
-                  <Sparkles className="h-5 w-5 mr-2" />
-                  Fitness Journey
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Go to Fitness Journey
                 </Link>
               </Button>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Scripture of the Day */}
-          <div className="mb-8" data-tour="scripture">
+          <div className="mb-6" data-tour="scripture">
             <ScriptureOfDay />
           </div>
 
           {/* Your Trends */}
-          <div className="mb-8">
+          <div className="mb-6">
             <TrendsDashboard />
           </div>
 
-          {/* Quick Stats Row */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8" data-tour="streak-stats">
+          {/* Quick Stats Row - 2x2 grid on mobile */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-6" data-tour="streak-stats">
             <Card className="bg-gradient-to-br from-primary/10 to-primary/5">
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-full bg-primary/20">
-                    <Flame className="h-5 w-5 text-primary" />
+              <CardContent className="p-3 md:pt-6 md:p-6">
+                <div className="flex items-center gap-2 md:gap-3">
+                  <div className="p-1.5 md:p-2 rounded-full bg-primary/20">
+                    <Flame className="h-4 w-4 md:h-5 md:w-5 text-primary" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold">{streak?.current_streak || 0}</p>
-                    <p className="text-xs text-muted-foreground">Day Streak</p>
+                    <p className="text-xl md:text-2xl font-bold">{streak?.current_streak || 0}</p>
+                    <p className="text-[10px] md:text-xs text-muted-foreground">Streak</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
             <Card className="bg-gradient-to-br from-amber-500/10 to-amber-500/5">
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-full bg-amber-500/20">
-                    <Zap className="h-5 w-5 text-amber-500" />
+              <CardContent className="p-3 md:pt-6 md:p-6">
+                <div className="flex items-center gap-2 md:gap-3">
+                  <div className="p-1.5 md:p-2 rounded-full bg-amber-500/20">
+                    <Zap className="h-4 w-4 md:h-5 md:w-5 text-amber-500" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold">{streak?.total_xp || 0}</p>
-                    <p className="text-xs text-muted-foreground">Total XP</p>
+                    <p className="text-xl md:text-2xl font-bold">{streak?.total_xp || 0}</p>
+                    <p className="text-[10px] md:text-xs text-muted-foreground">XP</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
             <Card className="bg-gradient-to-br from-green-500/10 to-green-500/5">
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-full bg-green-500/20">
-                    <Trophy className="h-5 w-5 text-green-500" />
+              <CardContent className="p-3 md:pt-6 md:p-6">
+                <div className="flex items-center gap-2 md:gap-3">
+                  <div className="p-1.5 md:p-2 rounded-full bg-green-500/20">
+                    <Trophy className="h-4 w-4 md:h-5 md:w-5 text-green-500" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold">{leaderboardPos?.rank || '-'}</p>
-                    <p className="text-xs text-muted-foreground">Leaderboard</p>
+                    <p className="text-xl md:text-2xl font-bold">{leaderboardPos?.rank || '-'}</p>
+                    <p className="text-[10px] md:text-xs text-muted-foreground">Rank</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
             <Card className="bg-gradient-to-br from-purple-500/10 to-purple-500/5">
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-full bg-purple-500/20">
-                    <Medal className="h-5 w-5 text-purple-500" />
+              <CardContent className="p-3 md:pt-6 md:p-6">
+                <div className="flex items-center gap-2 md:gap-3">
+                  <div className="p-1.5 md:p-2 rounded-full bg-purple-500/20">
+                    <Medal className="h-4 w-4 md:h-5 md:w-5 text-purple-500" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold">{earnedBadgesCount}/{totalBadges}</p>
-                    <p className="text-xs text-muted-foreground">Badges</p>
+                    <p className="text-xl md:text-2xl font-bold">{earnedBadgesCount}/{totalBadges}</p>
+                    <p className="text-[10px] md:text-xs text-muted-foreground">Badges</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-4 md:space-y-6">
               {/* Weekly Workout Stats */}
               <Card data-tour="weekly-training">
-                <CardHeader className="flex flex-row items-center justify-between">
+                <CardHeader className="flex flex-row items-center justify-between py-3 md:py-6">
                   <div>
-                    <CardTitle className="flex items-center gap-2">
-                      <Dumbbell className="h-5 w-5" />
-                      This Week's Training
+                    <CardTitle className="flex items-center gap-2 text-base md:text-lg">
+                      <Dumbbell className="h-4 w-4 md:h-5 md:w-5" />
+                      This Week
                     </CardTitle>
-                    <CardDescription>Your workout activity</CardDescription>
+                    <CardDescription className="text-xs md:text-sm">Your workout activity</CardDescription>
                   </div>
-                  <Button variant="ghost" size="sm" asChild>
+                  <Button variant="ghost" size="sm" className="text-xs" asChild>
                     <Link to="/workouts" className="flex items-center gap-1">
-                      View All <ChevronRight className="h-4 w-4" />
+                      <span className="hidden md:inline">View All</span>
+                      <ChevronRight className="h-4 w-4" />
                     </Link>
                   </Button>
                 </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="text-center p-4 bg-muted rounded-lg">
-                      <p className="text-3xl font-bold text-primary">{weeklyStats.totalWorkouts}</p>
-                      <p className="text-sm text-muted-foreground">Workouts</p>
+                <CardContent className="pt-0">
+                  <div className="grid grid-cols-3 gap-2 md:gap-4">
+                    <div className="text-center p-3 md:p-4 bg-muted rounded-lg">
+                      <p className="text-2xl md:text-3xl font-bold text-primary">{weeklyStats.totalWorkouts}</p>
+                      <p className="text-xs md:text-sm text-muted-foreground">Workouts</p>
                     </div>
-                    <div className="text-center p-4 bg-muted rounded-lg">
-                      <p className="text-3xl font-bold text-primary">{weeklyStats.totalMinutes}</p>
-                      <p className="text-sm text-muted-foreground">Minutes</p>
+                    <div className="text-center p-3 md:p-4 bg-muted rounded-lg">
+                      <p className="text-2xl md:text-3xl font-bold text-primary">{weeklyStats.totalMinutes}</p>
+                      <p className="text-xs md:text-sm text-muted-foreground">Minutes</p>
                     </div>
-                    <div className="text-center p-4 bg-muted rounded-lg">
-                      <p className="text-3xl font-bold text-primary">+{weeklyStats.totalXp}</p>
-                      <p className="text-sm text-muted-foreground">XP Earned</p>
+                    <div className="text-center p-3 md:p-4 bg-muted rounded-lg">
+                      <p className="text-2xl md:text-3xl font-bold text-primary">+{weeklyStats.totalXp}</p>
+                      <p className="text-xs md:text-sm text-muted-foreground">XP</p>
                     </div>
                   </div>
                   {workouts.length > 0 && (
-                    <div className="mt-4 space-y-2">
-                      <p className="text-sm font-medium text-muted-foreground">Recent Workouts</p>
-                      {workouts.slice(0, 3).map((workout) => (
-                        <div key={workout.id} className="flex items-center justify-between p-2 bg-muted/50 rounded">
-                          <span className="capitalize">{workout.workout_type.replace('_', ' ')}</span>
-                          <span className="text-sm text-muted-foreground">
-                            {workout.duration_minutes} min • +{workout.xp_earned} XP
+                    <div className="mt-3 space-y-2">
+                      <p className="text-xs font-medium text-muted-foreground">Recent</p>
+                      {workouts.slice(0, 2).map((workout) => (
+                        <div key={workout.id} className="flex items-center justify-between p-2 bg-muted/50 rounded text-sm">
+                          <span className="capitalize truncate">{workout.workout_type.replace('_', ' ')}</span>
+                          <span className="text-xs text-muted-foreground shrink-0">
+                            {workout.duration_minutes}m • +{workout.xp_earned}
                           </span>
                         </div>
                       ))}
@@ -463,42 +459,43 @@ export default function Dashboard() {
 
               {/* Running Stats */}
               <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
+                <CardHeader className="flex flex-row items-center justify-between py-3 md:py-6">
                   <div>
-                    <CardTitle className="flex items-center gap-2">
-                      <MapPin className="h-5 w-5" />
+                    <CardTitle className="flex items-center gap-2 text-base md:text-lg">
+                      <MapPin className="h-4 w-4 md:h-5 md:w-5" />
                       Running Stats
                     </CardTitle>
-                    <CardDescription>Your running achievements</CardDescription>
+                    <CardDescription className="text-xs md:text-sm">Your running achievements</CardDescription>
                   </div>
-                  <Button variant="ghost" size="sm" asChild>
+                  <Button variant="ghost" size="sm" className="text-xs" asChild>
                     <Link to="/running" className="flex items-center gap-1">
-                      Track Run <ChevronRight className="h-4 w-4" />
+                      <span className="hidden md:inline">Track Run</span>
+                      <ChevronRight className="h-4 w-4" />
                     </Link>
                   </Button>
                 </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-4 gap-4">
-                    <div className="text-center p-4 bg-muted rounded-lg">
-                      <p className="text-3xl font-bold text-primary">{runningStats.totalRuns}</p>
-                      <p className="text-sm text-muted-foreground">Total Runs</p>
+                <CardContent className="pt-0">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
+                    <div className="text-center p-3 md:p-4 bg-muted rounded-lg">
+                      <p className="text-2xl md:text-3xl font-bold text-primary">{runningStats.totalRuns}</p>
+                      <p className="text-xs md:text-sm text-muted-foreground">Runs</p>
                     </div>
-                    <div className="text-center p-4 bg-muted rounded-lg">
-                      <p className="text-3xl font-bold text-primary">{(runningStats.totalDistanceKm * 0.621371).toFixed(1)}</p>
-                      <p className="text-sm text-muted-foreground">Miles</p>
+                    <div className="text-center p-3 md:p-4 bg-muted rounded-lg">
+                      <p className="text-2xl md:text-3xl font-bold text-primary">{(runningStats.totalDistanceKm * 0.621371).toFixed(1)}</p>
+                      <p className="text-xs md:text-sm text-muted-foreground">Miles</p>
                     </div>
-                    <div className="text-center p-4 bg-muted rounded-lg">
-                      <p className="text-3xl font-bold text-primary">{Math.round(runningStats.totalDurationMinutes)}</p>
-                      <p className="text-sm text-muted-foreground">Minutes</p>
+                    <div className="text-center p-3 md:p-4 bg-muted rounded-lg">
+                      <p className="text-2xl md:text-3xl font-bold text-primary">{Math.round(runningStats.totalDurationMinutes)}</p>
+                      <p className="text-xs md:text-sm text-muted-foreground">Minutes</p>
                     </div>
-                    <div className="text-center p-4 bg-muted rounded-lg">
-                      <p className="text-3xl font-bold text-primary">{runningStats.runningBadges}</p>
-                      <p className="text-sm text-muted-foreground">Badges</p>
+                    <div className="text-center p-3 md:p-4 bg-muted rounded-lg">
+                      <p className="text-2xl md:text-3xl font-bold text-primary">{runningStats.runningBadges}</p>
+                      <p className="text-xs md:text-sm text-muted-foreground">Badges</p>
                     </div>
                   </div>
                   {runningStats.totalRuns === 0 && (
-                    <div className="mt-4 text-center text-muted-foreground">
-                      <p className="text-sm">No runs yet. Start tracking to earn running badges!</p>
+                    <div className="mt-3 text-center text-muted-foreground">
+                      <p className="text-xs md:text-sm">No runs yet. Start tracking!</p>
                     </div>
                   )}
                 </CardContent>
