@@ -429,15 +429,15 @@ const Workouts = () => {
             </CardContent>
           </Card>
 
-          <Tabs defaultValue="history" className="space-y-6">
+          <Tabs defaultValue="templates" className="space-y-6">
             <TabsList className="grid w-full grid-cols-5">
-              <TabsTrigger value="history" className="flex items-center gap-2">
-                <History className="w-4 h-4" />
-                <span className="hidden sm:inline">History</span>
-              </TabsTrigger>
               <TabsTrigger value="templates" className="flex items-center gap-2">
                 <FileText className="w-4 h-4" />
                 <span className="hidden sm:inline">Templates</span>
+              </TabsTrigger>
+              <TabsTrigger value="history" className="flex items-center gap-2">
+                <History className="w-4 h-4" />
+                <span className="hidden sm:inline">History</span>
               </TabsTrigger>
               <TabsTrigger value="tutorials" className="flex items-center gap-2">
                 <Video className="w-4 h-4" />
