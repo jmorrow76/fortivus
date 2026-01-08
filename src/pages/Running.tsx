@@ -3,10 +3,12 @@ import Footer from '@/components/Footer';
 import { RunTracker } from '@/components/RunTracker';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 
 const Running = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   if (!user) {
     return (
@@ -33,6 +35,10 @@ const Running = () => {
       <Navbar />
       <main className="container mx-auto px-4 pt-44 md:pt-28 pb-8">
         <div className="max-w-4xl mx-auto">
+          <Button variant="ghost" className="mb-4" onClick={() => navigate(-1)}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
           <div className="mb-8">
             <h1 className="text-3xl font-bold mb-2">GPS Run Tracker</h1>
             <p className="text-muted-foreground">

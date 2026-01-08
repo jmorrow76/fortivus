@@ -25,9 +25,9 @@ const DailyCheckin = () => {
       <Navbar />
       <main className="pt-44 md:pt-28 pb-16 px-4">
         <div className="container max-w-2xl mx-auto">
-          <Button variant="ghost" className="mb-6" onClick={() => navigate("/")}>
+          <Button variant="ghost" className="mb-6" onClick={() => navigate(-1)}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Home
+            Back
           </Button>
 
           <div className="mb-8">
