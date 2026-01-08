@@ -285,31 +285,33 @@ const BodyAnalysis = ({ onSaved }: BodyAnalysisProps) => {
   };
 
   return (
-    <div className="space-y-8">
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-heading font-bold mb-2">
+    <div className="space-y-6 md:space-y-8">
+      <div className="text-center mb-6 md:mb-8">
+        <h2 className="text-xl md:text-2xl font-heading font-bold mb-2">
           Body Composition <span className="text-accent">Analysis</span>
         </h2>
-        <p className="text-muted-foreground max-w-2xl mx-auto">
+        <p className="text-muted-foreground text-sm md:text-base max-w-2xl mx-auto px-2">
           Upload a photo and get an AI-powered estimate of your body fat percentage 
-          with personalized recommendations. Photos are automatically saved to your progress gallery.
+          with personalized recommendations.
         </p>
       </div>
 
       <Tabs defaultValue="analyze" className="w-full">
-        <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
-          <TabsTrigger value="analyze" className="gap-2">
-            <Camera className="w-4 h-4" />
-            New Analysis
-          </TabsTrigger>
-          <TabsTrigger value="history" className="gap-2">
-            <History className="w-4 h-4" />
-            History & Trends
-          </TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+          <TabsList className="w-max md:w-full md:max-w-md mx-auto grid grid-cols-2 mb-6 md:mb-8">
+            <TabsTrigger value="analyze" className="gap-1.5 text-xs md:text-sm md:gap-2">
+              <Camera className="w-3.5 h-3.5 md:w-4 md:h-4" />
+              New Analysis
+            </TabsTrigger>
+            <TabsTrigger value="history" className="gap-1.5 text-xs md:text-sm md:gap-2">
+              <History className="w-3.5 h-3.5 md:w-4 md:h-4" />
+              History
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
           <TabsContent value="analyze">
-            <div className="grid lg:grid-cols-2 gap-8">
+            <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
           {/* Upload Section */}
           <Card variant="default" className="overflow-hidden">
             <CardHeader>
@@ -403,32 +405,32 @@ const BodyAnalysis = ({ onSaved }: BodyAnalysisProps) => {
                 </div>
               )}
 
-              {/* Photo Tips */}
-              <div className="bg-secondary/50 rounded-lg p-4 space-y-3">
+              {/* Photo Tips - Mobile optimized */}
+              <div className="bg-secondary/50 rounded-lg p-3 md:p-4 space-y-2 md:space-y-3">
                 <h4 className="font-semibold text-sm flex items-center gap-2">
                   <Lightbulb className="w-4 h-4 text-accent" />
-                  Photo Tips for Best Results
+                  Photo Tips
                 </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 gap-2 md:grid-cols-3 md:gap-3">
                   <div className="flex items-start gap-2">
                     <User className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="text-xs font-medium">Pose</p>
-                      <p className="text-xs text-muted-foreground">Stand relaxed, arms at sides or slightly away. Front or 45° angle works best.</p>
+                      <p className="text-xs text-muted-foreground">Stand relaxed, arms at sides.</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
                     <Sun className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="text-xs font-medium">Lighting</p>
-                      <p className="text-xs text-muted-foreground">Natural light or bright, even lighting. Avoid harsh shadows or backlight.</p>
+                      <p className="text-xs text-muted-foreground">Natural, even lighting.</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
                     <Camera className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="text-xs font-medium">Framing</p>
-                      <p className="text-xs text-muted-foreground">Torso clearly visible. Minimal clothing for accurate assessment.</p>
+                      <p className="text-xs text-muted-foreground">Torso clearly visible.</p>
                     </div>
                   </div>
                 </div>
