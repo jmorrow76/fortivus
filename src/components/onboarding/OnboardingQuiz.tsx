@@ -224,10 +224,15 @@ const OnboardingQuiz = ({ onComplete, isSubmitting = false }: OnboardingQuizProp
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-2xl relative">
         <Button
+          type="button"
           variant="ghost"
           size="icon"
-          className="absolute top-4 right-4 z-10"
-          onClick={handleExit}
+          className="absolute top-4 right-4 z-50"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handleExit();
+          }}
           aria-label="Exit assessment"
         >
           <X className="h-5 w-5" />
