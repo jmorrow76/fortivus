@@ -10,6 +10,13 @@ const Running = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
+  const handleBack = () => {
+    // React Router stores an idx in window.history.state; idx > 0 means we can go back.
+    const idx = (window.history.state as { idx?: number } | null)?.idx ?? 0;
+    if (idx > 0) navigate(-1);
+    else navigate('/my-progress');
+  };
+
   if (!user) {
     return (
       <div className="min-h-screen bg-background">
@@ -35,7 +42,7 @@ const Running = () => {
       <Navbar />
       <main className="container mx-auto px-4 pt-24 md:pt-28 pb-8">
         <div className="max-w-4xl mx-auto">
-          <Button variant="ghost" className="mb-4 -ml-2" onClick={() => navigate(-1)}>
+          <Button variant="ghost" className="mb-4 -ml-2" onClick={handleBack}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
