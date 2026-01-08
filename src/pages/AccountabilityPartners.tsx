@@ -129,7 +129,7 @@ const AccountabilityPartners = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      <main className="container mx-auto px-4 pt-40 md:pt-28 pb-8">
+      <main className="container mx-auto px-4 pt-44 md:pt-28 pb-8">
         <Button 
           variant="ghost" 
           onClick={() => navigate(-1)} 

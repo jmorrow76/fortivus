@@ -634,7 +634,7 @@ const PersonalPlan = () => {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <div className="container mx-auto px-4 pt-40 md:pt-28 pb-8">
+        <div className="container mx-auto px-4 pt-44 md:pt-28 pb-8">
           <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6">
             <ArrowLeft className="h-4 w-4 mr-2" /> Back
           </Button>
@@ -662,7 +662,7 @@ const PersonalPlan = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <div className="container mx-auto px-4 pt-40 md:pt-28 pb-8">
+      <div className="container mx-auto px-4 pt-44 md:pt-28 pb-8">
         <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6">
           <ArrowLeft className="h-4 w-4 mr-2" /> Back
         </Button>

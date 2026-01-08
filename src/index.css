@@ -7,7 +7,7 @@
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 10rem; /* Mobile: accounts for navbar + safe area */
+  scroll-padding-top: 11rem; /* Mobile: accounts for navbar + safe area */
 }
 
 @media (min-width: 768px) {
@@ -18,12 +18,23 @@ html {
 
 /* Anchor link scroll margin for sections and headings */
 [id] {
-  scroll-margin-top: 10rem;
+  scroll-margin-top: 11rem;
 }
 
 @media (min-width: 768px) {
   [id] {
     scroll-margin-top: 7rem;
+  }
+}
+
+/* Global page content offset for fixed navbar */
+.page-content {
+  padding-top: calc(env(safe-area-inset-top) + 10rem); /* Mobile: extra space for taller navbar */
+}
+
+@media (min-width: 768px) {
+  .page-content {
+    padding-top: 7rem; /* Desktop */
   }
 }
 
