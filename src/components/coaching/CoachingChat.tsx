@@ -46,8 +46,8 @@ const CoachingChat = ({ messages, isStreaming, onSendMessage }: CoachingChatProp
   ];
 
   return (
-    <div className="flex flex-col h-full">
-      <ScrollArea ref={scrollRef} className="flex-1 p-4">
+    <div className="flex flex-col h-full min-h-0">
+      <ScrollArea ref={scrollRef} className="flex-1 min-h-0 p-4">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full space-y-6 py-12">
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
@@ -56,7 +56,7 @@ const CoachingChat = ({ messages, isStreaming, onSendMessage }: CoachingChatProp
             <div className="text-center space-y-2">
               <h3 className="text-xl font-semibold">Your Personal AI Coach</h3>
               <p className="text-muted-foreground max-w-md">
-                Get expert guidance on training, nutrition, and mindset. 
+                Get expert guidance on training, nutrition, and mindset.
                 Ask me anything about optimizing your fitness journey.
               </p>
             </div>
@@ -118,7 +118,7 @@ const CoachingChat = ({ messages, isStreaming, onSendMessage }: CoachingChatProp
         )}
       </ScrollArea>
 
-      <form onSubmit={handleSubmit} className="p-4 border-t">
+      <form onSubmit={handleSubmit} className="p-4 border-t shrink-0">
         <div className="flex gap-2">
           <Textarea
             ref={textareaRef}
