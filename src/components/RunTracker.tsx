@@ -392,6 +392,72 @@ export const RunTracker = () => {
 
   const routeCoordinates = activeRun?.coordinates.map(c => [c.lat, c.lng] as [number, number]) || [];
 
+  // Render the quick start section for mobile
+  const renderQuickStart = () => (
+    <Card className="md:hidden">
+      <CardContent className="p-4">
+        {/* Interval Training Toggle */}
+        {!isTracking && (
+          <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg mb-4">
+            <div className="flex items-center gap-3">
+              <Timer className="h-5 w-5 text-muted-foreground" />
+              <div>
+                <p className="font-medium text-sm">Interval Training</p>
+                <p className="text-xs text-muted-foreground">
+                  {intervalSettings.enabled 
+                    ? `${intervalSettings.workSeconds}s work / ${intervalSettings.restSeconds}s rest`
+                    : 'Customize work/rest periods'}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => setShowIntervalDialog(true)}
+                className="h-8 w-8"
+              >
+                <Settings className="h-4 w-4" />
+              </Button>
+              <Switch 
+                checked={intervalSettings.enabled}
+                onCheckedChange={(checked) => setIntervalSettings(prev => ({ ...prev, enabled: checked }))}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Controls */}
+        <div className="flex justify-center gap-4">
+          {!isTracking ? (
+            <Button size="lg" onClick={startRun} className="gap-2 w-full">
+              <Play className="h-5 w-5" />
+              {intervalSettings.enabled ? 'Start Intervals' : 'Start Run'}
+            </Button>
+          ) : (
+            <>
+              {isPaused ? (
+                <Button size="lg" variant="outline" onClick={resumeRun} className="gap-2 flex-1">
+                  <Play className="h-5 w-5" />
+                  Resume
+                </Button>
+              ) : (
+                <Button size="lg" variant="outline" onClick={pauseRun} className="gap-2 flex-1">
+                  <Pause className="h-5 w-5" />
+                  Pause
+                </Button>
+              )}
+              <Button size="lg" variant="destructive" onClick={() => setShowStopDialog(true)} className="gap-2 flex-1">
+                <Square className="h-5 w-5" />
+                Finish
+              </Button>
+            </>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+
   return (
     <div className="space-y-6">
       {error && (
@@ -399,6 +465,9 @@ export const RunTracker = () => {
           {error}
         </div>
       )}
+
+      {/* Mobile Quick Start - At Top */}
+      {renderQuickStart()}
 
       {/* Weekly Goal Progress */}
       {!isTracking && (
@@ -632,9 +701,9 @@ export const RunTracker = () => {
             </MapErrorBoundary>
           </div>
 
-          {/* Interval Training Toggle (before starting) */}
+          {/* Interval Training Toggle (before starting) - Desktop only */}
           {!isTracking && (
-            <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg mb-4">
+            <div className="hidden md:flex items-center justify-between p-3 bg-muted/50 rounded-lg mb-4">
               <div className="flex items-center gap-3">
                 <Timer className="h-5 w-5 text-muted-foreground" />
                 <div>
@@ -663,8 +732,8 @@ export const RunTracker = () => {
             </div>
           )}
 
-          {/* Controls */}
-          <div className="flex justify-center gap-4">
+          {/* Controls - Desktop only */}
+          <div className="hidden md:flex justify-center gap-4">
             {!isTracking ? (
               <Button size="lg" onClick={startRun} className="gap-2">
                 <Play className="h-5 w-5" />
