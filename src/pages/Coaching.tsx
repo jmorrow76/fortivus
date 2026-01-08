@@ -108,7 +108,7 @@ const Coaching = () => {
         {/* Desktop header */}
         <div className="mb-6 hidden md:block">
           <div className="flex items-center gap-4 mb-2">
-            <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+            <Button variant="ghost" size="icon" onClick={() => navigate('/my-progress')}>
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <h1 className="text-2xl font-bold tracking-tight">AI Coaching</h1>
@@ -122,7 +122,7 @@ const Coaching = () => {
         <div className="mb-4 md:hidden">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 min-w-0">
-              <Button variant="ghost" size="icon" className="shrink-0" onClick={() => navigate(-1)}>
+              <Button variant="ghost" size="icon" className="shrink-0" onClick={() => navigate('/my-progress')}>
                 <ArrowLeft className="h-5 w-5" />
               </Button>
               <div className="min-w-0">
