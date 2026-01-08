@@ -104,7 +104,7 @@ const Coaching = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
-      <main className="flex-1 container mx-auto px-4 pt-24 md:pt-28 pb-6">
+      <main className="flex-1 container mx-auto px-4 pt-24 md:pt-28 pb-6 flex flex-col min-h-0">
         {/* Desktop header */}
         <div className="mb-6 hidden md:block">
           <div className="flex items-center gap-4 mb-2">
@@ -152,11 +152,11 @@ const Coaching = () => {
             </Sheet>
           </div>
         </div>
-        
-        <Card className="h-[calc(100vh-240px)] md:h-[calc(100vh-220px)] overflow-hidden">
-          <div className="flex h-full">
+
+        <Card className="flex-1 min-h-0 overflow-hidden">
+          <div className="flex h-full min-h-0">
             {/* Desktop sidebar */}
-            <div className="w-64 shrink-0 hidden md:block">
+            <div className="w-64 shrink-0 hidden md:block h-full">
               <ConversationSidebar
                 conversations={conversations}
                 currentConversation={currentConversation}
@@ -165,7 +165,7 @@ const Coaching = () => {
                 onDeleteConversation={deleteConversation}
               />
             </div>
-            <div className="flex-1">
+            <div className="flex-1 min-h-0">
               <CoachingChat
                 messages={messages}
                 isStreaming={isStreaming}
