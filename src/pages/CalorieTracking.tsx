@@ -7,7 +7,7 @@ import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Lock, Flame, CalendarDays } from 'lucide-react';
+import { Lock, Flame, CalendarDays, ArrowLeft } from 'lucide-react';
 
 export default function CalorieTracking() {
   const { user, subscription } = useAuth();
@@ -20,6 +20,10 @@ export default function CalorieTracking() {
       <Navbar />
       
       <main className="flex-1 container max-w-4xl mx-auto px-4 py-8 pt-44 md:pt-28">
+        <Button variant="ghost" className="mb-4" onClick={() => navigate(-1)}>
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back
+        </Button>
         {!user ? (
           <Card>
             <CardContent className="p-8 text-center space-y-4">

@@ -13,12 +13,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Textarea } from '@/components/ui/textarea';
 import { 
   Dumbbell, Play, History, Trophy, Plus, Search, 
-  Timer, Check, X, ChevronRight, Minus, Clock, FileText, Trash2, Save, TrendingUp, Video
+  Timer, Check, X, ChevronRight, Minus, Clock, FileText, Trash2, Save, TrendingUp, Video, ArrowLeft
 } from 'lucide-react';
 import ExerciseProgressChart from '@/components/ExerciseProgressChart';
 import ExerciseVideoLibrary from '@/components/ExerciseVideoLibrary';
 import PRCelebration from '@/components/PRCelebration';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { format, formatDistanceToNow } from 'date-fns';
 
 const muscleGroups = [
@@ -27,6 +27,7 @@ const muscleGroups = [
 ];
 
 const Workouts = () => {
+  const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const {
     exercises,
@@ -404,6 +405,10 @@ const Workouts = () => {
       <Navbar />
       <main className="container mx-auto px-4 pt-44 md:pt-28 pb-16">
         <div className="max-w-4xl mx-auto">
+          <Button variant="ghost" className="mb-4" onClick={() => navigate(-1)}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
           <div className="mb-8">
             <h1 className="text-3xl font-bold tracking-tight mb-2">Workouts</h1>
             <p className="text-muted-foreground">
