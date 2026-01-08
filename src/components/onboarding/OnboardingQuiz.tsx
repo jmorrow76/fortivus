@@ -162,7 +162,8 @@ const OnboardingQuiz = ({ onComplete, isSubmitting = false }: OnboardingQuizProp
   });
 
   const handleExit = () => {
-    navigate('/dashboard');
+    // Dashboard forces onboarding when no record exists, so send users somewhere safe.
+    navigate('/my-progress');
   };
 
   const step = STEPS[currentStep];
