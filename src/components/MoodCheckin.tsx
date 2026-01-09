@@ -134,8 +134,10 @@ const MoodCheckin = () => {
     energyLevel: number;
     sleepQuality: number | null;
     notes: string | null;
-  }): Promise<WorkoutRecommendation | null> => {
+  }, retryCount = 0): Promise<WorkoutRecommendation | null> => {
     setGeneratingWorkout(true);
+    const maxRetries = 2;
+    
     try {
       const { data, error } = await supabase.functions.invoke(
         "generate-workout-recommendation",
@@ -153,12 +155,79 @@ const MoodCheckin = () => {
 
       if (error) throw error;
       return data.recommendation;
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error generating workout:", error);
-      return null;
+      
+      // Retry on network errors (Load failed, timeout, etc.)
+      if (retryCount < maxRetries && (error.message?.includes('Load failed') || error.name === 'FunctionsFetchError')) {
+        console.log(`Retrying workout generation... attempt ${retryCount + 2}/${maxRetries + 1}`);
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second before retry
+        return generateWorkoutRecommendation(overrideData, retryCount + 1);
+      }
+      
+      // Return a fallback recommendation if all retries fail
+      const currentEnergy = overrideData?.energyLevel ?? energyLevel;
+      const currentStress = overrideData?.stressLevel ?? stressLevel;
+      
+      return getDefaultRecommendation(currentEnergy, currentStress);
     } finally {
-      setGeneratingWorkout(false);
+      if (retryCount === 0) {
+        setGeneratingWorkout(false);
+      }
     }
+  };
+  
+  const getDefaultRecommendation = (energy: number, stress: number): WorkoutRecommendation => {
+    const isLowEnergy = energy <= 2;
+    const isHighStress = stress >= 4;
+    
+    if (isLowEnergy || isHighStress) {
+      return {
+        workoutType: "active_recovery",
+        intensity: "low",
+        duration: 25,
+        title: "Recovery & Restoration",
+        description: "A gentle session to help your body recover while keeping you moving.",
+        exercises: [
+          { name: "Light Walking", sets: 1, reps: "10 minutes", notes: "Easy pace" },
+          { name: "Cat-Cow Stretch", sets: 3, reps: "10 each", notes: "Slow and controlled" },
+          { name: "Hip Circles", sets: 2, reps: "10 each direction" },
+          { name: "Shoulder Rolls", sets: 2, reps: "15 each direction" },
+          { name: "Deep Breathing", sets: 1, reps: "5 minutes", notes: "Box breathing: 4-4-4-4" },
+        ],
+        warmup: "2-3 minutes of gentle movement and deep breathing",
+        cooldown: "5 minutes of stretching and relaxation",
+        motivationalNote: "Rest is part of training. Your body grows stronger during recovery.",
+        devotional: {
+          verse: "Matthew 11:28",
+          text: "Come to me, all you who are weary and burdened, and I will give you rest.",
+          reflection: "God invites us to find rest in Him. Today, honor your body's need for recovery.",
+        },
+      };
+    }
+    
+    return {
+      workoutType: "strength",
+      intensity: "moderate",
+      duration: 45,
+      title: "Full Body Strength",
+      description: "A balanced workout targeting all major muscle groups.",
+      exercises: [
+        { name: "Goblet Squats", sets: 3, reps: "10-12" },
+        { name: "Push-ups", sets: 3, reps: "10-15", notes: "Modify as needed" },
+        { name: "Dumbbell Rows", sets: 3, reps: "10 each arm" },
+        { name: "Lunges", sets: 3, reps: "10 each leg" },
+        { name: "Plank Hold", sets: 3, reps: "30-45 seconds" },
+      ],
+      warmup: "5 minutes of light cardio and dynamic stretching",
+      cooldown: "5 minutes of static stretching",
+      motivationalNote: "Every rep is building a stronger you. Stay consistent!",
+      devotional: {
+        verse: "1 Corinthians 6:19-20",
+        text: "Do you not know that your bodies are temples of the Holy Spirit?",
+        reflection: "Honor God by caring for the body He has given you.",
+      },
+    };
   };
 
   const handleSubmit = async () => {
