@@ -205,12 +205,12 @@ export function StrongWorkoutView({
               Add Exercise
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-lg max-h-[85vh] bg-card border-border">
-            <DialogHeader>
+          <DialogContent className="w-[calc(100%-2rem)] max-w-lg h-[calc(100vh-4rem)] max-h-[600px] bg-card border-border flex flex-col">
+            <DialogHeader className="flex-shrink-0">
               <DialogTitle className="text-foreground">Add Exercise</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4">
-              <div className="relative">
+            <div className="flex flex-col flex-1 min-h-0 space-y-3">
+              <div className="relative flex-shrink-0">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search exercises..."
@@ -219,7 +219,7 @@ export function StrongWorkoutView({
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              <ScrollArea className="h-12">
+              <ScrollArea className="h-10 flex-shrink-0">
                 <div className="flex gap-2 pb-2">
                   {muscleGroups.map(muscle => (
                     <Badge
@@ -237,7 +237,7 @@ export function StrongWorkoutView({
                   ))}
                 </div>
               </ScrollArea>
-              <ScrollArea className="h-[350px]">
+              <ScrollArea className="flex-1 min-h-0">
                 <div className="space-y-1">
                   {filteredExercises.map(exercise => (
                     <button
