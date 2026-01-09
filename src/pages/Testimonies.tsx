@@ -223,19 +223,19 @@ export default function Testimonies() {
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       
-      <main className="flex-1 container pt-44 md:pt-28 pb-8">
+      <main className="flex-1 container px-4 pt-24 md:pt-28 pb-8">
         {/* Header */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center gap-2 mb-4">
-            <Sparkles className="h-8 w-8 text-primary" />
+        <div className="text-center mb-8 md:mb-12">
+          <div className="inline-flex items-center justify-center gap-2 mb-3">
+            <Sparkles className="h-6 w-6 md:h-8 md:w-8 text-primary" />
           </div>
-          <h1 className="font-heading text-4xl md:text-5xl font-bold mb-4">
+          <h1 className="font-heading text-3xl md:text-5xl font-bold mb-3 md:mb-4">
             Testimonies
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-6">
+          <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto mb-4 md:mb-6">
             Share how God has answered your prayers and celebrate His faithfulness with our community of brothers.
           </p>
-          <p className="text-sm text-muted-foreground italic">
+          <p className="text-xs md:text-sm text-muted-foreground italic px-2">
             "Come and hear, all you who fear God, and I will tell what he has done for my soul." — Psalm 66:16
           </p>
         </div>
@@ -319,42 +319,51 @@ export default function Testimonies() {
                 key={testimony.id} 
                 className={testimony.is_featured ? 'border-primary/50 bg-primary/5' : ''}
               >
-                <CardHeader>
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                      <Avatar>
-                        <AvatarImage src={testimony.author_avatar} />
-                        <AvatarFallback>
-                          <User className="h-4 w-4" />
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="font-medium text-sm">{testimony.author_name}</p>
-                        <p className="text-xs text-muted-foreground flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
-                          {formatDistanceToNow(new Date(testimony.created_at), { addSuffix: true })}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
+                <CardHeader className="pb-3">
+                  {/* Badges row */}
+                  {((testimony as any).is_weekly_spotlight || testimony.is_featured) && (
+                    <div className="flex flex-wrap gap-2 mb-3">
                       {(testimony as any).is_weekly_spotlight && (
-                        <Badge className="gap-1 bg-primary">
+                        <Badge className="gap-1 bg-primary text-xs">
                           <Award className="h-3 w-3" />
                           Testimony of the Week
                         </Badge>
                       )}
                       {testimony.is_featured && !(testimony as any).is_weekly_spotlight && (
-                        <Badge variant="secondary" className="gap-1">
+                        <Badge variant="secondary" className="gap-1 text-xs">
                           <Star className="h-3 w-3" />
                           Featured
                         </Badge>
                       )}
+                    </div>
+                  )}
+                  
+                  {/* Author row */}
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <Avatar className="h-8 w-8 shrink-0">
+                        <AvatarImage src={testimony.author_avatar} />
+                        <AvatarFallback>
+                          <User className="h-3 w-3" />
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0">
+                        <p className="font-medium text-sm truncate">{testimony.author_name}</p>
+                        <p className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Calendar className="h-3 w-3 shrink-0" />
+                          {formatDistanceToNow(new Date(testimony.created_at), { addSuffix: true })}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {/* Action buttons */}
+                    <div className="flex items-center gap-1 shrink-0">
                       {isAdmin && (
                         <>
                           <Button
                             variant="ghost"
                             size="icon"
-                            className={`h-8 w-8 ${(testimony as any).is_weekly_spotlight ? 'text-primary' : 'text-muted-foreground'}`}
+                            className={`h-7 w-7 ${(testimony as any).is_weekly_spotlight ? 'text-primary' : 'text-muted-foreground'}`}
                             onClick={() => handleSetWeeklySpotlight(testimony.id)}
                             title="Set as Testimony of the Week"
                             disabled={(testimony as any).is_weekly_spotlight}
@@ -364,7 +373,7 @@ export default function Testimonies() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className={`h-8 w-8 ${testimony.is_featured ? 'text-yellow-500' : 'text-muted-foreground'}`}
+                            className={`h-7 w-7 ${testimony.is_featured ? 'text-yellow-500' : 'text-muted-foreground'}`}
                             onClick={() => handleToggleFeatured(testimony.id, testimony.title, testimony.is_featured)}
                             title={testimony.is_featured ? 'Remove from featured' : 'Feature this testimony'}
                           >
@@ -376,7 +385,7 @@ export default function Testimonies() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                          className="h-7 w-7 text-muted-foreground hover:text-destructive"
                           onClick={() => handleDelete(testimony.id)}
                         >
                           <Trash2 className="h-4 w-4" />
@@ -384,7 +393,8 @@ export default function Testimonies() {
                       )}
                     </div>
                   </div>
-                  <CardTitle className="text-xl mt-2">{testimony.title}</CardTitle>
+                  
+                  <CardTitle className="text-lg md:text-xl mt-3">{testimony.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">
