@@ -189,30 +189,6 @@ const Workouts = () => {
             </p>
           </div>
 
-          {/* Quick Start - Empty Workout */}
-          <Card className="mb-6 border-accent/20 bg-accent/5">
-            <CardContent className="pt-6">
-              <div className="flex flex-col gap-4">
-                <div>
-                  <h2 className="font-semibold text-lg mb-1">Quick Start</h2>
-                  <p className="text-sm text-muted-foreground">Begin a blank workout and add exercises as you go</p>
-                </div>
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <Input
-                    placeholder="Workout name (optional)"
-                    value={workoutName}
-                    onChange={(e) => setWorkoutName(e.target.value)}
-                    className="flex-1"
-                  />
-                  <Button onClick={handleStartWorkout} size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground">
-                    <Play className="w-5 h-5 mr-2" />
-                    Start Empty Workout
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
           <Tabs defaultValue="templates" className="space-y-6">
             <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="templates" className="flex items-center gap-2">
@@ -275,45 +251,7 @@ const Workouts = () => {
             {/* Templates Tab */}
             <TabsContent value="templates">
               <div className="space-y-4">
-                {/* Create Template Button */}
-                <Dialog open={showCreateTemplate} onOpenChange={setShowCreateTemplate}>
-                  <DialogTrigger asChild>
-                    <Button className="w-full">
-                      <Plus className="w-4 h-4 mr-2" />
-                      Create New Template
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Create Template</DialogTitle>
-                      <DialogDescription>
-                        Create a workout template you can reuse.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-4 py-4">
-                      <Input
-                        placeholder="Template name"
-                        value={newTemplateName}
-                        onChange={(e) => setNewTemplateName(e.target.value)}
-                      />
-                      <Textarea
-                        placeholder="Description (optional)"
-                        value={newTemplateDesc}
-                        onChange={(e) => setNewTemplateDesc(e.target.value)}
-                      />
-                    </div>
-                    <DialogFooter>
-                      <Button variant="outline" onClick={() => setShowCreateTemplate(false)}>
-                        Cancel
-                      </Button>
-                      <Button onClick={handleCreateTemplate} disabled={!newTemplateName.trim()}>
-                        Create & Add Exercises
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-
-                {/* Add Exercises to Template Dialog */}
+                {/* Add Exercises to Template Dialog (keep dialog definition here) */}
                 <Dialog open={showAddExerciseToTemplate} onOpenChange={(open) => {
                   setShowAddExerciseToTemplate(open);
                   if (!open) setEditingTemplate(null);
@@ -510,6 +448,68 @@ const Workouts = () => {
                     ))}
                   </div>
                 )}
+
+                {/* Quick Start - Empty Workout */}
+                <Card className="border-accent/20 bg-accent/5">
+                  <CardContent className="pt-6">
+                    <div className="flex flex-col gap-4">
+                      <div>
+                        <h2 className="font-semibold text-lg mb-1">Quick Start</h2>
+                        <p className="text-sm text-muted-foreground">Begin a blank workout and add exercises as you go</p>
+                      </div>
+                      <div className="flex flex-col sm:flex-row gap-3">
+                        <Input
+                          placeholder="Workout name (optional)"
+                          value={workoutName}
+                          onChange={(e) => setWorkoutName(e.target.value)}
+                          className="flex-1"
+                        />
+                        <Button onClick={handleStartWorkout} size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground">
+                          <Play className="w-5 h-5 mr-2" />
+                          Start Empty Workout
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Create Template Button */}
+                <Dialog open={showCreateTemplate} onOpenChange={setShowCreateTemplate}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" className="w-full">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Create New Template
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Create Template</DialogTitle>
+                      <DialogDescription>
+                        Create a workout template you can reuse.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <Input
+                        placeholder="Template name"
+                        value={newTemplateName}
+                        onChange={(e) => setNewTemplateName(e.target.value)}
+                      />
+                      <Textarea
+                        placeholder="Description (optional)"
+                        value={newTemplateDesc}
+                        onChange={(e) => setNewTemplateDesc(e.target.value)}
+                      />
+                    </div>
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => setShowCreateTemplate(false)}>
+                        Cancel
+                      </Button>
+                      <Button onClick={handleCreateTemplate} disabled={!newTemplateName.trim()}>
+                        Create & Add Exercises
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </div>
             </TabsContent>
 
