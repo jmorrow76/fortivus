@@ -109,29 +109,29 @@ export function StrongExerciseCard({
   };
 
   return (
-    <div className="bg-zinc-900 rounded-xl overflow-hidden border border-zinc-800">
+    <div className="bg-card rounded-xl overflow-hidden border border-border">
       {/* Header */}
       <div 
-        className="flex items-center justify-between px-4 py-3 bg-zinc-800/50 cursor-pointer"
+        className="flex items-center justify-between px-4 py-3 bg-secondary/50 cursor-pointer"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="flex items-center gap-3">
-          <div className="w-1 h-8 bg-blue-500 rounded-full" />
+          <div className="w-1 h-8 bg-accent rounded-full" />
           <div>
-            <h3 className="font-semibold text-white">{exerciseName}</h3>
-            <p className="text-xs text-zinc-500 capitalize">{muscleGroup}</p>
+            <h3 className="font-semibold text-foreground">{exerciseName}</h3>
+            <p className="text-xs text-muted-foreground capitalize">{muscleGroup}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8 text-zinc-400" onClick={(e) => e.stopPropagation()}>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" onClick={(e) => e.stopPropagation()}>
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-zinc-800 border-zinc-700">
+            <DropdownMenuContent align="end" className="bg-card border-border">
               <DropdownMenuItem 
-                className="text-red-400 focus:text-red-400 focus:bg-zinc-700"
+                className="text-destructive focus:text-destructive focus:bg-secondary"
                 onClick={onRemoveExercise}
               >
                 <Trash2 className="h-4 w-4 mr-2" />
@@ -140,9 +140,9 @@ export function StrongExerciseCard({
             </DropdownMenuContent>
           </DropdownMenu>
           {isExpanded ? (
-            <ChevronUp className="h-5 w-5 text-zinc-400" />
+            <ChevronUp className="h-5 w-5 text-muted-foreground" />
           ) : (
-            <ChevronDown className="h-5 w-5 text-zinc-400" />
+            <ChevronDown className="h-5 w-5 text-muted-foreground" />
           )}
         </div>
       </div>
@@ -151,7 +151,7 @@ export function StrongExerciseCard({
       {isExpanded && (
         <div className="p-4">
           {/* Table header */}
-          <div className="grid grid-cols-[40px_1fr_1fr_1fr_48px] gap-2 mb-2 text-xs text-zinc-500 font-medium uppercase tracking-wider">
+          <div className="grid grid-cols-[40px_1fr_1fr_1fr_48px] gap-2 mb-2 text-xs text-muted-foreground font-medium uppercase tracking-wider">
             <span className="text-center">Set</span>
             <span className="text-center">Previous</span>
             <span className="text-center">lbs</span>
@@ -172,13 +172,13 @@ export function StrongExerciseCard({
                 {/* Set number */}
                 <span className={cn(
                   "text-center font-medium text-sm",
-                  set.is_warmup ? "text-yellow-500" : "text-zinc-300"
+                  set.is_warmup ? "text-yellow-500" : "text-foreground"
                 )}>
                   {set.is_warmup ? 'W' : idx + 1}
                 </span>
 
                 {/* Previous */}
-                <span className="text-center text-sm text-zinc-500">
+                <span className="text-center text-sm text-muted-foreground">
                   {getPreviousForSet(idx)}
                 </span>
 
@@ -187,8 +187,8 @@ export function StrongExerciseCard({
                   type="number"
                   placeholder={previousSets[idx]?.weight?.toString() || "0"}
                   className={cn(
-                    "h-10 text-center bg-zinc-800 border-zinc-700 text-white",
-                    set.is_completed && "bg-zinc-800/50"
+                    "h-10 text-center bg-secondary border-border text-foreground",
+                    set.is_completed && "bg-secondary/50"
                   )}
                   value={editingSets[set.id]?.weight ?? set.weight ?? ''}
                   onChange={(e) => setEditingSets(prev => ({
@@ -207,8 +207,8 @@ export function StrongExerciseCard({
                   type="number"
                   placeholder={previousSets[idx]?.reps?.toString() || "0"}
                   className={cn(
-                    "h-10 text-center bg-zinc-800 border-zinc-700 text-white",
-                    set.is_completed && "bg-zinc-800/50"
+                    "h-10 text-center bg-secondary border-border text-foreground",
+                    set.is_completed && "bg-secondary/50"
                   )}
                   value={editingSets[set.id]?.reps ?? set.reps ?? ''}
                   onChange={(e) => setEditingSets(prev => ({
@@ -231,7 +231,7 @@ export function StrongExerciseCard({
                   ) : (
                     <Button
                       size="icon"
-                      className="h-10 w-10 bg-zinc-800 hover:bg-blue-600 border-zinc-700"
+                      className="h-10 w-10 bg-secondary hover:bg-accent hover:text-accent-foreground border-border"
                       onClick={() => handleCompleteSet(set.id)}
                     >
                       <Check className="h-5 w-5" />
@@ -245,7 +245,7 @@ export function StrongExerciseCard({
           {/* Add Set button */}
           <Button
             variant="ghost"
-            className="w-full mt-4 text-blue-400 hover:text-blue-300 hover:bg-zinc-800"
+            className="w-full mt-4 text-accent hover:text-accent/80 hover:bg-secondary"
             onClick={onAddSet}
           >
             <Plus className="h-4 w-4 mr-2" />

@@ -61,20 +61,20 @@ export function RestTimerOverlay({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 bg-zinc-900 flex flex-col items-center justify-center"
+          className="fixed inset-0 z-50 bg-background flex flex-col items-center justify-center"
         >
           {/* Close button */}
           <Button
             variant="ghost"
             size="icon"
-            className="absolute top-4 right-4 text-zinc-400 hover:text-white"
+            className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"
             onClick={onClose}
           >
             <X className="h-6 w-6" />
           </Button>
 
           {/* Title */}
-          <p className="text-zinc-400 text-lg uppercase tracking-wider mb-8">
+          <p className="text-muted-foreground text-lg uppercase tracking-wider mb-8">
             Rest Timer
           </p>
 
@@ -87,7 +87,7 @@ export function RestTimerOverlay({
                 cy="50"
                 r="45"
                 fill="none"
-                stroke="#27272a"
+                className="stroke-secondary"
                 strokeWidth="6"
               />
               {/* Progress circle */}
@@ -96,17 +96,17 @@ export function RestTimerOverlay({
                 cy="50"
                 r="45"
                 fill="none"
-                stroke="#3b82f6"
+                className="stroke-accent"
                 strokeWidth="6"
                 strokeLinecap="round"
                 strokeDasharray={`${2 * Math.PI * 45}`}
                 strokeDashoffset={`${2 * Math.PI * 45 * (1 - progress / 100)}`}
-                className="transition-all duration-1000 ease-linear"
+                style={{ transition: 'stroke-dashoffset 1s linear' }}
               />
             </svg>
             {/* Time display */}
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-6xl font-mono font-bold text-white">
+              <span className="text-6xl font-mono font-bold text-foreground">
                 {formatTime(seconds)}
               </span>
             </div>
@@ -117,7 +117,7 @@ export function RestTimerOverlay({
             <Button
               variant="outline"
               size="lg"
-              className="bg-zinc-800 border-zinc-700 text-white hover:bg-zinc-700 gap-2"
+              className="bg-secondary border-border text-foreground hover:bg-secondary/80 gap-2"
               onClick={() => addTime(-15)}
             >
               <Minus className="h-4 w-4" />
@@ -126,7 +126,7 @@ export function RestTimerOverlay({
             <Button
               variant="outline"
               size="lg"
-              className="bg-zinc-800 border-zinc-700 text-white hover:bg-zinc-700 gap-2"
+              className="bg-secondary border-border text-foreground hover:bg-secondary/80 gap-2"
               onClick={() => addTime(15)}
             >
               <Plus className="h-4 w-4" />
@@ -138,7 +138,7 @@ export function RestTimerOverlay({
           <Button
             variant="ghost"
             size="lg"
-            className="text-zinc-400 hover:text-white gap-2"
+            className="text-muted-foreground hover:text-foreground gap-2"
             onClick={onClose}
           >
             <SkipForward className="h-5 w-5" />
