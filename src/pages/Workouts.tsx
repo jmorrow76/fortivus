@@ -18,6 +18,7 @@ import {
 import ExerciseProgressChart from '@/components/ExerciseProgressChart';
 import ExerciseVideoLibrary from '@/components/ExerciseVideoLibrary';
 import PRCelebration from '@/components/PRCelebration';
+import { StrongWorkoutView } from '@/components/workout/StrongWorkoutView';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { format, formatDistanceToNow } from 'date-fns';
 
@@ -57,10 +58,6 @@ const Workouts = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedMuscle, setSelectedMuscle] = useState('all');
   const [workoutName, setWorkoutName] = useState('');
-  const [showExercisePicker, setShowExercisePicker] = useState(false);
-  const [editingSets, setEditingSets] = useState<Record<string, { reps: string; weight: string }>>({});
-  const [restTimer, setRestTimer] = useState<number | null>(null);
-  const [elapsedTime, setElapsedTime] = useState(0);
   
   // Template state
   const [showCreateTemplate, setShowCreateTemplate] = useState(false);
@@ -70,29 +67,6 @@ const Workouts = () => {
   const [showAddExerciseToTemplate, setShowAddExerciseToTemplate] = useState(false);
   const [showSaveAsTemplate, setShowSaveAsTemplate] = useState(false);
   const [saveTemplateName, setSaveTemplateName] = useState('');
-
-  // Rest timer effect - must be before any conditional returns
-  useEffect(() => {
-    if (restTimer === null) return;
-    if (restTimer <= 0) {
-      setRestTimer(null);
-      return;
-    }
-    const interval = setInterval(() => {
-      setRestTimer(prev => (prev !== null && prev > 0) ? prev - 1 : null);
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [restTimer]);
-
-  // Elapsed time effect - must be before any conditional returns
-  useEffect(() => {
-    if (!activeSession) return;
-    const interval = setInterval(() => {
-      const start = new Date(activeSession.started_at).getTime();
-      setElapsedTime(Math.floor((Date.now() - start) / 1000));
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [activeSession]);
 
   // Auth redirect - after all hooks
   if (!authLoading && !user) {
@@ -111,20 +85,6 @@ const Workouts = () => {
     const name = workoutName.trim() || `Workout - ${format(new Date(), 'MMM d')}`;
     await startWorkout(name);
     setWorkoutName('');
-  };
-
-  // Handle set completion
-  const handleCompleteSet = async (setId: string) => {
-    const editing = editingSets[setId];
-    if (!editing) return;
-    
-    const reps = parseInt(editing.reps) || 0;
-    const weight = parseFloat(editing.weight) || 0;
-    
-    await completeSet(setId, reps, weight);
-    
-    // Start rest timer
-    setRestTimer(90);
   };
 
   // Create template handler
@@ -155,247 +115,60 @@ const Workouts = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Active Workout View
+  // Active Workout View - Strong App Style
   if (activeSession) {
     return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        
-        {/* PR Celebration Animation */}
-        <PRCelebration
-          isVisible={!!prCelebration}
-          exerciseName={prCelebration?.exerciseName || ''}
-          weight={prCelebration?.weight || 0}
-          reps={prCelebration?.reps || 0}
-          onComplete={clearPrCelebration}
+      <>
+        <StrongWorkoutView
+          session={activeSession}
+          activeExercises={activeExercises}
+          exercises={exercises}
+          userId={user?.id}
+          prCelebration={prCelebration}
+          onAddExercise={addExerciseToWorkout}
+          onAddSet={addSet}
+          onCompleteSet={completeSet}
+          onDeleteSet={deleteSet}
+          onRemoveExercise={(exerciseId) => {
+            const exercise = activeExercises.find(ae => ae.exercise.id === exerciseId);
+            if (exercise) {
+              exercise.sets.forEach(set => deleteSet(set.id, exerciseId));
+            }
+          }}
+          onFinish={() => finishWorkout()}
+          onCancel={cancelWorkout}
+          onSaveAsTemplate={() => setShowSaveAsTemplate(true)}
+          onClearPR={clearPrCelebration}
         />
         
-        <main className="container mx-auto px-4 pt-44 md:pt-28 pb-32">
-          {/* Workout Header */}
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-2xl font-bold">{activeSession.name}</h1>
-              <p className="text-muted-foreground flex items-center gap-2">
-                <Clock className="w-4 h-4" />
-                {formatTime(elapsedTime)}
-              </p>
+        {/* Save as Template Dialog */}
+        <Dialog open={showSaveAsTemplate} onOpenChange={setShowSaveAsTemplate}>
+          <DialogContent className="bg-zinc-900 border-zinc-800">
+            <DialogHeader>
+              <DialogTitle className="text-white">Save as Template</DialogTitle>
+              <DialogDescription className="text-zinc-400">
+                Save this workout as a reusable template for future sessions.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <Input
+                placeholder="Template name"
+                className="bg-zinc-800 border-zinc-700 text-white"
+                value={saveTemplateName}
+                onChange={(e) => setSaveTemplateName(e.target.value)}
+              />
             </div>
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={cancelWorkout}>
-                <X className="w-4 h-4 mr-2" />
+            <DialogFooter>
+              <Button variant="outline" className="border-zinc-700 text-zinc-400" onClick={() => setShowSaveAsTemplate(false)}>
                 Cancel
               </Button>
-              <Button onClick={() => finishWorkout()}>
-                <Check className="w-4 h-4 mr-2" />
-                Finish
+              <Button className="bg-blue-600 hover:bg-blue-700" onClick={handleSaveAsTemplate} disabled={!saveTemplateName.trim()}>
+                Save Template
               </Button>
-            </div>
-          </div>
-
-          {/* Rest Timer */}
-          {restTimer !== null && (
-            <Card className="mb-6 bg-primary/10 border-primary">
-              <CardContent className="py-4 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Timer className="w-6 h-6 text-primary" />
-                  <span className="text-lg font-semibold">Rest Timer</span>
-                </div>
-                <span className="text-3xl font-mono font-bold text-primary">
-                  {formatTime(restTimer)}
-                </span>
-                <Button variant="ghost" size="sm" onClick={() => setRestTimer(null)}>
-                  Skip
-                </Button>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Active Exercises */}
-          <div className="space-y-4 mb-6">
-            {activeExercises.map(({ exercise, sets }) => (
-              <Card key={exercise.id}>
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">{exercise.name}</CardTitle>
-                    <Badge variant="secondary">{exercise.muscle_group}</Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  {/* Sets Table */}
-                  <div className="space-y-2">
-                    <div className="grid grid-cols-5 gap-2 text-sm text-muted-foreground font-medium">
-                      <span>Set</span>
-                      <span>Previous</span>
-                      <span>lbs</span>
-                      <span>Reps</span>
-                      <span></span>
-                    </div>
-                    {sets.map((set, idx) => (
-                      <div key={set.id} className="grid grid-cols-5 gap-2 items-center">
-                        <span className={`font-medium ${set.is_warmup ? 'text-muted-foreground' : ''}`}>
-                          {set.is_warmup ? 'W' : idx + 1}
-                        </span>
-                        <span className="text-muted-foreground text-sm">-</span>
-                        <Input
-                          type="number"
-                          placeholder="0"
-                          className="h-8"
-                          value={editingSets[set.id]?.weight ?? set.weight ?? ''}
-                          onChange={(e) => setEditingSets(prev => ({
-                            ...prev,
-                            [set.id]: { ...prev[set.id], weight: e.target.value, reps: prev[set.id]?.reps ?? '' }
-                          }))}
-                          disabled={set.is_completed}
-                        />
-                        <Input
-                          type="number"
-                          placeholder="0"
-                          className="h-8"
-                          value={editingSets[set.id]?.reps ?? set.reps ?? ''}
-                          onChange={(e) => setEditingSets(prev => ({
-                            ...prev,
-                            [set.id]: { ...prev[set.id], reps: e.target.value, weight: prev[set.id]?.weight ?? '' }
-                          }))}
-                          disabled={set.is_completed}
-                        />
-                        <div className="flex gap-1">
-                          {set.is_completed ? (
-                            <Button size="icon" variant="ghost" className="h-8 w-8 text-green-500">
-                              <Check className="w-4 h-4" />
-                            </Button>
-                          ) : (
-                            <Button 
-                              size="icon" 
-                              variant="ghost" 
-                              className="h-8 w-8"
-                              onClick={() => handleCompleteSet(set.id)}
-                            >
-                              <Check className="w-4 h-4" />
-                            </Button>
-                          )}
-                          <Button 
-                            size="icon" 
-                            variant="ghost" 
-                            className="h-8 w-8 text-destructive"
-                            onClick={() => deleteSet(set.id, exercise.id)}
-                          >
-                            <Minus className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <Button 
-                    variant="ghost" 
-                    className="w-full mt-3"
-                    onClick={() => addSet(exercise.id)}
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Set
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {/* Add Exercise Button */}
-          <Dialog open={showExercisePicker} onOpenChange={setShowExercisePicker}>
-            <DialogTrigger asChild>
-              <Button className="w-full" size="lg">
-                <Plus className="w-5 h-5 mr-2" />
-                Add Exercise
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-lg max-h-[80vh]">
-              <DialogHeader>
-                <DialogTitle>Add Exercise</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search exercises..."
-                    className="pl-10"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
-                <ScrollArea className="h-12">
-                  <div className="flex gap-2 pb-2">
-                    {muscleGroups.map(muscle => (
-                      <Badge
-                        key={muscle}
-                        variant={selectedMuscle === muscle ? 'default' : 'outline'}
-                        className="cursor-pointer capitalize whitespace-nowrap"
-                        onClick={() => setSelectedMuscle(muscle)}
-                      >
-                        {muscle}
-                      </Badge>
-                    ))}
-                  </div>
-                </ScrollArea>
-                <ScrollArea className="h-[300px]">
-                  <div className="space-y-1">
-                    {filteredExercises.map(exercise => (
-                      <button
-                        key={exercise.id}
-                        className="w-full p-3 text-left hover:bg-muted rounded-lg flex items-center justify-between"
-                        onClick={() => {
-                          addExerciseToWorkout(exercise);
-                          setShowExercisePicker(false);
-                        }}
-                      >
-                        <div>
-                          <p className="font-medium">{exercise.name}</p>
-                          <p className="text-sm text-muted-foreground capitalize">
-                            {exercise.muscle_group} • {exercise.equipment}
-                          </p>
-                        </div>
-                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                      </button>
-                    ))}
-                  </div>
-                </ScrollArea>
-              </div>
-            </DialogContent>
-          </Dialog>
-
-          {/* Save as Template Button */}
-          {activeExercises.length > 0 && (
-            <Dialog open={showSaveAsTemplate} onOpenChange={setShowSaveAsTemplate}>
-              <DialogTrigger asChild>
-                <Button variant="outline" className="w-full mt-3">
-                  <Save className="w-5 h-5 mr-2" />
-                  Save as Template
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Save as Template</DialogTitle>
-                  <DialogDescription>
-                    Save this workout as a reusable template for future sessions.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4 py-4">
-                  <Input
-                    placeholder="Template name"
-                    value={saveTemplateName}
-                    onChange={(e) => setSaveTemplateName(e.target.value)}
-                  />
-                </div>
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setShowSaveAsTemplate(false)}>
-                    Cancel
-                  </Button>
-                  <Button onClick={handleSaveAsTemplate} disabled={!saveTemplateName.trim()}>
-                    Save Template
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          )}
-        </main>
-      </div>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </>
     );
   }
 
