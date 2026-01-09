@@ -189,20 +189,26 @@ const Workouts = () => {
             </p>
           </div>
 
-          {/* Start Workout Card */}
-          <Card className="mb-8">
+          {/* Quick Start - Empty Workout */}
+          <Card className="mb-6 border-accent/20 bg-accent/5">
             <CardContent className="pt-6">
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Input
-                  placeholder="Workout name (optional)"
-                  value={workoutName}
-                  onChange={(e) => setWorkoutName(e.target.value)}
-                  className="flex-1"
-                />
-                <Button onClick={handleStartWorkout} size="lg">
-                  <Play className="w-5 h-5 mr-2" />
-                  Start Workout
-                </Button>
+              <div className="flex flex-col gap-4">
+                <div>
+                  <h2 className="font-semibold text-lg mb-1">Quick Start</h2>
+                  <p className="text-sm text-muted-foreground">Begin a blank workout and add exercises as you go</p>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Input
+                    placeholder="Workout name (optional)"
+                    value={workoutName}
+                    onChange={(e) => setWorkoutName(e.target.value)}
+                    className="flex-1"
+                  />
+                  <Button onClick={handleStartWorkout} size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground">
+                    <Play className="w-5 h-5 mr-2" />
+                    Start Empty Workout
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
