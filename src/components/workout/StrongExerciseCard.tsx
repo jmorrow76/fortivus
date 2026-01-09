@@ -151,9 +151,9 @@ export function StrongExerciseCard({
       {isExpanded && (
         <div className="p-4">
           {/* Table header */}
-          <div className="grid grid-cols-[40px_1fr_1fr_1fr_48px] gap-2 mb-2 text-xs text-muted-foreground font-medium uppercase tracking-wider">
+          <div className="grid grid-cols-[32px_minmax(50px,1fr)_minmax(60px,1fr)_minmax(50px,1fr)_40px] gap-1 sm:gap-2 mb-2 text-[10px] sm:text-xs text-muted-foreground font-medium uppercase tracking-wider">
             <span className="text-center">Set</span>
-            <span className="text-center">Previous</span>
+            <span className="text-center">Prev</span>
             <span className="text-center">lbs</span>
             <span className="text-center">Reps</span>
             <span></span>
@@ -165,20 +165,20 @@ export function StrongExerciseCard({
               <div 
                 key={set.id} 
                 className={cn(
-                  "grid grid-cols-[40px_1fr_1fr_1fr_48px] gap-2 items-center py-1",
+                  "grid grid-cols-[32px_minmax(50px,1fr)_minmax(60px,1fr)_minmax(50px,1fr)_40px] gap-1 sm:gap-2 items-center py-1",
                   set.is_completed && "opacity-60"
                 )}
               >
                 {/* Set number */}
                 <span className={cn(
-                  "text-center font-medium text-sm",
+                  "text-center font-medium text-xs sm:text-sm",
                   set.is_warmup ? "text-yellow-500" : "text-foreground"
                 )}>
                   {set.is_warmup ? 'W' : idx + 1}
                 </span>
 
                 {/* Previous */}
-                <span className="text-center text-sm text-muted-foreground">
+                <span className="text-center text-[11px] sm:text-sm text-muted-foreground truncate">
                   {getPreviousForSet(idx)}
                 </span>
 
@@ -187,7 +187,7 @@ export function StrongExerciseCard({
                   type="number"
                   placeholder={previousSets[idx]?.weight?.toString() || "0"}
                   className={cn(
-                    "h-10 text-center bg-secondary border-border text-foreground",
+                    "h-9 sm:h-10 text-center text-sm px-1 bg-secondary border-border text-foreground",
                     set.is_completed && "bg-secondary/50"
                   )}
                   value={editingSets[set.id]?.weight ?? set.weight ?? ''}
@@ -207,7 +207,7 @@ export function StrongExerciseCard({
                   type="number"
                   placeholder={previousSets[idx]?.reps?.toString() || "0"}
                   className={cn(
-                    "h-10 text-center bg-secondary border-border text-foreground",
+                    "h-9 sm:h-10 text-center text-sm px-1 bg-secondary border-border text-foreground",
                     set.is_completed && "bg-secondary/50"
                   )}
                   value={editingSets[set.id]?.reps ?? set.reps ?? ''}
@@ -225,16 +225,16 @@ export function StrongExerciseCard({
                 {/* Complete/Delete */}
                 <div className="flex justify-center">
                   {set.is_completed ? (
-                    <div className="h-10 w-10 rounded-lg bg-green-500/20 flex items-center justify-center">
-                      <Check className="h-5 w-5 text-green-500" />
+                    <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-lg bg-green-500/20 flex items-center justify-center">
+                      <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-500" />
                     </div>
                   ) : (
                     <Button
                       size="icon"
-                      className="h-10 w-10 bg-secondary hover:bg-accent hover:text-accent-foreground border-border"
+                      className="h-9 w-9 sm:h-10 sm:w-10 bg-secondary hover:bg-accent hover:text-accent-foreground border-border"
                       onClick={() => handleCompleteSet(set.id)}
                     >
-                      <Check className="h-5 w-5" />
+                      <Check className="h-4 w-4 sm:h-5 sm:w-5" />
                     </Button>
                   )}
                 </div>
