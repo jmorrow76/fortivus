@@ -45,19 +45,18 @@ const Navbar = () => {
 
   const navLinks = [
     { name: "Knowledge Hub", href: "/knowledge", isPage: true },
-    { name: "Forum", href: "/forum", isPage: true },
-    { name: "Community", href: "/community", isPage: true },
-    { name: "Testimonies", href: "/testimonies", isPage: true },
-    { name: "Accountability", href: "/accountability", isPage: true },
     { name: "Recommendations", href: "/recommendations", isPage: true },
+  ];
+
+  const communitySubLinks = [
+    { name: "Community Feed", href: "/community" },
+    { name: "Forum", href: "/forum" },
+    { name: "Testimonies", href: "/testimonies" },
+    { name: "Accountability", href: "/accountability" },
   ];
 
   const mobileNavLinks = [
     { name: "Knowledge Hub", href: "/knowledge", isPage: true },
-    { name: "Forum", href: "/forum", isPage: true },
-    { name: "Community", href: "/community", isPage: true },
-    { name: "Testimonies", href: "/testimonies", isPage: true },
-    { name: "Accountability", href: "/accountability", isPage: true },
     { name: "Recommendations", href: "/recommendations", isPage: true },
   ];
 
@@ -90,6 +89,23 @@ const Navbar = () => {
                 {link.name}
               </Link>
             ))}
+            
+            {/* Community Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="text-xs font-medium tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-200 flex items-center gap-1">
+                Community
+                <ChevronDown className="h-3 w-3" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center">
+                {communitySubLinks.map((link) => (
+                  <DropdownMenuItem key={link.name} asChild>
+                    <Link to={link.href} className="cursor-pointer">
+                      {link.name}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           <div className="hidden lg:flex items-center gap-2" data-tour="nav-actions">
@@ -207,6 +223,26 @@ const Navbar = () => {
                   {link.name}
                 </Link>
               ))}
+              
+              {/* Mobile Community Section */}
+              <div className="pt-2">
+                <p className="text-xs font-medium tracking-[0.1em] uppercase text-muted-foreground flex items-center gap-1 mb-2">
+                  <Users className="h-3 w-3" />
+                  Community
+                </p>
+                <div className="pl-4 flex flex-col gap-2">
+                  {communitySubLinks.map((link) => (
+                    <Link
+                      key={link.name}
+                      to={link.href}
+                      className="text-xs text-muted-foreground hover:text-foreground transition-colors py-1"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      {link.name}
+                    </Link>
+                  ))}
+                </div>
+              </div>
               <div className="flex flex-col gap-3 pt-4 border-t border-border mt-2">
                 {user ? (
                   <>
