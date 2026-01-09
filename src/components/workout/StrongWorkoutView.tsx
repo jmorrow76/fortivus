@@ -105,7 +105,7 @@ export function StrongWorkoutView({
   const totalSets = activeExercises.reduce((sum, ae) => sum + ae.sets.length, 0);
 
   return (
-    <div className="min-h-screen bg-zinc-950">
+    <div className="min-h-screen bg-background">
       {/* PR Celebration */}
       <PRCelebration
         isVisible={!!prCelebration}
@@ -124,12 +124,12 @@ export function StrongWorkoutView({
       />
 
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-zinc-950 border-b border-zinc-800 px-4 py-3 pt-[calc(env(safe-area-inset-top)+12px)]">
+      <div className="sticky top-0 z-40 bg-background border-b border-border px-4 py-3 pt-[calc(env(safe-area-inset-top)+12px)]">
         <div className="flex items-center justify-between">
           <Button
             variant="ghost"
             size="sm"
-            className="text-red-400 hover:text-red-300 hover:bg-zinc-800"
+            className="text-destructive hover:text-destructive/80 hover:bg-secondary"
             onClick={onCancel}
           >
             <X className="h-4 w-4 mr-1" />
@@ -137,8 +137,8 @@ export function StrongWorkoutView({
           </Button>
 
           <div className="text-center">
-            <h1 className="text-white font-semibold text-sm">{session.name}</h1>
-            <div className="flex items-center justify-center gap-2 text-zinc-400 text-xs">
+            <h1 className="text-foreground font-semibold text-sm">{session.name}</h1>
+            <div className="flex items-center justify-center gap-2 text-muted-foreground text-xs">
               <Clock className="h-3 w-3" />
               <span className="font-mono">{formatTime(elapsedTime)}</span>
             </div>
@@ -147,7 +147,7 @@ export function StrongWorkoutView({
           <Button
             variant="ghost"
             size="sm"
-            className="text-blue-400 hover:text-blue-300 hover:bg-zinc-800"
+            className="text-accent hover:text-accent/80 hover:bg-secondary"
             onClick={onFinish}
           >
             <Check className="h-4 w-4 mr-1" />
@@ -157,13 +157,13 @@ export function StrongWorkoutView({
 
         {/* Progress indicator */}
         <div className="mt-3 flex items-center gap-3">
-          <div className="flex-1 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+          <div className="flex-1 h-1.5 bg-secondary rounded-full overflow-hidden">
             <div 
-              className="h-full bg-blue-500 transition-all duration-300"
+              className="h-full bg-accent transition-all duration-300"
               style={{ width: totalSets > 0 ? `${(completedSets / totalSets) * 100}%` : '0%' }}
             />
           </div>
-          <span className="text-xs text-zinc-500">
+          <span className="text-xs text-muted-foreground">
             {completedSets}/{totalSets} sets
           </span>
         </div>
@@ -173,9 +173,9 @@ export function StrongWorkoutView({
       <div className="px-4 py-6 pb-32 space-y-4">
         {activeExercises.length === 0 ? (
           <div className="text-center py-16">
-            <Dumbbell className="h-16 w-16 mx-auto text-zinc-700 mb-4" />
-            <h2 className="text-xl font-semibold text-white mb-2">No exercises yet</h2>
-            <p className="text-zinc-500 mb-6">Add exercises to start your workout</p>
+            <Dumbbell className="h-16 w-16 mx-auto text-muted-foreground/50 mb-4" />
+            <h2 className="text-xl font-semibold text-foreground mb-2">No exercises yet</h2>
+            <p className="text-muted-foreground mb-6">Add exercises to start your workout</p>
           </div>
         ) : (
           activeExercises.map(({ exercise, sets }) => (
@@ -198,23 +198,23 @@ export function StrongWorkoutView({
         <Dialog open={showExercisePicker} onOpenChange={setShowExercisePicker}>
           <DialogTrigger asChild>
             <Button 
-              className="w-full py-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+              className="w-full py-6 bg-accent hover:bg-accent/90 text-accent-foreground font-semibold"
               size="lg"
             >
               <Plus className="h-5 w-5 mr-2" />
               Add Exercise
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-lg max-h-[85vh] bg-zinc-900 border-zinc-800">
+          <DialogContent className="max-w-lg max-h-[85vh] bg-card border-border">
             <DialogHeader>
-              <DialogTitle className="text-white">Add Exercise</DialogTitle>
+              <DialogTitle className="text-foreground">Add Exercise</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search exercises..."
-                  className="pl-10 bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500"
+                  className="pl-10 bg-secondary border-border text-foreground placeholder:text-muted-foreground"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -227,8 +227,8 @@ export function StrongWorkoutView({
                       variant={selectedMuscle === muscle ? 'default' : 'outline'}
                       className={`cursor-pointer capitalize whitespace-nowrap ${
                         selectedMuscle === muscle 
-                          ? 'bg-blue-600 hover:bg-blue-700' 
-                          : 'border-zinc-700 text-zinc-400 hover:text-white'
+                          ? 'bg-accent hover:bg-accent/90 text-accent-foreground' 
+                          : 'border-border text-muted-foreground hover:text-foreground'
                       }`}
                       onClick={() => setSelectedMuscle(muscle)}
                     >
@@ -242,7 +242,7 @@ export function StrongWorkoutView({
                   {filteredExercises.map(exercise => (
                     <button
                       key={exercise.id}
-                      className="w-full p-3 text-left hover:bg-zinc-800 rounded-lg flex items-center justify-between group"
+                      className="w-full p-3 text-left hover:bg-secondary rounded-lg flex items-center justify-between group"
                       onClick={() => {
                         onAddExercise(exercise);
                         setShowExercisePicker(false);
@@ -251,12 +251,12 @@ export function StrongWorkoutView({
                       }}
                     >
                       <div>
-                        <p className="font-medium text-white">{exercise.name}</p>
-                        <p className="text-sm text-zinc-500 capitalize">
+                        <p className="font-medium text-foreground">{exercise.name}</p>
+                        <p className="text-sm text-muted-foreground capitalize">
                           {exercise.muscle_group} • {exercise.equipment}
                         </p>
                       </div>
-                      <ChevronRight className="h-4 w-4 text-zinc-600 group-hover:text-zinc-400" />
+                      <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground" />
                     </button>
                   ))}
                 </div>
@@ -269,7 +269,7 @@ export function StrongWorkoutView({
         {activeExercises.length > 0 && (
           <Button
             variant="outline"
-            className="w-full border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-800"
+            className="w-full border-border text-muted-foreground hover:text-foreground hover:bg-secondary"
             onClick={onSaveAsTemplate}
           >
             <Save className="h-4 w-4 mr-2" />
