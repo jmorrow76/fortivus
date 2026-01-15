@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,10 @@ const Pricing = () => {
   const [loading, setLoading] = useState<string | null>(null);
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
   const { isNativeIOS, purchasing, purchaseSubscription, restorePurchases } = useAppleIAP();
+  
+  // Check if user is subscribed (including iOS purchases)
+  const isSubscribed = subscription.subscribed;
+  const isIOSPurchase = subscription.productId === 'ios_purchase';
 
   const handleSubscribe = async (planName: string) => {
     if (!user || !session) {
@@ -164,7 +168,7 @@ const Pricing = () => {
     (FORTIVUS_ELITE.monthly.price * 12)) * 100
   );
 
-  const isOnFreePlan = user && !subscription.subscribed;
+  const isOnFreePlan = user && !isSubscribed;
   
   const plans = [
     {
@@ -214,11 +218,11 @@ const Pricing = () => {
         "Executive performance mode",
         "Priority support",
       ],
-      cta: subscription.subscribed ? "Your Plan" : "Start Elite Membership",
+      cta: isSubscribed ? "Your Plan" : "Start Elite Membership",
       variant: "default" as const,
       popular: true,
-      disabled: subscription.subscribed,
-      isCurrentPlan: subscription.subscribed,
+      disabled: isSubscribed,
+      isCurrentPlan: isSubscribed,
     },
     {
       name: "Annual",
@@ -232,11 +236,11 @@ const Pricing = () => {
         "Priority support",
         "Lock in current pricing",
       ],
-      cta: subscription.subscribed ? "Your Plan" : "Start Annual Membership",
+      cta: isSubscribed ? "Your Plan" : "Start Annual Membership",
       variant: "outline" as const,
       popular: false,
-      disabled: subscription.subscribed && billingCycle === "yearly",
-      isCurrentPlan: subscription.subscribed && billingCycle === "yearly",
+      disabled: isSubscribed && billingCycle === "yearly",
+      isCurrentPlan: isSubscribed && billingCycle === "yearly",
     },
   ];
 
@@ -260,7 +264,7 @@ const Pricing = () => {
           </div>
           
           {/* iOS Restore Purchases */}
-          {isNativeIOS && !subscription.subscribed && (
+          {isNativeIOS && !isSubscribed && (
             <div className="mt-4 flex justify-center">
               <Button
                 variant="ghost"
