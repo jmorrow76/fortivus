@@ -29,10 +29,12 @@ const Profile = () => {
   const { isNative, loading: cameraLoading, getPhotoWithPrompt, error: cameraError } = useNativeCamera();
   const { isNativeIOS } = useAppleIAP();
   const isManualGrant = subscription.productId === 'manual_grant';
+  const isIOSPurchase = subscription.productId === 'ios_purchase';
   const isElite = subscription.subscribed && (
     subscription.productId === FORTIVUS_ELITE.monthly.product_id ||
     subscription.productId === FORTIVUS_ELITE.yearly.product_id ||
-    isManualGrant
+    isManualGrant ||
+    isIOSPurchase
   );
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -361,7 +363,7 @@ const Profile = () => {
                       <Sparkles className="h-4 w-4 text-accent" />
                       Complimentary membership
                     </span>
-                  ) : isNativeIOS ? (
+                  ) : isIOSPurchase || isNativeIOS ? (
                     // iOS users manage via App Store
                     <div className="flex flex-col gap-2">
                       <p className="text-xs text-muted-foreground">
@@ -413,6 +415,32 @@ const Profile = () => {
                   </Button>
                 </div>
               )}
+            </CardContent>
+          </Card>
+
+          {/* Account Management Card - Prominent for App Store compliance */}
+          <Card className="shadow-card mb-6">
+            <CardHeader className="pb-3">
+              <CardTitle className="font-heading text-lg flex items-center gap-2">
+                <Settings className="h-5 w-5" />
+                Account Settings
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Button
+                variant="outline"
+                className="w-full justify-start"
+                onClick={() => {
+                  const deleteSection = document.getElementById('delete-account');
+                  deleteSection?.scrollIntoView({ behavior: 'smooth' });
+                }}
+              >
+                <Trash2 className="h-4 w-4 mr-2 text-destructive" />
+                Delete Account
+              </Button>
+              <p className="text-xs text-muted-foreground">
+                Permanently delete your account and all associated data
+              </p>
             </CardContent>
           </Card>
 
