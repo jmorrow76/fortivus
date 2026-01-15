@@ -419,28 +419,93 @@ const Profile = () => {
           </Card>
 
           {/* Account Management Card - Prominent for App Store compliance */}
-          <Card className="shadow-card mb-6">
+          <Card className="shadow-card mb-6" id="delete-account-card">
             <CardHeader className="pb-3">
               <CardTitle className="font-heading text-lg flex items-center gap-2">
                 <Settings className="h-5 w-5" />
-                Account Settings
+                Account Management
               </CardTitle>
+              <CardDescription>
+                Manage your account settings
+              </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <Button
-                variant="outline"
-                className="w-full justify-start"
-                onClick={() => {
-                  const deleteSection = document.getElementById('delete-account');
-                  deleteSection?.scrollIntoView({ behavior: 'smooth' });
-                }}
-              >
-                <Trash2 className="h-4 w-4 mr-2 text-destructive" />
-                Delete Account
-              </Button>
-              <p className="text-xs text-muted-foreground">
-                Permanently delete your account and all associated data
-              </p>
+            <CardContent className="space-y-4">
+              {/* Direct Delete Account Button with Dialog - Apple App Store Compliance */}
+              <div className="p-4 bg-destructive/5 rounded-lg border border-destructive/20">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="p-2 bg-destructive/10 rounded-lg">
+                    <Trash2 className="h-5 w-5 text-destructive" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-destructive">Delete Account</h4>
+                    <p className="text-xs text-muted-foreground">
+                      Permanently remove your account and all data
+                    </p>
+                  </div>
+                </div>
+                
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button 
+                      variant="destructive" 
+                      className="w-full gap-2"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Delete My Account
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle className="flex items-center gap-2">
+                        <AlertTriangle className="h-5 w-5 text-destructive" />
+                        Delete Your Account?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription className="space-y-4">
+                        <p>
+                          This action cannot be undone. This will permanently delete your account and remove all your data from our servers.
+                        </p>
+                        <ul className="text-sm mt-2 ml-4 list-disc space-y-1">
+                          <li>Your profile and personal information</li>
+                          <li>All workout history and progress photos</li>
+                          <li>Saved plans, goals, and achievements</li>
+                          <li>Any active subscriptions will be cancelled</li>
+                        </ul>
+                        <div className="space-y-2 pt-2">
+                          <p className="text-sm font-medium text-foreground">
+                            Type "DELETE" to confirm:
+                          </p>
+                          <input
+                            type="text"
+                            value={deleteConfirmText}
+                            onChange={(e) => setDeleteConfirmText(e.target.value.toUpperCase())}
+                            placeholder="DELETE"
+                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                          />
+                        </div>
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel onClick={() => setDeleteConfirmText("")}>
+                        Cancel
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleDeleteAccount}
+                        disabled={deleteConfirmText !== "DELETE" || deletingAccount}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        {deletingAccount ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Deleting...
+                          </>
+                        ) : (
+                          "Permanently Delete Account"
+                        )}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
             </CardContent>
           </Card>
 
