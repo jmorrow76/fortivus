@@ -263,6 +263,21 @@ const Pricing = () => {
             </span>
           </div>
           
+          {/* iOS App Store Notice - Make it clear IAP is used */}
+          {isNativeIOS && (
+            <div className="mt-4 p-4 bg-secondary/50 rounded-lg border border-border">
+              <div className="flex items-center gap-3 justify-center">
+                <Apple className="h-5 w-5 text-foreground" />
+                <div className="text-sm">
+                  <p className="font-medium">Subscriptions are managed through the App Store</p>
+                  <p className="text-muted-foreground text-xs">
+                    Payment will be charged to your Apple ID account
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+          
           {/* iOS Restore Purchases */}
           {isNativeIOS && !isSubscribed && (
             <div className="mt-4 flex justify-center">
@@ -393,8 +408,10 @@ const Pricing = () => {
                   >
                     {loading === plan.name ? (
                       <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    ) : isNativeIOS && plan.name !== "Free" ? (
+                      <Apple className="h-4 w-4 mr-2" />
                     ) : null}
-                    {plan.cta}
+                    {isNativeIOS && plan.name !== "Free" ? "Subscribe with Apple" : plan.cta}
                   </Button>
                 )}
               </CardContent>
