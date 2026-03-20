@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Zap, X, Footprints, Dumbbell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
+import { haptics } from '@/hooks/useNativeFeatures';
 
 const QuickStartFAB = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,12 +13,19 @@ const QuickStartFAB = () => {
 
   if (!user) return null;
 
+  const handleToggle = () => {
+    haptics.light();
+    setIsOpen(!isOpen);
+  };
+
   const handleStartRun = () => {
+    haptics.medium();
     setIsOpen(false);
     navigate('/running');
   };
 
   const handleStartWorkout = () => {
+    haptics.medium();
     setIsOpen(false);
     navigate('/workouts');
   };
