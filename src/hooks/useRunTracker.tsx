@@ -92,7 +92,7 @@ export const useRunTracker = (): UseRunTrackerReturn => {
   const [error, setError] = useState<string | null>(null);
   
   const watchIdRef = useRef<string | number | null>(null);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const pausedDurationRef = useRef<number>(0);
   const isNative = isNativePlatform();
 
