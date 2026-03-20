@@ -12,6 +12,7 @@ import { StrongExerciseCard } from './StrongExerciseCard';
 import { RestTimerOverlay } from './RestTimerOverlay';
 import PRCelebration from '@/components/PRCelebration';
 import { WorkoutSession, Exercise, ActiveWorkoutExercise, PRCelebrationData } from '@/hooks/useWorkoutTracker';
+import { haptics } from '@/hooks/useNativeFeatures';
 
 interface StrongWorkoutViewProps {
   session: WorkoutSession;
