@@ -150,7 +150,7 @@ export function StrongWorkoutView({
             variant="ghost"
             size="sm"
             className="text-accent hover:text-accent/80 hover:bg-secondary"
-            onClick={onFinish}
+            onClick={() => { haptics.success(); onFinish(); }}
           >
             <Check className="h-4 w-4 mr-1" />
             Finish
