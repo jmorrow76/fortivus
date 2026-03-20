@@ -12,6 +12,7 @@ import { StrongExerciseCard } from './StrongExerciseCard';
 import { RestTimerOverlay } from './RestTimerOverlay';
 import PRCelebration from '@/components/PRCelebration';
 import { WorkoutSession, Exercise, ActiveWorkoutExercise, PRCelebrationData } from '@/hooks/useWorkoutTracker';
+import { haptics } from '@/hooks/useNativeFeatures';
 
 interface StrongWorkoutViewProps {
   session: WorkoutSession;
@@ -84,6 +85,7 @@ export function StrongWorkoutView({
   });
 
   const handleCompleteSet = (setId: string, reps: number, weight: number) => {
+    haptics.medium();
     onCompleteSet(setId, reps, weight);
     setRestDuration(90);
     setShowRestTimer(true);
@@ -148,7 +150,7 @@ export function StrongWorkoutView({
             variant="ghost"
             size="sm"
             className="text-accent hover:text-accent/80 hover:bg-secondary"
-            onClick={onFinish}
+            onClick={() => { haptics.success(); onFinish(); }}
           >
             <Check className="h-4 w-4 mr-1" />
             Finish

@@ -145,7 +145,7 @@ export const RunTracker = () => {
   const [intervalPhase, setIntervalPhase] = useState<'work' | 'rest'>('work');
   const [intervalTimeRemaining, setIntervalTimeRemaining] = useState(0);
   const [completedIntervals, setCompletedIntervals] = useState(0);
-  const intervalTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   
   // Weekly goal state
   const [weeklyGoal, setWeeklyGoal] = useState<{ 
