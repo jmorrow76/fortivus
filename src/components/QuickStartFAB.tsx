@@ -71,7 +71,7 @@ const QuickStartFAB = () => {
 
       <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
         <Button
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={handleToggle}
           size="icon"
           className="h-14 w-14 rounded-full shadow-xl"
         >

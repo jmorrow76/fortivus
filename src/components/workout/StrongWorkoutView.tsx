@@ -85,6 +85,7 @@ export function StrongWorkoutView({
   });
 
   const handleCompleteSet = (setId: string, reps: number, weight: number) => {
+    haptics.medium();
     onCompleteSet(setId, reps, weight);
     setRestDuration(90);
     setShowRestTimer(true);
