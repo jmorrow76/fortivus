@@ -43,7 +43,7 @@ const Programs = () => {
             Programs Built for <span className="text-accent">Your Stage of Life</span>
           </h2>
           <p className="section-description">
-            Each program is designed with recovery, joint health, and hormonal
+            Each program is designed with recovery, longevity, and sustainable
             optimization in mind. No more generic workouts.
           </p>
         </div>
