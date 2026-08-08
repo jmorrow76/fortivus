@@ -340,28 +340,8 @@ const MyProgress = () => {
           <div className="md:hidden mb-6" data-tour="mobile-quick-actions">
             <div className="grid grid-cols-3 gap-2 mb-4">
               {/* Start Workout */}
-              <Link to="/workouts">
-                <Card className="bg-gradient-to-br from-primary/20 to-primary/5 border-primary/30 hover:border-primary/50 transition-all h-full">
-                  <CardContent className="p-3 flex flex-col items-center justify-center text-center gap-1.5 min-h-[90px]">
-                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                      <Dumbbell className="h-5 w-5 text-primary" />
-                    </div>
-                    <span className="font-semibold text-xs">Workout</span>
-                  </CardContent>
-                </Card>
-              </Link>
               
               {/* Track Run */}
-              <Link to="/running">
-                <Card className="bg-gradient-to-br from-green-500/20 to-green-500/5 border-green-500/30 hover:border-green-500/50 transition-all h-full">
-                  <CardContent className="p-3 flex flex-col items-center justify-center text-center gap-1.5 min-h-[90px]">
-                    <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
-                      <MapPin className="h-5 w-5 text-green-500" />
-                    </div>
-                    <span className="font-semibold text-xs">Run</span>
-                  </CardContent>
-                </Card>
-              </Link>
               
               
               {/* Daily Check-in */}
@@ -504,16 +484,6 @@ const MyProgress = () => {
               </Link>
               
               
-              <Link to="/workouts" className="group">
-                <Card className="h-full transition-all hover:shadow-md hover:border-primary/30">
-                  <CardContent className="p-4 flex flex-col items-center text-center gap-2">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                      <Dumbbell className="h-5 w-5 text-primary" />
-                    </div>
-                    <span className="text-sm font-medium">Start Workout</span>
-                  </CardContent>
-                </Card>
-              </Link>
               
               <Link to="/body-analysis" className="group">
                 <Card className="h-full transition-all hover:shadow-md hover:border-primary/30">
@@ -526,16 +496,6 @@ const MyProgress = () => {
                 </Card>
               </Link>
               
-              <Link to="/running" className="group">
-                <Card className="h-full transition-all hover:shadow-md hover:border-primary/30">
-                  <CardContent className="p-4 flex flex-col items-center text-center gap-2">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                      <TrendingUp className="h-5 w-5 text-primary" />
-                    </div>
-                    <span className="text-sm font-medium">Track a Run</span>
-                  </CardContent>
-                </Card>
-              </Link>
               
               <Link to="/checkin" className="group">
                 <Card className="h-full transition-all hover:shadow-md hover:border-primary/30">
@@ -549,73 +509,13 @@ const MyProgress = () => {
               </Link>
               
               
-              <Link to="/sleep-adaptive" className="group">
-                <Card className="h-full transition-all hover:shadow-md hover:border-primary/30">
-                  <CardContent className="p-4 flex flex-col items-center text-center gap-2">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                      <Moon className="h-5 w-5 text-primary" />
-                    </div>
-                    <span className="text-sm font-medium">Optimize Sleep</span>
-                  </CardContent>
-                </Card>
-              </Link>
               
               
-              <Link to="/comeback" className="group">
-                <Card className="h-full transition-all hover:shadow-md hover:border-primary/30">
-                  <CardContent className="p-4 flex flex-col items-center text-center gap-2">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                      <RotateCcw className="h-5 w-5 text-primary" />
-                    </div>
-                    <span className="text-sm font-medium">Start Comeback Protocol</span>
-                  </CardContent>
-                </Card>
-              </Link>
               
-              <Link to="/executive-mode" className="group">
-                <Card className="h-full transition-all hover:shadow-md hover:border-primary/30">
-                  <CardContent className="p-4 flex flex-col items-center text-center gap-2">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                      <Briefcase className="h-5 w-5 text-primary" />
-                    </div>
-                    <span className="text-sm font-medium">Executive Performance</span>
-                  </CardContent>
-                </Card>
-              </Link>
               
             </div>
           </div>
 
-          {/* MOBILE: More Actions - Collapsible list of additional features */}
-          <div className="md:hidden mb-6">
-            <h2 className="font-heading text-base font-semibold mb-3">More Tools</h2>
-            <div className="grid grid-cols-3 gap-2">
-              <Link to="/sleep-adaptive" className="group">
-                <Card className="hover:border-primary/30 transition-all">
-                  <CardContent className="p-3 flex flex-col items-center text-center gap-1">
-                    <Moon className="h-5 w-5 text-primary" />
-                    <span className="text-xs">Sleep</span>
-                  </CardContent>
-                </Card>
-              </Link>
-              <Link to="/comeback" className="group">
-                <Card className="hover:border-primary/30 transition-all">
-                  <CardContent className="p-3 flex flex-col items-center text-center gap-1">
-                    <RotateCcw className="h-5 w-5 text-primary" />
-                    <span className="text-xs">Comeback</span>
-                  </CardContent>
-                </Card>
-              </Link>
-              <Link to="/executive-mode" className="group">
-                <Card className="hover:border-primary/30 transition-all">
-                  <CardContent className="p-3 flex flex-col items-center text-center gap-1">
-                    <Briefcase className="h-5 w-5 text-primary" />
-                    <span className="text-xs">Executive</span>
-                  </CardContent>
-                </Card>
-              </Link>
-            </div>
-          </div>
 
         </div>
       </main>

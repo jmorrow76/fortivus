@@ -428,7 +428,7 @@ const PersonalPlan = () => {
           <Button 
             variant="outline" 
             size="sm" 
-            onClick={() => navigate("/workouts")}
+            onClick={() => navigate("/dashboard")}
             className="ml-2"
           >
             Go to Workouts
@@ -554,7 +554,7 @@ const PersonalPlan = () => {
           <Button 
             variant="outline" 
             size="sm" 
-            onClick={() => navigate("/workouts")}
+            onClick={() => navigate("/dashboard")}
             className="ml-2"
           >
             Go to Workouts

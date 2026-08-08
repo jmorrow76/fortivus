@@ -49,7 +49,6 @@ import SupportButton from "./components/SupportButton";
 import ReferralButton from "./components/ReferralButton";
 import BackToTopButton from "./components/BackToTopButton";
 import ScrollToTop from "./components/ScrollToTop";
-import QuickStartFAB from "./components/QuickStartFAB";
 import { QuickActionsProvider } from "./components/QuickActionsProvider";
 
 const queryClient = new QueryClient();
@@ -66,7 +65,6 @@ const App = () => (
         <BrowserRouter>
           <QuickActionsProvider />
           <ScrollToTop />
-          <QuickStartFAB />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/dashboard" element={<Dashboard />} />
@@ -87,15 +85,10 @@ const App = () => (
             <Route path="/knowledge" element={<KnowledgeHub />} />
             <Route path="/knowledge/:slug" element={<ArticleDetail />} />
             <Route path="/pricing" element={<PricingPage />} />
-            <Route path="/subscription-success" element={<SubscriptionSuccess />} />
-            <Route path="/workouts" element={<Workouts />} />
-            <Route path="/running" element={<Running />} />
+            <Route path="/subscription-success" element={<SubscriptionSuccess />} />} />} />
             <Route path="/coaching" element={<Coaching />} />
             <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/unsubscribe" element={<Unsubscribe />} />
-            <Route path="/sleep-adaptive" element={<SleepAdaptive />} />
-            <Route path="/comeback" element={<ComebackProtocol />} />
-            <Route path="/executive-mode" element={<ExecutiveMode />} />
+            <Route path="/unsubscribe" element={<Unsubscribe />} />} />} />} />
             <Route path="/messages" element={<Messages />} />
             <Route path="/accountability" element={<AccountabilityPartners />} />
             <Route path="/testimonies" element={<Testimonies />} />

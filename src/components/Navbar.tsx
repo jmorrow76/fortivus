@@ -33,11 +33,6 @@ const Navbar = () => {
   const eliteFeatures = [
     { name: "Fitness Journey", href: "/my-progress", icon: Crown, highlight: true },
     { name: "AI Coach", href: "/coaching", icon: MessageCircle },
-    { name: "Workouts", href: "/workouts", icon: Dumbbell },
-    { name: "Run Tracker", href: "/running", icon: MapPin },
-    { name: "Sleep-Adaptive Workouts", href: "/sleep-adaptive", icon: Moon },
-    { name: "Comeback Protocol", href: "/comeback", icon: RotateCcw },
-    { name: "Executive Performance", href: "/executive-mode", icon: Briefcase },
   ];
 
   const navLinks = [

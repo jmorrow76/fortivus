@@ -10,15 +10,8 @@ const footerLinks = {
   ],
   "Elite Features": [
     { label: "AI Coach", href: "/coaching" },
-    { label: "Workouts", href: "/workouts" },
-    { label: "Run Tracker", href: "/running" },
     { label: "Body Analysis", href: "/body-analysis" },
     { label: "Progress Photos", href: "/progress" },
-  ],
-  "More Features": [
-    { label: "Sleep-Adaptive Workouts", href: "/sleep-adaptive" },
-    { label: "Comeback Protocol", href: "/comeback" },
-    { label: "Executive Performance", href: "/executive-mode" },
   ],
   Company: [
     { label: "About Us", href: "/about" },
