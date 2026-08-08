@@ -39,18 +39,6 @@ const eliteFeatures = [
     link: "/personal-plan",
   },
   {
-    icon: Dumbbell,
-    title: "Advanced Workout Tracker",
-    description: "Log every set, rep, and weight. Track personal records, view progress charts, and follow structured programs.",
-    link: "/workouts",
-  },
-  {
-    icon: MapPin,
-    title: "GPS Running Tracker",
-    description: "Map your runs with live GPS, track pace and distance, compete on leaderboards, and earn running badges.",
-    link: "/running",
-  },
-  {
     icon: Heart,
     title: "Wearable Integration",
     description: "Sync Apple Health or Google Fit to import steps, heart rate, and sleep data for holistic health tracking.",
@@ -71,29 +59,7 @@ const eliteFeatures = [
   },
 ];
 
-const advancedEliteFeatures = [
-  {
-    icon: Moon,
-    title: "Sleep-Adaptive Workouts",
-    description: "AI automatically modifies your workouts based on sleep quality, HRV, and recovery metrics. Never push too hard when your body needs rest.",
-    highlight: "New",
-    link: "/sleep-adaptive",
-  },
-  {
-    icon: RotateCcw,
-    title: "Comeback Protocol",
-    description: "Smart return-to-fitness guidance after breaks due to injury, illness, or life. Get a personalized 4-week protocol to rebuild safely.",
-    highlight: "New",
-    link: "/comeback",
-  },
-  {
-    icon: Briefcase,
-    title: "Executive Performance Mode",
-    description: "Cognitive optimization for busy executives. Integrate fitness with demanding work schedules and maintain peak mental performance.",
-    highlight: "New",
-    link: "/executive-mode",
-  },
-];
+const advancedEliteFeatures: typeof eliteFeatures = [];
 
 const freeFeatures = [
   {

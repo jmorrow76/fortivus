@@ -87,15 +87,10 @@ const App = () => (
             <Route path="/knowledge" element={<KnowledgeHub />} />
             <Route path="/knowledge/:slug" element={<ArticleDetail />} />
             <Route path="/pricing" element={<PricingPage />} />
-            <Route path="/subscription-success" element={<SubscriptionSuccess />} />
-            <Route path="/workouts" element={<Workouts />} />
-            <Route path="/running" element={<Running />} />
+            <Route path="/subscription-success" element={<SubscriptionSuccess />} />} />} />
             <Route path="/coaching" element={<Coaching />} />
             <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/unsubscribe" element={<Unsubscribe />} />
-            <Route path="/sleep-adaptive" element={<SleepAdaptive />} />
-            <Route path="/comeback" element={<ComebackProtocol />} />
-            <Route path="/executive-mode" element={<ExecutiveMode />} />
+            <Route path="/unsubscribe" element={<Unsubscribe />} />} />} />} />
             <Route path="/messages" element={<Messages />} />
             <Route path="/accountability" element={<AccountabilityPartners />} />
             <Route path="/testimonies" element={<Testimonies />} />
