@@ -516,12 +516,6 @@ const MyProgress = () => {
             </div>
           </div>
 
-          {/* MOBILE: More Actions - Collapsible list of additional features */}
-          <div className="md:hidden mb-6">
-            <h2 className="font-heading text-base font-semibold mb-3">More Tools</h2>
-            <div className="grid grid-cols-3 gap-2">
-            </div>
-          </div>
 
         </div>
       </main>

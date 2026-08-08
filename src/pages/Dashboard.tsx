@@ -419,8 +419,6 @@ export default function Dashboard() {
                     </CardTitle>
                     <CardDescription className="text-xs md:text-sm">Your workout activity</CardDescription>
                   </div>
-                  <Button variant="ghost" size="sm" className="text-xs" asChild>
-                  </Button>
                 </CardHeader>
                 <CardContent className="pt-0">
                   <div className="grid grid-cols-3 gap-2 md:gap-4">
@@ -463,8 +461,6 @@ export default function Dashboard() {
                     </CardTitle>
                     <CardDescription className="text-xs md:text-sm">Your running achievements</CardDescription>
                   </div>
-                  <Button variant="ghost" size="sm" className="text-xs" asChild>
-                  </Button>
                 </CardHeader>
                 <CardContent className="pt-0">
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
@@ -504,8 +500,6 @@ export default function Dashboard() {
                       </CardTitle>
                       <CardDescription>{exerciseChart.exerciseName} • PR: {exerciseChart.maxWeight} lbs</CardDescription>
                     </div>
-                    <Button variant="ghost" size="sm" asChild>
-                    </Button>
                   </CardHeader>
                   <CardContent>
                     <div className="h-[180px]">
@@ -554,16 +548,12 @@ export default function Dashboard() {
                     </CardTitle>
                     <CardDescription>Your latest PRs</CardDescription>
                   </div>
-                  <Button variant="ghost" size="sm" asChild>
-                  </Button>
                 </CardHeader>
                 <CardContent>
                   {recentPRs.length === 0 ? (
                     <div className="text-center py-6 text-muted-foreground">
                       <Trophy className="h-8 w-8 mx-auto mb-2 opacity-50" />
                       <p>No PRs yet</p>
-                      <Button variant="link" asChild>
-                      </Button>
                     </div>
                   ) : (
                     <div className="space-y-3">
