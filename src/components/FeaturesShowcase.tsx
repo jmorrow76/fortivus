@@ -28,14 +28,14 @@ const eliteFeatures = [
   {
     icon: Camera,
     title: "AI Body Analysis",
-    description: "Upload a photo and get instant body composition insights with clinical-grade accuracy. Track changes over time.",
+    description: "Upload a photo and get instant body composition insights. Track changes over time.",
     highlight: "Most Popular",
     link: "/body-analysis",
   },
   {
     icon: Brain,
     title: "AI Personal Plan",
-    description: "Get a fully customized workout, nutrition, and supplement protocol based on your unique goals and body type.",
+    description: "Get a fully customized workout program based on your unique goals and training experience.",
     link: "/personal-plan",
   },
   {
@@ -43,13 +43,6 @@ const eliteFeatures = [
     title: "Advanced Workout Tracker",
     description: "Log every set, rep, and weight. Track personal records, view progress charts, and follow structured programs.",
     link: "/workouts",
-  },
-  {
-    icon: Salad,
-    title: "AI Calorie Tracking",
-    description: "Snap food photos, scan nutrition labels & barcodes, or analyze restaurant menus for instant AI calorie estimates. Smart logging with 100+ foods and custom macro goals.",
-    highlight: "New",
-    link: "/calorie-tracking",
   },
   {
     icon: MapPin,
@@ -79,20 +72,6 @@ const eliteFeatures = [
 ];
 
 const advancedEliteFeatures = [
-  {
-    icon: Battery,
-    title: "Hormonal Cycle Optimization",
-    description: "AI-powered testosterone optimization with personalized training and nutrition adjustments based on your natural hormonal fluctuations.",
-    highlight: "New",
-    link: "/hormonal",
-  },
-  {
-    icon: Shield,
-    title: "Joint Health Analytics",
-    description: "Predictive injury risk analysis that identifies potential issues before they happen. Get smart exercise modifications and mobility protocols.",
-    highlight: "New",
-    link: "/joint-health",
-  },
   {
     icon: Moon,
     title: "Sleep-Adaptive Workouts",
@@ -138,7 +117,7 @@ const freeFeatures = [
   {
     icon: Calendar,
     title: "Knowledge Hub",
-    description: "Access expert articles on training, nutrition, and recovery tailored for men over 40.",
+    description: "Access expert articles on training, recovery, and mindset tailored for men over 40.",
     link: "/knowledge-hub",
   },
 ];
@@ -154,7 +133,7 @@ const FeaturesShowcase = () => {
             Everything You Need to <span className="text-accent">Steward Well</span>
           </h2>
           <p className="section-description">
-            Fortivus combines AI-powered personalization with proven training science—all grounded in the calling to honor God with your body.
+            Fortivus combines AI-powered personalization with proven training principles—all grounded in the calling to honor God with your body.
           </p>
         </div>
 
