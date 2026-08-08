@@ -12,13 +12,10 @@ const footerLinks = {
     { label: "AI Coach", href: "/coaching" },
     { label: "Workouts", href: "/workouts" },
     { label: "Run Tracker", href: "/running" },
-    { label: "Calorie Tracker", href: "/calories" },
     { label: "Body Analysis", href: "/body-analysis" },
     { label: "Progress Photos", href: "/progress" },
   ],
   "More Features": [
-    { label: "Hormonal Optimization", href: "/hormonal" },
-    { label: "Joint Health Analytics", href: "/joint-health" },
     { label: "Sleep-Adaptive Workouts", href: "/sleep-adaptive" },
     { label: "Comeback Protocol", href: "/comeback" },
     { label: "Executive Performance", href: "/executive-mode" },
