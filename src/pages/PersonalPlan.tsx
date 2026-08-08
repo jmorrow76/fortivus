@@ -646,7 +646,7 @@ const PersonalPlan = () => {
               </div>
               <h2 className="font-heading text-2xl font-bold mb-3">Elite Feature</h2>
               <p className="text-muted-foreground mb-6">
-                AI Personal Plans are available exclusively to Fortivus Elite members. Get custom diet, workout, and supplement recommendations tailored to your goals.
+                AI Personal Plans are available exclusively to Fortivus Elite members. Get a custom workout program tailored to your goals.
               </p>
               <Button onClick={() => navigate("/#pricing")} size="lg">
                 <Sparkles className="h-4 w-4 mr-2" />
@@ -677,7 +677,7 @@ const PersonalPlan = () => {
               Your Personal Plan
             </h1>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Get a custom diet, workout, and supplement protocol designed specifically for your goals and lifestyle.
+              Get a custom workout program designed specifically for your goals and lifestyle.
             </p>
           </div>
 
@@ -933,16 +933,8 @@ const PersonalPlan = () => {
                     <CardContent className="pt-6">
                       <div className="flex flex-wrap gap-6 justify-center text-center">
                         <div>
-                          <div className="text-2xl font-bold text-accent">{plan.diet.dailyCalories}</div>
-                          <div className="text-sm text-muted-foreground">Daily Calories</div>
-                        </div>
-                        <div>
                           <div className="text-2xl font-bold text-accent">{plan.workout.daysPerWeek}</div>
                           <div className="text-sm text-muted-foreground">Days/Week</div>
-                        </div>
-                        <div>
-                          <div className="text-2xl font-bold text-accent">{plan.supplements.length}</div>
-                          <div className="text-sm text-muted-foreground">Supplements</div>
                         </div>
                       </div>
                       <div className="mt-4 pt-4 border-t border-border text-center">
@@ -974,74 +966,6 @@ const PersonalPlan = () => {
                         ))}
                       </ul>
                     </CardContent>
-                  </Card>
-
-                  {/* Diet Section */}
-                  <Card>
-                    <CardHeader
-                      className="cursor-pointer"
-                      onClick={() => toggleSection("diet")}
-                    >
-                      <CardTitle className="flex items-center justify-between">
-                        <span className="flex items-center gap-2">
-                          <Utensils className="h-5 w-5 text-accent" />
-                          Diet Plan
-                        </span>
-                        {expandedSections.diet ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
-                      </CardTitle>
-                    </CardHeader>
-                    {expandedSections.diet && (
-                      <CardContent className="space-y-6">
-                        {/* Macros */}
-                        <div className="grid grid-cols-3 gap-4">
-                          <div className="text-center p-4 rounded-lg bg-secondary">
-                            <div className="text-xl font-bold">{plan.diet.macros.protein}g</div>
-                            <div className="text-sm text-muted-foreground">Protein</div>
-                          </div>
-                          <div className="text-center p-4 rounded-lg bg-secondary">
-                            <div className="text-xl font-bold">{plan.diet.macros.carbs}g</div>
-                            <div className="text-sm text-muted-foreground">Carbs</div>
-                          </div>
-                          <div className="text-center p-4 rounded-lg bg-secondary">
-                            <div className="text-xl font-bold">{plan.diet.macros.fats}g</div>
-                            <div className="text-sm text-muted-foreground">Fats</div>
-                          </div>
-                        </div>
-
-                        {/* Meal Plan */}
-                        <div>
-                          <h4 className="font-semibold mb-3">Sample Meal Plan</h4>
-                          <div className="space-y-3">
-                            {plan.diet.mealPlan.map((meal, idx) => (
-                              <div key={idx} className="p-4 rounded-lg border border-border">
-                                <div className="flex justify-between items-center mb-2">
-                                  <span className="font-medium">{meal.meal}</span>
-                                  <span className="text-sm text-muted-foreground">{meal.calories} cal</span>
-                                </div>
-                                <ul className="text-sm text-muted-foreground list-disc list-inside">
-                                  {meal.foods.map((food, i) => (
-                                    <li key={i}>{food}</li>
-                                  ))}
-                                </ul>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* Tips */}
-                        <div>
-                          <h4 className="font-semibold mb-3">Nutrition Tips</h4>
-                          <ul className="space-y-2">
-                            {plan.diet.tips.map((tip, idx) => (
-                              <li key={idx} className="flex items-start gap-2 text-sm">
-                                <span className="text-accent">•</span>
-                                {tip}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </CardContent>
-                    )}
                   </Card>
 
                   {/* Workout Section */}
@@ -1125,7 +1049,7 @@ const PersonalPlan = () => {
                     )}
                   </Card>
 
-                  {/* Supplements Section */}
+                  {/* Gear Section */}
                   <Card>
                     <CardHeader
                       className="cursor-pointer"
@@ -1133,66 +1057,17 @@ const PersonalPlan = () => {
                     >
                       <CardTitle className="flex items-center justify-between">
                         <span className="flex items-center gap-2">
-                          <Pill className="h-5 w-5 text-accent" />
-                          Supplement Protocol
+                          <ShoppingBag className="h-5 w-5 text-accent" />
+                          Recommended Gear
                         </span>
                         {expandedSections.supplements ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
                       </CardTitle>
                     </CardHeader>
                     {expandedSections.supplements && (
                       <CardContent className="space-y-6">
-                        <div className="space-y-4">
-                          {plan.supplements.map((supp, idx) => (
-                            <div key={idx} className="p-4 rounded-lg border border-border">
-                              <div className="flex justify-between items-start mb-1">
-                                <div className="font-semibold">{supp.name}</div>
-                                {supp.product && (
-                                  <a 
-                                    href={supp.product.amazon_url} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1 text-sm text-accent hover:underline"
-                                  >
-                                    {supp.product.price && <span className="font-medium">{supp.product.price}</span>}
-                                    <ExternalLink className="h-3.5 w-3.5" />
-                                  </a>
-                                )}
-                              </div>
-                              <div className="grid md:grid-cols-3 gap-2 text-sm">
-                                <div>
-                                  <span className="text-muted-foreground">Dosage:</span>{" "}
-                                  {supp.dosage}
-                                </div>
-                                <div>
-                                  <span className="text-muted-foreground">Timing:</span>{" "}
-                                  {supp.timing}
-                                </div>
-                                <div className="md:col-span-3 mt-1 text-muted-foreground">
-                                  {supp.benefit}
-                                </div>
-                              </div>
-                              {supp.product && (
-                                <a 
-                                  href={supp.product.amazon_url} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-accent/10 text-accent text-sm hover:bg-accent/20 transition-colors"
-                                >
-                                  <ShoppingBag className="h-3.5 w-3.5" />
-                                  View Recommended Product
-                                </a>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-
                         {/* Recommended Gear Section */}
                         {plan.recommendedGear && plan.recommendedGear.length > 0 && (
                           <div className="pt-4 border-t border-border">
-                            <h4 className="font-semibold mb-3 flex items-center gap-2">
-                              <ShoppingBag className="h-4 w-4 text-accent" />
-                              Recommended Gear
-                            </h4>
                             <div className="space-y-3">
                               {plan.recommendedGear.map((gear, idx) => (
                                 <div key={idx} className="p-3 rounded-lg bg-secondary/50">
@@ -1287,9 +1162,7 @@ const PersonalPlan = () => {
                             </div>
                             <p className="font-medium line-clamp-2">{savedPlan.goals}</p>
                             <div className="flex gap-4 mt-2 text-sm text-muted-foreground">
-                              <span>{savedPlan.plan_data.diet.dailyCalories} cal/day</span>
                               <span>{savedPlan.plan_data.workout.daysPerWeek} days/week</span>
-                              <span>{savedPlan.plan_data.supplements.length} supplements</span>
                             </div>
                           </div>
                           <div className="flex gap-2">

@@ -8,11 +8,11 @@ import {
 const faqs = [
   {
     question: "Is Fortivus really designed for men over 40?",
-    answer: "Absolutely. Every program, nutrition guide, and recommendation is specifically tailored to the unique physiology of men in their 40s, 50s, and beyond. We account for hormonal changes, recovery needs, and joint health that generic fitness programs ignore."
+    answer: "Absolutely. Every program and training recommendation is built with men in their 40s, 50s, and beyond in mind, with a focus on sustainable progress and recovery rather than the all-out approach of generic fitness programs."
   },
   {
     question: "How is the AI body analysis different from other tools?",
-    answer: "Our AI analyzes your photos to estimate body fat percentage, identify areas of focus, and track changes over time. Unlike generic calculators, it provides personalized insights and recommendations based on your specific body composition and goals."
+    answer: "Our AI analyzes your photos to give you a visual sense of how your physique is changing over time, so you can track progress alongside your training log."
   },
   {
     question: "Can I cancel my membership anytime?",
@@ -25,10 +25,6 @@ const faqs = [
   {
     question: "How quickly will I see results?",
     answer: "Most members report noticeable improvements in energy and strength within 2-3 weeks. Visible body composition changes typically appear around 6-8 weeks with consistent effort. Our progress tracking tools help you see improvements that might otherwise go unnoticed."
-  },
-  {
-    question: "Are the supplement recommendations required?",
-    answer: "No, supplements are optional enhancements, not requirements. Our curated recommendations are evidence-based and specifically chosen for men over 40, but the core programs work effectively without them."
   },
   {
     question: "What if the program doesn't work for me?",

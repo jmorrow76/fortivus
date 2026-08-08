@@ -29,11 +29,9 @@ interface Product {
 
 const CATEGORIES = [
   { value: "all", label: "All Products" },
-  { value: "supplements", label: "Supplements" },
   { value: "equipment", label: "Equipment" },
   { value: "apparel", label: "Apparel" },
   { value: "recovery", label: "Recovery" },
-  { value: "nutrition", label: "Nutrition" },
   { value: "skincare", label: "Skin & Hair Care" },
   { value: "books", label: "Books" },
   { value: "general", label: "General" },
@@ -66,9 +64,12 @@ const Recommendations = () => {
     }
   };
 
+  const EXCLUDED_CATEGORIES = ["supplements", "nutrition"];
+  const visibleProducts = products.filter(p => !EXCLUDED_CATEGORIES.includes(p.category));
+
   const filteredProducts = selectedCategory === "all" 
-    ? products 
-    : products.filter(p => p.category === selectedCategory);
+    ? visibleProducts 
+    : visibleProducts.filter(p => p.category === selectedCategory);
 
   const featuredProducts = filteredProducts.filter(p => p.is_featured);
   const regularProducts = filteredProducts.filter(p => !p.is_featured);
@@ -84,7 +85,7 @@ const Recommendations = () => {
             My Daily Essentials
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-6">
-            These are the exact products I use every single day to support my health, training, and recovery. 
+            These are the exact products I use every single day for training and everyday life. 
             I only recommend what I personally trust and have tested.
           </p>
           

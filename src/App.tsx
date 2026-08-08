@@ -82,21 +82,17 @@ const App = () => (
             <Route path="/achievements" element={<Gamification />} />
             <Route path="/leaderboard" element={<LeaderboardPage />} />
             <Route path="/community" element={<Social />} />
-            <Route path="/supplements" element={<Supplements />} />
             <Route path="/gear" element={<Gear />} />
             <Route path="/body-analysis" element={<BodyAnalysisPage />} />
             <Route path="/knowledge" element={<KnowledgeHub />} />
             <Route path="/knowledge/:slug" element={<ArticleDetail />} />
             <Route path="/pricing" element={<PricingPage />} />
             <Route path="/subscription-success" element={<SubscriptionSuccess />} />
-            <Route path="/calories" element={<CalorieTracking />} />
             <Route path="/workouts" element={<Workouts />} />
             <Route path="/running" element={<Running />} />
             <Route path="/coaching" element={<Coaching />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/unsubscribe" element={<Unsubscribe />} />
-            <Route path="/hormonal" element={<HormonalOptimization />} />
-            <Route path="/joint-health" element={<JointHealth />} />
             <Route path="/sleep-adaptive" element={<SleepAdaptive />} />
             <Route path="/comeback" element={<ComebackProtocol />} />
             <Route path="/executive-mode" element={<ExecutiveMode />} />
@@ -108,7 +104,6 @@ const App = () => (
             <Route path="/recommendations" element={<Recommendations />} />
             <Route path="/my-progress" element={<MyProgress />} />
             <Route path="/instagram-posts" element={<InstagramPosts />} />
-            <Route path="/fasting" element={<FastingTracker />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

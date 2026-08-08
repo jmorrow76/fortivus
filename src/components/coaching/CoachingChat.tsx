@@ -38,10 +38,9 @@ const CoachingChat = ({ messages, isStreaming, onSendMessage }: CoachingChatProp
   };
 
   const suggestedPrompts = [
-    "What's the best workout split for building muscle after 40?",
-    "How should I adjust my nutrition for fat loss while preserving muscle?",
+    "What's a good workout split for building strength after 40?",
+    "How do I structure a training week around a busy schedule?",
     "I'm struggling with motivation. How do I stay consistent?",
-    "What supplements actually work for men over 40?",
   ];
 
   return (
@@ -55,8 +54,8 @@ const CoachingChat = ({ messages, isStreaming, onSendMessage }: CoachingChatProp
             <div className="text-center space-y-2">
               <h3 className="text-xl font-semibold">Your Personal AI Coach</h3>
               <p className="text-muted-foreground max-w-md">
-                Get expert guidance on training, nutrition, and mindset.
-                Ask me anything about optimizing your fitness journey.
+                Get guidance on training and mindset.
+                Ask me anything about your fitness journey.
               </p>
             </div>
             <div className="grid gap-2 w-full max-w-lg">
