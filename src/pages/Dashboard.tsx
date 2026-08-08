@@ -420,10 +420,6 @@ export default function Dashboard() {
                     <CardDescription className="text-xs md:text-sm">Your workout activity</CardDescription>
                   </div>
                   <Button variant="ghost" size="sm" className="text-xs" asChild>
-                    <Link to="/workouts" className="flex items-center gap-1">
-                      <span className="hidden md:inline">View All</span>
-                      <ChevronRight className="h-4 w-4" />
-                    </Link>
                   </Button>
                 </CardHeader>
                 <CardContent className="pt-0">
@@ -468,10 +464,6 @@ export default function Dashboard() {
                     <CardDescription className="text-xs md:text-sm">Your running achievements</CardDescription>
                   </div>
                   <Button variant="ghost" size="sm" className="text-xs" asChild>
-                    <Link to="/running" className="flex items-center gap-1">
-                      <span className="hidden md:inline">Track Run</span>
-                      <ChevronRight className="h-4 w-4" />
-                    </Link>
                   </Button>
                 </CardHeader>
                 <CardContent className="pt-0">
@@ -513,9 +505,6 @@ export default function Dashboard() {
                       <CardDescription>{exerciseChart.exerciseName} • PR: {exerciseChart.maxWeight} lbs</CardDescription>
                     </div>
                     <Button variant="ghost" size="sm" asChild>
-                      <Link to="/workouts" className="flex items-center gap-1">
-                        All Charts <ChevronRight className="h-4 w-4" />
-                      </Link>
                     </Button>
                   </CardHeader>
                   <CardContent>
@@ -566,9 +555,6 @@ export default function Dashboard() {
                     <CardDescription>Your latest PRs</CardDescription>
                   </div>
                   <Button variant="ghost" size="sm" asChild>
-                    <Link to="/workouts" className="flex items-center gap-1">
-                      View All <ChevronRight className="h-4 w-4" />
-                    </Link>
                   </Button>
                 </CardHeader>
                 <CardContent>
@@ -577,7 +563,6 @@ export default function Dashboard() {
                       <Trophy className="h-8 w-8 mx-auto mb-2 opacity-50" />
                       <p>No PRs yet</p>
                       <Button variant="link" asChild>
-                        <Link to="/workouts">Start tracking workouts</Link>
                       </Button>
                     </div>
                   ) : (
