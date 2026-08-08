@@ -31,9 +31,9 @@ export const QuickActionsProvider = () => {
             
             // Handle quick action deep links
             if (path.includes('start-run') || url.searchParams.get('action') === 'start-run') {
-              navigate('/running');
+              navigate('/dashboard');
             } else if (path.includes('start-workout') || url.searchParams.get('action') === 'start-workout') {
-              navigate('/workouts');
+              navigate('/dashboard');
             } else if (path.includes('daily-checkin') || url.searchParams.get('action') === 'checkin') {
               navigate('/daily-checkin');
             } else if (path) {
@@ -48,9 +48,9 @@ export const QuickActionsProvider = () => {
             const path = url.pathname;
             
             if (path.includes('start-run')) {
-              navigate('/running');
+              navigate('/dashboard');
             } else if (path.includes('start-workout')) {
-              navigate('/workouts');
+              navigate('/dashboard');
             } else if (path.includes('daily-checkin')) {
               navigate('/daily-checkin');
             }

@@ -49,7 +49,6 @@ import SupportButton from "./components/SupportButton";
 import ReferralButton from "./components/ReferralButton";
 import BackToTopButton from "./components/BackToTopButton";
 import ScrollToTop from "./components/ScrollToTop";
-import QuickStartFAB from "./components/QuickStartFAB";
 import { QuickActionsProvider } from "./components/QuickActionsProvider";
 
 const queryClient = new QueryClient();
@@ -66,7 +65,6 @@ const App = () => (
         <BrowserRouter>
           <QuickActionsProvider />
           <ScrollToTop />
-          <QuickStartFAB />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/dashboard" element={<Dashboard />} />
