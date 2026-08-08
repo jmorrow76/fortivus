@@ -630,10 +630,6 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
                   </div>
                   <div className="flex gap-2 mt-2">
                     <Button variant="outline" size="sm" asChild>
-                      <Link to="/fasting">
-                        <BookOpen className="h-3 w-3 mr-1" />
-                        View Fasting Tracker
-                      </Link>
                     </Button>
                   </div>
                 </AlertDescription>
@@ -797,10 +793,6 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
                 ))}
               </div>
               <Button variant="outline" asChild className="w-full">
-                <Link to="/calories">
-                  <Utensils className="h-4 w-4 mr-2" />
-                  Open Calorie Tracker
-                </Link>
               </Button>
             </TabsContent>
 

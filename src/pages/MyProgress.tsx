@@ -363,17 +363,6 @@ const MyProgress = () => {
                 </Card>
               </Link>
               
-              {/* Log Food */}
-              <Link to="/calories">
-                <Card className="bg-gradient-to-br from-orange-500/20 to-orange-500/5 border-orange-500/30 hover:border-orange-500/50 transition-all h-full">
-                  <CardContent className="p-3 flex flex-col items-center justify-center text-center gap-1.5 min-h-[90px]">
-                    <div className="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center">
-                      <Utensils className="h-5 w-5 text-orange-500" />
-                    </div>
-                    <span className="font-semibold text-xs">Log Food</span>
-                  </CardContent>
-                </Card>
-              </Link>
               
               {/* Daily Check-in */}
               <Link to="/checkin">
@@ -460,14 +449,6 @@ const MyProgress = () => {
                   </CardContent>
                 </Card>
               </Link>
-              <Link to="/fasting" className="group">
-                <Card className="hover:border-primary/30 transition-all">
-                  <CardContent className="p-3 flex flex-col items-center text-center gap-1">
-                    <Clock className="h-5 w-5 text-primary" />
-                    <span className="text-xs">Fasting</span>
-                  </CardContent>
-                </Card>
-              </Link>
               <Link to="/gamification" className="group">
                 <Card className="hover:border-primary/30 transition-all">
                   <CardContent className="p-3 flex flex-col items-center text-center gap-1">
@@ -522,16 +503,6 @@ const MyProgress = () => {
                 </Card>
               </Link>
               
-              <Link to="/calories" className="group">
-                <Card className="h-full transition-all hover:shadow-md hover:border-primary/30">
-                  <CardContent className="p-4 flex flex-col items-center text-center gap-2">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                      <Utensils className="h-5 w-5 text-primary" />
-                    </div>
-                    <span className="text-sm font-medium">Log Food</span>
-                  </CardContent>
-                </Card>
-              </Link>
               
               <Link to="/workouts" className="group">
                 <Card className="h-full transition-all hover:shadow-md hover:border-primary/30">
@@ -577,16 +548,6 @@ const MyProgress = () => {
                 </Card>
               </Link>
               
-              <Link to="/hormonal" className="group">
-                <Card className="h-full transition-all hover:shadow-md hover:border-primary/30">
-                  <CardContent className="p-4 flex flex-col items-center text-center gap-2">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                      <Activity className="h-5 w-5 text-primary" />
-                    </div>
-                    <span className="text-sm font-medium">Hormonal Optimization</span>
-                  </CardContent>
-                </Card>
-              </Link>
               
               <Link to="/sleep-adaptive" className="group">
                 <Card className="h-full transition-all hover:shadow-md hover:border-primary/30">
@@ -599,16 +560,6 @@ const MyProgress = () => {
                 </Card>
               </Link>
               
-              <Link to="/joint-health" className="group">
-                <Card className="h-full transition-all hover:shadow-md hover:border-primary/30">
-                  <CardContent className="p-4 flex flex-col items-center text-center gap-2">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                      <Shield className="h-5 w-5 text-primary" />
-                    </div>
-                    <span className="text-sm font-medium">Assess Joint Health</span>
-                  </CardContent>
-                </Card>
-              </Link>
               
               <Link to="/comeback" className="group">
                 <Card className="h-full transition-all hover:shadow-md hover:border-primary/30">
@@ -632,16 +583,6 @@ const MyProgress = () => {
                 </Card>
               </Link>
               
-              <Link to="/fasting" className="group">
-                <Card className="h-full transition-all hover:shadow-md hover:border-primary/30">
-                  <CardContent className="p-4 flex flex-col items-center text-center gap-2">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                      <Clock className="h-5 w-5 text-primary" />
-                    </div>
-                    <span className="text-sm font-medium">Biblical Fasting</span>
-                  </CardContent>
-                </Card>
-              </Link>
             </div>
           </div>
 
@@ -649,27 +590,11 @@ const MyProgress = () => {
           <div className="md:hidden mb-6">
             <h2 className="font-heading text-base font-semibold mb-3">More Tools</h2>
             <div className="grid grid-cols-3 gap-2">
-              <Link to="/hormonal" className="group">
-                <Card className="hover:border-primary/30 transition-all">
-                  <CardContent className="p-3 flex flex-col items-center text-center gap-1">
-                    <Activity className="h-5 w-5 text-primary" />
-                    <span className="text-xs">Hormonal</span>
-                  </CardContent>
-                </Card>
-              </Link>
               <Link to="/sleep-adaptive" className="group">
                 <Card className="hover:border-primary/30 transition-all">
                   <CardContent className="p-3 flex flex-col items-center text-center gap-1">
                     <Moon className="h-5 w-5 text-primary" />
                     <span className="text-xs">Sleep</span>
-                  </CardContent>
-                </Card>
-              </Link>
-              <Link to="/joint-health" className="group">
-                <Card className="hover:border-primary/30 transition-all">
-                  <CardContent className="p-3 flex flex-col items-center text-center gap-1">
-                    <Shield className="h-5 w-5 text-primary" />
-                    <span className="text-xs">Joint Health</span>
                   </CardContent>
                 </Card>
               </Link>
@@ -686,14 +611,6 @@ const MyProgress = () => {
                   <CardContent className="p-3 flex flex-col items-center text-center gap-1">
                     <Briefcase className="h-5 w-5 text-primary" />
                     <span className="text-xs">Executive</span>
-                  </CardContent>
-                </Card>
-              </Link>
-              <Link to="/fasting" className="group">
-                <Card className="hover:border-primary/30 transition-all">
-                  <CardContent className="p-3 flex flex-col items-center text-center gap-1">
-                    <Clock className="h-5 w-5 text-primary" />
-                    <span className="text-xs">Fasting</span>
                   </CardContent>
                 </Card>
               </Link>
