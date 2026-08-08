@@ -599,7 +599,7 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
             <div className="overflow-x-auto -mx-1 px-1 pb-2">
               <TabsList className={cn(
                 "inline-flex w-auto min-w-full md:grid md:w-full mb-4 md:mb-6 gap-1",
-                aiPlan ? "md:grid-cols-5" : "md:grid-cols-4"
+                aiPlan ? "md:grid-cols-4" : "md:grid-cols-3"
               )}>
                 <TabsTrigger value="overview" className="text-xs md:text-sm px-3 md:px-4">Overview</TabsTrigger>
                 {aiPlan && (
@@ -609,7 +609,6 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
                   </TabsTrigger>
                 )}
                 <TabsTrigger value="workouts" className="text-xs md:text-sm px-3 md:px-4">Workouts</TabsTrigger>
-                <TabsTrigger value="nutrition" className="text-xs md:text-sm px-3 md:px-4">Nutrition</TabsTrigger>
                 <TabsTrigger value="schedule" className="text-xs md:text-sm px-3 md:px-4">Schedule</TabsTrigger>
               </TabsList>
             </div>
@@ -633,34 +632,12 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
                 </div>
                 <div className="p-3 md:p-4 bg-background rounded-lg border">
                   <div className="flex items-center gap-2 mb-1.5 md:mb-2">
-                    <Utensils className="h-4 w-4 text-primary flex-shrink-0" />
-                    <span className="text-xs md:text-sm font-medium">Nutrition Tip</span>
-                  </div>
-                  <p className="text-xs md:text-sm text-muted-foreground line-clamp-3">{recommendations.nutritionTip}</p>
-                </div>
-                <div className="p-3 md:p-4 bg-background rounded-lg border">
-                  <div className="flex items-center gap-2 mb-1.5 md:mb-2">
                     <Battery className="h-4 w-4 text-primary flex-shrink-0" />
                     <span className="text-xs md:text-sm font-medium">Recovery</span>
                   </div>
                   <p className="text-xs md:text-sm text-muted-foreground line-clamp-3">{recommendations.recoveryPriority}</p>
                 </div>
               </div>
-
-              {/* Supplement Suggestions */}
-              {recommendations.supplementSuggestions.length > 0 && (
-                <div className="p-4 bg-background rounded-lg border">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Pill className="h-4 w-4 text-primary" />
-                    <span className="text-sm font-medium">Recommended Supplements</span>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {recommendations.supplementSuggestions.map((supp, idx) => (
-                      <Badge key={idx} variant="secondary">{supp}</Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
 
               <div className="flex flex-wrap gap-3 pt-2">
                 <Button variant="outline" asChild>
