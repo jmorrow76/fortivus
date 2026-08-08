@@ -595,47 +595,6 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
         </CardHeader>
 
         <CardContent>
-          {/* Active Fasting Alert */}
-          {activeFast && (() => {
-            const workoutRec = getWorkoutRecommendation();
-            const nutritionRec = getNutritionGuidance();
-            return (
-              <Alert className="mb-6 border-orange-500/50 bg-orange-500/10">
-                <Flame className="h-4 w-4 text-orange-500" />
-                <AlertTitle className="text-orange-600 flex items-center gap-2">
-                  Active Fast - Recommendations Adjusted
-                </AlertTitle>
-                <AlertDescription className="mt-2 space-y-2">
-                  <p className="text-sm text-muted-foreground">
-                    You're currently on a <strong>{FASTING_TYPES.find(t => t.id === activeFast.fasting_type)?.name || activeFast.fasting_type}</strong> fast. 
-                    Your workout and nutrition recommendations are automatically adjusted.
-                  </p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
-                    <div className="p-3 bg-background/50 rounded-lg">
-                      <div className="flex items-center gap-2 mb-1">
-                        <Dumbbell className="h-4 w-4 text-orange-500" />
-                        <span className="text-sm font-medium">Workout Guidance</span>
-                      </div>
-                      <p className="text-xs text-muted-foreground">{workoutRec.message}</p>
-                    </div>
-                    <div className="p-3 bg-background/50 rounded-lg">
-                      <div className="flex items-center gap-2 mb-1">
-                        <Utensils className="h-4 w-4 text-orange-500" />
-                        <span className="text-sm font-medium">Nutrition Guidance</span>
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        {nutritionRec?.duringFast?.[0] || 'Stay hydrated and listen to your body'}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex gap-2 mt-2">
-                    <Button variant="outline" size="sm" asChild>
-                    </Button>
-                  </div>
-                </AlertDescription>
-              </Alert>
-            );
-          })()}
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <div className="overflow-x-auto -mx-1 px-1 pb-2">
               <TabsList className={cn(
@@ -758,44 +717,6 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
               ))}
             </TabsContent>
 
-            {/* Nutrition Tab */}
-            <TabsContent value="nutrition" className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {recommendations.suggestedMeals.map((meal, idx) => (
-                  <Card key={idx} className="bg-background">
-                    <CardHeader className="pb-2">
-                      <div className="flex items-center justify-between">
-                        <Badge variant="outline">{meal.meal}</Badge>
-                        <span className="text-sm font-medium text-primary">
-                          {meal.macros.calories} cal
-                        </span>
-                      </div>
-                      <CardTitle className="text-base mt-2">{meal.name}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground mb-3">{meal.description}</p>
-                      <div className="flex gap-3 text-xs">
-                        <div className="flex items-center gap-1">
-                          <div className="h-2 w-2 rounded-full bg-blue-500" />
-                          <span>P: {meal.macros.protein}g</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <div className="h-2 w-2 rounded-full bg-amber-500" />
-                          <span>C: {meal.macros.carbs}g</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <div className="h-2 w-2 rounded-full bg-green-500" />
-                          <span>F: {meal.macros.fat}g</span>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-              <Button variant="outline" asChild className="w-full">
-              </Button>
-            </TabsContent>
-
             {/* Schedule Tab */}
             <TabsContent value="schedule" className="space-y-4">
               <div className="grid grid-cols-1 gap-2">
@@ -886,59 +807,6 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
                     </ul>
                   </div>
                 )}
-
-                {/* Diet Section */}
-                <div className="border rounded-lg overflow-hidden">
-                  <button
-                    onClick={() => toggleSection('diet')}
-                    className="w-full p-4 flex items-center justify-between bg-muted/50 hover:bg-muted/70 transition-colors"
-                  >
-                    <span className="font-semibold flex items-center gap-2">
-                      <Utensils className="h-4 w-4" />
-                      Diet Plan
-                    </span>
-                    {expandedSections.diet ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                  </button>
-                  {expandedSections.diet && (
-                    <div className="p-4 space-y-4">
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        <div className="p-3 bg-muted/50 rounded-lg text-center">
-                          <p className="text-2xl font-bold text-primary">{aiPlan.diet.dailyCalories}</p>
-                          <p className="text-xs text-muted-foreground">Daily Calories</p>
-                        </div>
-                        <div className="p-3 bg-muted/50 rounded-lg text-center">
-                          <p className="text-2xl font-bold text-blue-500">{aiPlan.diet.macros.protein}g</p>
-                          <p className="text-xs text-muted-foreground">Protein</p>
-                        </div>
-                        <div className="p-3 bg-muted/50 rounded-lg text-center">
-                          <p className="text-2xl font-bold text-amber-500">{aiPlan.diet.macros.carbs}g</p>
-                          <p className="text-xs text-muted-foreground">Carbs</p>
-                        </div>
-                        <div className="p-3 bg-muted/50 rounded-lg text-center">
-                          <p className="text-2xl font-bold text-green-500">{aiPlan.diet.macros.fats}g</p>
-                          <p className="text-xs text-muted-foreground">Fats</p>
-                        </div>
-                      </div>
-                      {aiPlan.diet.mealPlan && (
-                        <div className="space-y-2">
-                          {aiPlan.diet.mealPlan.map((meal, idx) => (
-                            <div key={idx} className="p-3 bg-background rounded-lg border">
-                              <div className="flex justify-between items-center mb-2">
-                                <Badge variant="secondary">{meal.meal}</Badge>
-                                <span className="text-sm text-primary font-medium">{meal.calories} cal</span>
-                              </div>
-                              <ul className="text-sm text-muted-foreground space-y-1">
-                                {meal.foods.map((food, fIdx) => (
-                                  <li key={fIdx}>• {food}</li>
-                                ))}
-                              </ul>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
 
                 {/* Workout Section */}
                 <div className="border rounded-lg overflow-hidden">
@@ -1041,40 +909,7 @@ const PersonalizedRecommendations = ({ recommendations, onboardingData }: Person
                   )}
                 </div>
 
-                {/* Supplements Section */}
-                {aiPlan.supplements && aiPlan.supplements.length > 0 && (
-                  <div className="border rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => toggleSection('supplements')}
-                      className="w-full p-4 flex items-center justify-between bg-muted/50 hover:bg-muted/70 transition-colors"
-                    >
-                      <span className="font-semibold flex items-center gap-2">
-                        <Pill className="h-4 w-4" />
-                        Supplement Protocol
-                      </span>
-                      {expandedSections.supplements ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                    </button>
-                    {expandedSections.supplements && (
-                      <div className="p-4 space-y-2">
-                        {aiPlan.supplements.map((supp, idx) => (
-                          <div key={idx} className="p-3 bg-background rounded-lg border">
-                            <div className="flex justify-between items-start">
-                              <div>
-                                <p className="font-medium">{supp.name}</p>
-                                <p className="text-xs text-muted-foreground">{supp.benefit}</p>
-                              </div>
-                              <div className="text-right text-sm">
-                                <p className="text-primary font-medium">{supp.dosage}</p>
-                                <p className="text-xs text-muted-foreground">{supp.timing}</p>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-
+                
                 {/* Actions */}
                 <div className="flex flex-wrap gap-3">
                   <Button onClick={handleSavePlan} disabled={isSaving}>
