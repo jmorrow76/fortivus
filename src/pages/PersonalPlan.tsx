@@ -1255,7 +1255,7 @@ const PersonalPlan = () => {
               Save Full Week as Templates
             </DialogTitle>
             <DialogDescription>
-              This will create separate workout templates for each training day in your plan. You can then use these templates to start workouts in the Workout Tracker.
+              This will create separate workout templates for each training day in your plan.
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
