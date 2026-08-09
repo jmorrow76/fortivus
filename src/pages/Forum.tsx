@@ -42,6 +42,11 @@ import {
   HeartHandshake,
   HandHeart,
   Sparkles,
+  ShieldCheck,
+  BookOpen,
+  Baby,
+  Briefcase,
+  Activity,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
