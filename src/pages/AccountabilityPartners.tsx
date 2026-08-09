@@ -68,6 +68,7 @@ const AccountabilityPartners = () => {
   } = useAccountabilityPartner();
 
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [activeTab, setActiveTab] = useState("partners");
   const [showCheckinDialog, setShowCheckinDialog] = useState<string | null>(null);
   const [checkinData, setCheckinData] = useState({
     prayed_for_partner: false,
@@ -188,7 +189,7 @@ const AccountabilityPartners = () => {
             </Card>
           )}
 
-          <Tabs defaultValue="partners" className="space-y-6">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 h-auto gap-1 p-1">
               <TabsTrigger value="partners" className="text-xs md:text-sm py-2">Partners</TabsTrigger>
               <TabsTrigger value="find" className="text-xs md:text-sm py-2">Find</TabsTrigger>
@@ -206,7 +207,7 @@ const AccountabilityPartners = () => {
                     <p className="text-muted-foreground mb-4">
                       Find a brother to walk alongside you in faith and fitness
                     </p>
-                    <Button onClick={() => document.querySelector('[value="find"]')?.dispatchEvent(new Event('click', { bubbles: true }))}>
+                    <Button onClick={() => setActiveTab("find")}>
                       Find a Partner
                     </Button>
                   </CardContent>
