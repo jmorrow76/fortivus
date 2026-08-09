@@ -68,6 +68,7 @@ const AccountabilityPartners = () => {
   } = useAccountabilityPartner();
 
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [activeTab, setActiveTab] = useState("partners");
   const [showCheckinDialog, setShowCheckinDialog] = useState<string | null>(null);
   const [checkinData, setCheckinData] = useState({
     prayed_for_partner: false,
