@@ -42,6 +42,11 @@ import {
   HeartHandshake,
   HandHeart,
   Sparkles,
+  ShieldCheck,
+  BookOpen,
+  Baby,
+  Briefcase,
+  Activity,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
@@ -86,6 +91,11 @@ const iconMap: Record<string, React.ElementType> = {
   Trophy,
   HeartHandshake,
   HandHeart,
+  ShieldCheck,
+  BookOpen,
+  Baby,
+  Briefcase,
+  Activity,
 };
 
 const Forum = () => {
