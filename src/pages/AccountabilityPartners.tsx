@@ -207,7 +207,7 @@ const AccountabilityPartners = () => {
                     <p className="text-muted-foreground mb-4">
                       Find a brother to walk alongside you in faith and fitness
                     </p>
-                    <Button onClick={() => document.querySelector('[value="find"]')?.dispatchEvent(new Event('click', { bubbles: true }))}>
+                    <Button onClick={() => setActiveTab("find")}>
                       Find a Partner
                     </Button>
                   </CardContent>
