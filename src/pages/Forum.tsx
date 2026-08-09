@@ -91,6 +91,11 @@ const iconMap: Record<string, React.ElementType> = {
   Trophy,
   HeartHandshake,
   HandHeart,
+  ShieldCheck,
+  BookOpen,
+  Baby,
+  Briefcase,
+  Activity,
 };
 
 const Forum = () => {
