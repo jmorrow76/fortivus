@@ -22,20 +22,6 @@
   ],
   "shortcuts": [
     {
-      "name": "Start Run",
-      "short_name": "Run",
-      "description": "Start tracking a new run",
-      "url": "/running?action=start",
-      "icons": [{ "src": "/app-icon.png", "sizes": "96x96" }]
-    },
-    {
-      "name": "Start Workout",
-      "short_name": "Workout",
-      "description": "Start a new workout session",
-      "url": "/workouts?action=start",
-      "icons": [{ "src": "/app-icon.png", "sizes": "96x96" }]
-    },
-    {
       "name": "Daily Check-in",
       "short_name": "Check-in",
       "description": "Complete your daily mood check-in",

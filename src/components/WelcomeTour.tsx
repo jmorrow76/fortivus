@@ -50,11 +50,10 @@ const dashboardSteps: TourStep[] = [
   },
   {
     title: "Training & Progress",
-    description: "Access your workouts, running stats, and track your fitness journey.",
+    description: "Track your fitness journey and see your progress over time.",
     icon: <Dumbbell className="h-8 w-8 text-primary" />,
     features: [
-      { icon: <Dumbbell className="h-5 w-5 text-primary" />, title: "Workout Tracker", description: "Log exercises, sets, and personal records" },
-      { icon: <TrendingUp className="h-5 w-5 text-green-500" />, title: "Running Stats", description: "Track your runs with GPS and see progress" },
+      { icon: <TrendingUp className="h-5 w-5 text-green-500" />, title: "Progress Insights", description: "See your trends and milestones over time" },
       { icon: <Sparkles className="h-5 w-5 text-accent" />, title: "Quick Access", description: "Jump to Fitness Journey for AI-powered features" },
     ],
   },
