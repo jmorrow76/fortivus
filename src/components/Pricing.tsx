@@ -506,15 +506,10 @@ const Pricing = () => {
                   { feature: "Quick Start Guide", free: true, elite: true, lifetime: true },
                   { feature: "AI Personal Plan", free: false, elite: true, lifetime: true },
                   { feature: "AI workout recommendations", free: false, elite: true, lifetime: true },
-                  { feature: "Advanced workout tracker", free: false, elite: true, lifetime: true },
-                  { feature: "Running GPS tracker", free: false, elite: true, lifetime: true },
                   { feature: "Wearable integration", free: false, elite: true, lifetime: true },
                   { feature: "Unlimited AI Body Analysis", free: false, elite: true, lifetime: true },
                   { feature: "Progress photo tracking", free: false, elite: true, lifetime: true },
                   { feature: "1-on-1 AI Coaching", free: false, elite: true, lifetime: true },
-                  { feature: "Sleep-adaptive auto-programming", free: false, elite: true, lifetime: true },
-                  { feature: "Comeback protocol system", free: false, elite: true, lifetime: true },
-                  { feature: "Executive performance mode", free: false, elite: true, lifetime: true },
                   { feature: "Priority support", free: false, elite: true, lifetime: true },
                 ].map((row) => (
                   <TableRow key={row.feature}>
