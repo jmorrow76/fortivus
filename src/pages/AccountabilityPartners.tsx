@@ -189,7 +189,7 @@ const AccountabilityPartners = () => {
             </Card>
           )}
 
-          <Tabs defaultValue="partners" className="space-y-6">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 h-auto gap-1 p-1">
               <TabsTrigger value="partners" className="text-xs md:text-sm py-2">Partners</TabsTrigger>
               <TabsTrigger value="find" className="text-xs md:text-sm py-2">Find</TabsTrigger>
