@@ -40,73 +40,77 @@ html {
 
 @layer base {
   :root {
-    --background: 40 20% 98%;
-    --foreground: 220 45% 15%;
+    /* Brotherhood palette: parchment, deep pine, brass */
+    --background: 42 30% 97%;
+    --foreground: 165 30% 11%;
 
-    --card: 40 20% 98%;
-    --card-foreground: 220 45% 15%;
+    --card: 42 34% 99%;
+    --card-foreground: 165 30% 11%;
 
-    --popover: 40 20% 98%;
-    --popover-foreground: 220 45% 15%;
+    --popover: 42 34% 99%;
+    --popover-foreground: 165 30% 11%;
 
-    --primary: 220 45% 20%;
-    --primary-foreground: 40 20% 98%;
+    --primary: 165 32% 14%;
+    --primary-foreground: 42 40% 97%;
 
-    --secondary: 40 15% 94%;
-    --secondary-foreground: 220 45% 15%;
+    --secondary: 40 22% 93%;
+    --secondary-foreground: 165 30% 13%;
 
-    --muted: 40 15% 94%;
-    --muted-foreground: 220 20% 45%;
+    --muted: 40 20% 93%;
+    --muted-foreground: 165 10% 38%;
 
-    --accent: 345 55% 35%;
-    --accent-foreground: 40 20% 98%;
+    --accent: 36 58% 42%;
+    --accent-foreground: 42 40% 97%;
 
-    --destructive: 0 65% 50%;
+    --destructive: 0 65% 45%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 20% 88%;
-    --input: 220 20% 88%;
-    --ring: 220 45% 20%;
+    --border: 40 18% 86%;
+    --input: 40 18% 86%;
+    --ring: 36 58% 42%;
 
     --radius: 0.25rem;
 
-    --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.04);
-    --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.05);
-    --shadow-elevated: 0 8px 24px rgba(0, 0, 0, 0.08);
+    --gradient-brotherhood: linear-gradient(135deg, hsl(165 32% 14%), hsl(165 28% 22%));
+    --gradient-brass: linear-gradient(135deg, hsl(36 58% 42%), hsl(42 70% 58%));
+
+    --shadow-subtle: 0 1px 3px hsl(165 30% 11% / 0.05);
+    --shadow-card: 0 4px 14px hsl(165 30% 11% / 0.07);
+    --shadow-elevated: 0 12px 32px hsl(165 30% 11% / 0.12);
 
     --font-heading: 'Cormorant Garamond', serif;
     --font-body: 'Source Sans 3', sans-serif;
 
-    --sidebar-background: 40 20% 98%;
-    --sidebar-foreground: 220 45% 15%;
-    --sidebar-primary: 220 45% 20%;
-    --sidebar-primary-foreground: 40 20% 98%;
-    --sidebar-accent: 40 15% 94%;
-    --sidebar-accent-foreground: 220 45% 15%;
-    --sidebar-border: 220 20% 88%;
-    --sidebar-ring: 220 45% 20%;
+    --sidebar-background: 42 30% 97%;
+    --sidebar-foreground: 165 30% 11%;
+    --sidebar-primary: 165 32% 14%;
+    --sidebar-primary-foreground: 42 40% 97%;
+    --sidebar-accent: 40 22% 93%;
+    --sidebar-accent-foreground: 165 30% 13%;
+    --sidebar-border: 40 18% 86%;
+    --sidebar-ring: 36 58% 42%;
   }
 
   .dark {
-    --background: 220 45% 8%;
-    --foreground: 40 20% 95%;
-    --card: 220 40% 12%;
-    --card-foreground: 40 20% 95%;
-    --popover: 220 40% 12%;
-    --popover-foreground: 40 20% 95%;
-    --primary: 40 20% 95%;
-    --primary-foreground: 220 45% 8%;
-    --secondary: 220 35% 18%;
-    --secondary-foreground: 40 20% 95%;
-    --muted: 220 30% 20%;
-    --muted-foreground: 220 15% 60%;
-    --accent: 345 55% 45%;
-    --accent-foreground: 40 20% 98%;
-    --destructive: 0 62.8% 30.6%;
+    --background: 165 32% 7%;
+    --foreground: 42 30% 95%;
+    --card: 165 28% 11%;
+    --card-foreground: 42 30% 95%;
+    --popover: 165 28% 11%;
+    --popover-foreground: 42 30% 95%;
+    --primary: 42 30% 95%;
+    --primary-foreground: 165 32% 7%;
+    --secondary: 165 22% 16%;
+    --secondary-foreground: 42 30% 95%;
+    --muted: 165 20% 18%;
+    --muted-foreground: 42 12% 65%;
+    --accent: 40 65% 55%;
+    --accent-foreground: 165 32% 7%;
+    --destructive: 0 62.8% 40%;
     --destructive-foreground: 0 0% 100%;
-    --border: 220 30% 22%;
-    --input: 220 30% 22%;
-    --ring: 40 20% 95%;
+    --border: 165 18% 20%;
+    --input: 165 18% 20%;
+    --ring: 40 65% 55%;
   }
 }
 
