@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
+import Pillars from "@/components/Pillars";
 import StatsCounter from "@/components/StatsCounter";
 import AIAnalysis from "@/components/AIAnalysis";
 import FeaturesShowcase from "@/components/FeaturesShowcase";
@@ -15,8 +16,10 @@ const Index = () => {
       <Navbar />
       <main>
         <Hero />
+        <Pillars />
         <StatsCounter />
         <AIAnalysis />
+
         <FeaturesShowcase />
         <Pricing />
         <TestimonySpotlight />
