@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import heroImage from "@/assets/hero-fitness.jpg";
+import heroImage from "@/assets/hero-brotherhood.jpg";
 
 const Hero = () => {
   return (
@@ -9,10 +9,13 @@ const Hero = () => {
       <div className="absolute inset-0">
         <img
           src={heroImage}
-          alt="Christian men training and encouraging one another"
+          alt="Christian men encouraging one another in a dawn-lit gym"
+          width={1920}
+          height={1280}
           className="w-full h-full object-cover object-center"
         />
-        <div className="absolute inset-0 bg-primary/70" />
+        <div className="absolute inset-0 bg-primary/30" />
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/55 via-primary/15 to-primary/70" />
       </div>
 
       {/* Content */}
