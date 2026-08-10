@@ -14,8 +14,8 @@ const Hero = () => {
           height={1280}
           className="w-full h-full object-cover object-center"
         />
-        <div className="absolute inset-0 bg-primary/55" />
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/70 via-primary/30 to-primary/85" />
+        <div className="absolute inset-0 bg-primary/30" />
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/55 via-primary/15 to-primary/70" />
       </div>
 
       {/* Content */}
