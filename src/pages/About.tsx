@@ -15,13 +15,14 @@ const About = () => {
             <div className="max-w-3xl mx-auto text-center">
               <span className="section-label">Our Mission</span>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-6">
-                Steward Your Body for <span className="text-accent">God's Glory</span>
+                Brothers in <span className="text-accent">Iron &amp; Spirit</span>
               </h1>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                Fortivus exists to help Christian men over 40 honor God by treating their bodies 
-                as temples of the Holy Spirit—through science-backed training, biblical wisdom, 
-                and a brotherhood of accountability.
+                Fortivus is a Christian brotherhood and lifestyle platform for men over 40—built to
+                strengthen faith, marriage, fatherhood, calling, and body. Not just a gym app: a
+                place where men sharpen one another for the whole of life.
               </p>
+
             </div>
           </div>
         </section>

@@ -62,29 +62,30 @@ const eliteFeatures = [
 const freeFeatures = [
   {
     icon: Users,
-    title: "Community Forum",
-    description: "Connect with thousands of men on the same journey. Ask questions, share wins, and stay motivated.",
+    title: "Brotherhood Forum",
+    description: "Faith, marriage, fatherhood, work, recovery, and health—real conversations with men who get it.",
     link: "/forum",
+  },
+  {
+    icon: Shield,
+    title: "Accountability Partners",
+    description: "Get paired with a brother who checks in, prays with you, and keeps you walking the line.",
+    link: "/accountability-partners",
   },
   {
     icon: Trophy,
     title: "Gamification & Badges",
-    description: "Earn XP, unlock badges, and climb the leaderboard. Make fitness fun with friendly competition.",
-    link: "/gamification",
-  },
-  {
-    icon: Target,
-    title: "Weekly Challenges",
-    description: "Join community challenges to push your limits and earn bonus rewards for completing goals.",
+    description: "Earn XP, unlock badges, and climb the leaderboard. Make consistency a shared pursuit.",
     link: "/gamification",
   },
   {
     icon: Calendar,
     title: "Knowledge Hub",
-    description: "Access expert articles on training, recovery, and mindset tailored for men over 40.",
+    description: "Expert articles on faith, leadership, discipline, training, and mindset for men over 40.",
     link: "/knowledge-hub",
   },
 ];
+
 
 const FeaturesShowcase = () => {
   return (
@@ -94,12 +95,14 @@ const FeaturesShowcase = () => {
         <div className="section-header">
           <span className="section-label">Platform Features</span>
           <h2 className="section-title">
-            Everything You Need to <span className="text-accent">Steward Well</span>
+            Tools for the <span className="text-accent">Whole Man</span>
           </h2>
           <p className="section-description">
-            Fortivus combines AI-powered personalization with proven training principles—all grounded in the calling to honor God with your body.
+            Faith, brotherhood, family, calling, and strength—Fortivus brings every pillar of a
+            Christian man's life into one place.
           </p>
         </div>
+
 
         {/* Elite Features */}
         <div className="mb-12">

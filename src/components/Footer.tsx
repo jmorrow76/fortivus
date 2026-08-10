@@ -39,12 +39,13 @@ const Footer = () => {
               </span>
             </Link>
             <p className="text-background/60 text-sm mb-4 max-w-xs leading-relaxed">
-              Faith-driven fitness for Christian men over 40. Steward your body as a temple,
-              optimize your health, and serve God with strength.
+              A Christian brotherhood and lifestyle platform for men 40+. Grow in faith, lead your
+              family, honor your calling, and steward your strength—together.
             </p>
             <p className="text-background/40 text-xs italic mb-8 max-w-xs">
-              "Do you not know that your bodies are temples of the Holy Spirit?" — 1 Cor 6:19
+              "As iron sharpens iron, so one man sharpens another." — Proverbs 27:17
             </p>
+
             <div className="flex gap-4">
               {socialLinks.map((social) => (
                 <a
