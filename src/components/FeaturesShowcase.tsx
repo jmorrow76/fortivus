@@ -39,12 +39,6 @@ const eliteFeatures = [
     link: "/personal-plan",
   },
   {
-    icon: Heart,
-    title: "Wearable Integration",
-    description: "Sync Apple Health or Google Fit to import steps, heart rate, and sleep data for holistic health tracking.",
-    link: "/profile",
-  },
-  {
     icon: BarChart3,
     title: "AI Progress Analysis",
     description: "Build a visual timeline of your transformation. AI compares your photos to quantify muscle gains, fat loss, and overall progress.",
