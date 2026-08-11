@@ -9,7 +9,7 @@ const Hero = () => {
       <div className="absolute inset-0">
         <img
           src={heroImage}
-          alt="Christian men encouraging one another in a dawn-lit gym"
+          alt="Christian men standing together at dawn on a misty pine ridge"
           width={1920}
           height={1280}
           className="w-full h-full object-cover object-center"
