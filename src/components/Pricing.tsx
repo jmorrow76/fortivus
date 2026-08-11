@@ -200,7 +200,6 @@ const Pricing = () => {
       features: [
         "Everything in Free",
         "AI workout recommendations",
-        "Wearable sync (Apple Health / Google Fit)",
         "Unlimited AI Body Analysis",
         "Progress photo tracking",
         "AI transformation photo comparison",
@@ -506,7 +505,6 @@ const Pricing = () => {
                   { feature: "Quick Start Guide", free: true, elite: true, lifetime: true },
                   { feature: "AI Personal Plan", free: false, elite: true, lifetime: true },
                   { feature: "AI workout recommendations", free: false, elite: true, lifetime: true },
-                  { feature: "Wearable integration", free: false, elite: true, lifetime: true },
                   { feature: "Unlimited AI Body Analysis", free: false, elite: true, lifetime: true },
                   { feature: "Progress photo tracking", free: false, elite: true, lifetime: true },
                   { feature: "1-on-1 AI Coaching", free: false, elite: true, lifetime: true },
