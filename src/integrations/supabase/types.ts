@@ -1516,6 +1516,118 @@ export type Database = {
           },
         ]
       }
+      pod_checkins: {
+        Row: {
+          checkin_date: string
+          created_at: string
+          id: string
+          kept_commitment: boolean
+          note: string | null
+          pod_id: string
+          prayer_request: string | null
+          user_id: string
+        }
+        Insert: {
+          checkin_date?: string
+          created_at?: string
+          id?: string
+          kept_commitment?: boolean
+          note?: string | null
+          pod_id: string
+          prayer_request?: string | null
+          user_id: string
+        }
+        Update: {
+          checkin_date?: string
+          created_at?: string
+          id?: string
+          kept_commitment?: boolean
+          note?: string | null
+          pod_id?: string
+          prayer_request?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pod_checkins_pod_id_fkey"
+            columns: ["pod_id"]
+            isOneToOne: false
+            referencedRelation: "pods"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pod_members: {
+        Row: {
+          id: string
+          joined_at: string
+          pod_id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          joined_at?: string
+          pod_id: string
+          role?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          joined_at?: string
+          pod_id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pod_members_pod_id_fkey"
+            columns: ["pod_id"]
+            isOneToOne: false
+            referencedRelation: "pods"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pods: {
+        Row: {
+          commitment: string
+          created_at: string
+          created_by: string
+          focus: string | null
+          id: string
+          is_active: boolean
+          max_members: number
+          meeting_rhythm: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          commitment: string
+          created_at?: string
+          created_by: string
+          focus?: string | null
+          id?: string
+          is_active?: boolean
+          max_members?: number
+          meeting_rhythm?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          commitment?: string
+          created_at?: string
+          created_by?: string
+          focus?: string | null
+          id?: string
+          is_active?: boolean
+          max_members?: number
+          meeting_rhythm?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       prayer_journal_entries: {
         Row: {
           answered_at: string | null
@@ -2380,6 +2492,11 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_pod_member: {
+        Args: { _pod_id: string; _user_id: string }
+        Returns: boolean
+      }
+      pod_member_count: { Args: { _pod_id: string }; Returns: number }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"

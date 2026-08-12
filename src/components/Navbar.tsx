@@ -45,6 +45,7 @@ const Navbar = () => {
     { name: "Forum", href: "/forum" },
     { name: "Testimonies", href: "/testimonies" },
     { name: "Accountability", href: "/accountability" },
+    { name: "Pods", href: "/pods" },
   ];
 
   const mobileNavLinks = [
