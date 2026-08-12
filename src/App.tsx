@@ -92,6 +92,7 @@ const App = () => (
             <Route path="/unsubscribe" element={<Unsubscribe />} />
             <Route path="/messages" element={<Messages />} />
             <Route path="/accountability" element={<AccountabilityPartners />} />
+            <Route path="/pods" element={<Pods />} />
             <Route path="/testimonies" element={<Testimonies />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />
