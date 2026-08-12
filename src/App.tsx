@@ -37,6 +37,7 @@ import ExecutiveMode from "./pages/ExecutiveMode";
 import Messages from "./pages/Messages";
 import Onboarding from "./pages/Onboarding";
 import AccountabilityPartners from "./pages/AccountabilityPartners";
+import Pods from "./pages/Pods";
 import Testimonies from "./pages/Testimonies";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
